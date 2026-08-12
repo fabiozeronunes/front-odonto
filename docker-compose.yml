@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: odonto-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: odonto
+      POSTGRES_PASSWORD: odonto_dev_password
+      POSTGRES_DB: odonto_study
+    ports:
+      - "5432:5432"
+    volumes:
+      - odonto_pgdata:/var/lib/postgresql/data
+
+volumes:
+  odonto_pgdata:

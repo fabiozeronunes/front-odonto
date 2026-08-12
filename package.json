@@ -1,0 +1,28 @@
+{
+  "name": "odontologia-study",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "allowScripts": {
+    "0": "@prisma/client",
+    "1": "prisma",
+    "2": "@prisma/engines",
+    "3": "esbuild",
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "esbuild@0.28.2": true,
+    "prisma@6.19.3": true,
+    "esbuild@0.25.12": true
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@odonto/api & npm run dev --workspace=@odonto/web",
+    "build": "npm run build --workspace=@odonto/api && npm run build --workspace=@odonto/web",
+    "lint": "npm run lint --workspace=@odonto/api && npm run lint --workspace=@odonto/web",
+    "typecheck": "npm run typecheck --workspace=@odonto/api && npm run typecheck --workspace=@odonto/web",
+    "test": "npm run test --workspace=@odonto/api",
+    "db:migrate": "npm run db:migrate --workspace=@odonto/api",
+    "db:seed": "npm run db:seed --workspace=@odonto/api"
+  }
+}

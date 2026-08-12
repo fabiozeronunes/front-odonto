@@ -1,0 +1,395 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum BillingPeriod {
+  MONTHLY
+  YEARLY
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  CANCELED
+  EXPIRED
+}
+
+enum VideoType {
+  EMBED
+  EXTERNAL
+  UPLOAD
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Difficulty {
+  BASICO
+  INTERMEDIARIO
+  AVANCADO
+}
+
+enum AccessLevel {
+  PUBLIC
+  MEMBER
+  PREMIUM
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         Role           @default(USER)
+  isActive     Boolean        @default(true)
+  plan         MembershipPlan @relation(fields: [planId], references: [id])
+  planId       String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  videos        Video[]
+  caseStudies   CaseStudy[]
+  watchHistory  WatchHistory[]
+  favorites     Favorite[]
+  subscriptions Subscription[]
+  orders        Order[]
+  specialties   Specialty[]
+  tags          Tag[]
+
+  @@index([email])
+}
+
+model MembershipPlan {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  slug        String        @unique
+  description String?
+  price       Decimal       @default(0)
+  billing     BillingPeriod @default(MONTHLY)
+  benefits    Json?
+  status      PlanStatus    @default(ACTIVE)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  users         User[]
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  plan      MembershipPlan     @relation(fields: [planId], references: [id])
+  planId    String
+  status    SubscriptionStatus @default(PENDING)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@unique([userId, planId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Specialty {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  videos      Video[]
+  caseStudies CaseStudy[]
+
+  @@index([createdById])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  videos      VideoTag[]
+  caseStudies CaseStudyTag[]
+  products    ProductTag[]
+  media       MediaTag[]
+
+  @@index([createdById])
+}
+
+model Video {
+  id              String         @id @default(cuid())
+  title           String
+  slug            String         @unique
+  description     String?
+  thumbnailUrl    String?
+  videoType       VideoType      @default(EMBED)
+  videoUrl        String
+  durationSeconds Int?
+  difficulty      Difficulty     @default(BASICO)
+  isFree          Boolean        @default(true)
+  author          String?
+  institution     String?
+  status          ContentStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  viewCount       Int            @default(0)
+  observations    String?
+  specialty       Specialty?     @relation(fields: [specialtyId], references: [id])
+  specialtyId     String?
+  createdBy       User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tags         VideoTag[]
+  caseStudies  VideoCaseStudy[]
+  watchHistory WatchHistory[]
+  favorites    Favorite[]
+  images       Media[]
+
+  @@index([specialtyId, status])
+  @@index([status, isFree])
+  @@index([createdById])
+  @@index([title])
+  @@index([publishedAt])
+}
+
+model VideoTag {
+  video   Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId String
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@id([videoId, tagId])
+  @@index([tagId])
+}
+
+model CaseStudy {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  description String?
+  diagnosis   String?
+  difficulty  Difficulty    @default(BASICO)
+  isFree      Boolean       @default(false)
+  status      ContentStatus @default(DRAFT)
+  author      String?
+  institution String?
+  observations String?
+  specialty   Specialty?    @relation(fields: [specialtyId], references: [id])
+  specialtyId String?
+  createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  tags          CaseStudyTag[]
+  videoCases    VideoCaseStudy[]
+  relatedCases  CaseStudyRelated[] @relation("related")
+  relatedFrom   CaseStudyRelated[] @relation("relatedFrom")
+  images        Media[]
+
+  @@index([specialtyId, status])
+  @@index([createdById])
+  @@index([title])
+}
+
+model CaseStudyTag {
+  caseStudy   CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId       String
+
+  @@id([caseStudyId, tagId])
+  @@index([tagId])
+}
+
+model VideoCaseStudy {
+  video       Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId     String
+  caseStudy   CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String
+
+  @@id([videoId, caseStudyId])
+  @@index([caseStudyId])
+}
+
+model CaseStudyRelated {
+  id          String    @id @default(cuid())
+  caseStudy   CaseStudy @relation("related", fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String
+  related     CaseStudy @relation("relatedFrom", fields: [relatedId], references: [id], onDelete: Cascade)
+  relatedId   String
+  createdAt   DateTime  @default(now())
+
+  @@index([caseStudyId])
+  @@unique([caseStudyId, relatedId])
+}
+
+model WatchHistory {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId   String
+  watchedAt DateTime @default(now())
+
+  @@unique([userId, videoId])
+  @@index([userId, watchedAt])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, videoId])
+  @@index([userId])
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  price       Decimal       @default(0)
+  promoPrice  Decimal?
+  sku         String?
+  stock       Int           @default(0)
+  status      ContentStatus @default(DRAFT)
+  isFeatured  Boolean       @default(false)
+  brand       String?
+  category    ProductCategory? @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  accessLevel AccessLevel   @default(PUBLIC)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  tags       ProductTag[]
+  images     Media[]
+  orderItems OrderItem[]
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model ProductCategory {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  products Product[]
+}
+
+model ProductTag {
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId     String
+
+  @@id([productId, tagId])
+  @@index([tagId])
+}
+
+model MediaTag {
+  media   Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  mediaId String
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@id([mediaId, tagId])
+  @@index([tagId])
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  url         String
+  alt         String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId   String?
+  video       Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId     String?
+  caseStudy   CaseStudy? @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String?
+  createdAt   DateTime @default(now())
+
+  tags MediaTag[]
+
+  @@index([productId])
+  @@index([videoId])
+  @@index([caseStudyId])
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  status    OrderStatus @default(PENDING)
+  subtotal  Decimal     @default(0)
+  discount  Decimal     @default(0)
+  total     Decimal     @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  items OrderItem[]
+
+  @@index([userId, createdAt])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productId String
+  quantity  Int     @default(1)
+  unitPrice Decimal @default(0)
+
+  @@index([orderId])
+}
