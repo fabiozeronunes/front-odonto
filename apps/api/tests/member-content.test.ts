@@ -10,8 +10,8 @@ async function login(email: string, password: string) {
 }
 
 describe("Conteúdo por membro", () => {
-  it("membro cria vídeo com observações e imagens e lista em /me", async () => {
-    const token = await login("test-free@odonto.study", "Senha@123");
+  it("membro com plano pago cria vídeo com observações e imagens e lista em /me", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const created = await request(app)
       .post("/api/videos")
       .set("Authorization", `Bearer ${token}`)
@@ -39,7 +39,7 @@ describe("Conteúdo por membro", () => {
   });
 
   it("bloqueia excluir caso de outro membro", async () => {
-    const token = await login("test-free@odonto.study", "Senha@123");
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const created = await request(app)
       .post("/api/case-studies")
       .set("Authorization", `Bearer ${token}`)
@@ -62,8 +62,8 @@ describe("Conteúdo por membro", () => {
     expect(res.status).toBe(401);
   });
 
-  it("membro pode criar tag p/ uso próprio e ela aparece no catálogo", async () => {
-    const token = await login("test-free@odonto.study", "Senha@123");
+  it("membro com plano pago pode criar tag p/ uso próprio e ela aparece no catálogo", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const res = await request(app)
       .post("/api/tags")
       .set("Authorization", `Bearer ${token}`)
@@ -73,5 +73,32 @@ describe("Conteúdo por membro", () => {
     const pub = await request(app).get("/api/tags");
     expect(pub.status).toBe(200);
     expect(pub.body.data.some((t: { id: string }) => t.id === res.body.data.id)).toBe(true);
+  });
+
+  it("bloqueia usuário gratuito de criar conteúdo", async () => {
+    const token = await login("test-free@odonto.study", "Senha@123");
+    const video = await request(app)
+      .post("/api/videos")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ title: `Vídeo do free ${Date.now()}` });
+    expect(video.status).toBe(403);
+
+    const caseStudy = await request(app)
+      .post("/api/case-studies")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ title: `Caso do free ${Date.now()}` });
+    expect(caseStudy.status).toBe(403);
+
+    const tag = await request(app)
+      .post("/api/tags")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ name: `Tag do free ${Date.now()}` });
+    expect(tag.status).toBe(403);
+
+    const specialty = await request(app)
+      .post("/api/specialties")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ name: `Especialidade do free ${Date.now()}` });
+    expect(specialty.status).toBe(403);
   });
 });

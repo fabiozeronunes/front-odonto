@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { requirePaidPlan } from "../../middlewares/requirePaidPlan.js";
 import { validate } from "../../middlewares/validate.js";
 import * as ctrl from "./specialties.controller.js";
 import { createSpecialtySchema, updateSpecialtySchema } from "./specialties.validators.js";
@@ -12,6 +13,6 @@ specialtiesRouter.get("/:slugOrId", ctrl.getOne);
 
 specialtiesRouter.use(authenticate);
 
-specialtiesRouter.post("/", validate(createSpecialtySchema), ctrl.create);
-specialtiesRouter.put("/:id", validate(updateSpecialtySchema), ctrl.update);
-specialtiesRouter.delete("/:id", ctrl.remove);
+specialtiesRouter.post("/", requirePaidPlan, validate(createSpecialtySchema), ctrl.create);
+specialtiesRouter.put("/:id", requirePaidPlan, validate(updateSpecialtySchema), ctrl.update);
+specialtiesRouter.delete("/:id", requirePaidPlan, ctrl.remove);

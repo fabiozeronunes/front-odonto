@@ -33,8 +33,8 @@ describe("Permissões administrativas", () => {
     expect(res.body.data.content).toBeDefined();
   });
 
-  it("permite que membro crie especialidade própria", async () => {
-    const token = await login("test-free@odonto.study", "Senha@123");
+  it("permite que membro com plano pago crie especialidade própria", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const res = await request(app)
       .post("/api/specialties")
       .set("Authorization", `Bearer ${token}`)
@@ -51,7 +51,7 @@ describe("Permissões administrativas", () => {
     expect(admin.status).toBe(201);
     const otherId = admin.body.data.id;
 
-    const token = await login("test-free@odonto.study", "Senha@123");
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const res = await request(app)
       .put(`/api/specialties/${otherId}`)
       .set("Authorization", `Bearer ${token}`)

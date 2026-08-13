@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { requirePaidPlan } from "../../middlewares/requirePaidPlan.js";
 import { validate } from "../../middlewares/validate.js";
 import * as ctrl from "./caseStudies.controller.js";
 import {
@@ -15,8 +16,8 @@ caseStudiesRouter.get("/:slugOrId", ctrl.getOne);
 
 caseStudiesRouter.use(authenticate);
 
-caseStudiesRouter.post("/", validate(createCaseStudySchema), ctrl.create);
-caseStudiesRouter.put("/:id", validate(updateCaseStudySchema), ctrl.update);
-caseStudiesRouter.delete("/:id", ctrl.remove);
-caseStudiesRouter.post("/:id/publish", ctrl.publish);
-caseStudiesRouter.post("/:id/unpublish", ctrl.unpublish);
+caseStudiesRouter.post("/", requirePaidPlan, validate(createCaseStudySchema), ctrl.create);
+caseStudiesRouter.put("/:id", requirePaidPlan, validate(updateCaseStudySchema), ctrl.update);
+caseStudiesRouter.delete("/:id", requirePaidPlan, ctrl.remove);
+caseStudiesRouter.post("/:id/publish", requirePaidPlan, ctrl.publish);
+caseStudiesRouter.post("/:id/unpublish", requirePaidPlan, ctrl.unpublish);

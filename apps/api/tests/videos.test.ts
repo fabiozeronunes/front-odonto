@@ -63,8 +63,8 @@ describe("Vídeos", () => {
     expect(res.body.data.slug).toBeDefined();
   });
 
-  it("permite que membro crie vídeo e ele apareça em 'meus vídeos'", async () => {
-    const token = await login("test-free@odonto.study", "Senha@123");
+  it("permite que membro com plano pago crie vídeo e ele apareça em 'meus vídeos'", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const res = await request(app)
       .post("/api/videos")
       .set("Authorization", `Bearer ${token}`)
@@ -92,7 +92,7 @@ describe("Vídeos", () => {
       .send({ title: `Vídeo admin ${Date.now()}`, videoUrl: "https://youtu.be/ADMIN-VID" });
     expect(created.status).toBe(201);
 
-    const token = await login("test-free@odonto.study", "Senha@123");
+    const token = await login("test-paid@odonto.study", "Senha@123");
     const res = await request(app)
       .delete(`/api/videos/${created.body.data.id}`)
       .set("Authorization", `Bearer ${token}`);

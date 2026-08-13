@@ -19,7 +19,7 @@ async function seedTestData() {
     update: {},
     create: { name: "Gratuito", slug: "gratuito", price: 0 },
   });
-  await prisma.membershipPlan.upsert({
+  const premiumPlan = await prisma.membershipPlan.upsert({
     where: { slug: "premium" },
     update: {},
     create: { name: "Premium", slug: "premium", price: 49.9 },
@@ -52,6 +52,18 @@ async function seedTestData() {
       passwordHash: await hash("Senha@123"),
       role: "USER",
       planId: freePlan.id,
+    },
+  });
+
+  const paidUser = await prisma.user.upsert({
+    where: { email: "test-paid@odonto.study" },
+    update: {},
+    create: {
+      name: "Paid Teste",
+      email: "test-paid@odonto.study",
+      passwordHash: await hash("Senha@123"),
+      role: "USER",
+      planId: premiumPlan.id,
     },
   });
 

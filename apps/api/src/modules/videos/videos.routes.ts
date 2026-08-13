@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { requirePaidPlan } from "../../middlewares/requirePaidPlan.js";
 import { validate } from "../../middlewares/validate.js";
 import * as ctrl from "./videos.controller.js";
 import {
@@ -23,8 +24,8 @@ videosRouter.use(authenticate);
 
 videosRouter.post("/:id/watch", ctrl.watch);
 videosRouter.post("/:id/favorite", ctrl.favorite);
-videosRouter.post("/", validate(createVideoSchema), ctrl.create);
-videosRouter.put("/:id", validate(updateVideoSchema), ctrl.update);
-videosRouter.delete("/:id", ctrl.remove);
-videosRouter.post("/:id/publish", ctrl.publish);
-videosRouter.post("/:id/unpublish", ctrl.unpublish);
+videosRouter.post("/", requirePaidPlan, validate(createVideoSchema), ctrl.create);
+videosRouter.put("/:id", requirePaidPlan, validate(updateVideoSchema), ctrl.update);
+videosRouter.delete("/:id", requirePaidPlan, ctrl.remove);
+videosRouter.post("/:id/publish", requirePaidPlan, ctrl.publish);
+videosRouter.post("/:id/unpublish", requirePaidPlan, ctrl.unpublish);

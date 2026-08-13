@@ -125,6 +125,11 @@ export function Navbar() {
                       {isAdmin ? "Painel Admin" : "Minha Área"}
                     </Button>
                   </Link>
+                  <Link to="/meus-conteudos" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      Meu espaço
+                    </Button>
+                  </Link>
                   <Link to="/perfil" onClick={() => setOpen(false)}>
                     <Button variant="outline" className="w-full">
                       Meu perfil
