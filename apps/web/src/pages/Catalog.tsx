@@ -95,7 +95,7 @@ export function Catalog() {
     setSearchParams(next);
   }
 
-  const activeFilterCount = [specialty, tag, imageTag, difficulty, access, source].filter(Boolean).length;
+  const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length;
 
   const matchingImages = videos.flatMap((video) =>
     (video.images ?? [])
@@ -121,6 +121,40 @@ export function Catalog() {
       </div>
 
       <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-sm font-semibold text-slate-700">Conteúdo:</span>
+          <button
+            type="button"
+            onClick={() =>
+              updateParam("source", source === "FRONTODONTUS" ? "" : "FRONTODONTUS")
+            }
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+              source === "FRONTODONTUS"
+                ? "bg-primary-700 text-white shadow-sm"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${source === "FRONTODONTUS" ? "bg-white" : "bg-primary-600"}`}
+            />
+            FrontOdontus
+          </button>
+          <button
+            type="button"
+            onClick={() => updateParam("source", source === "STUDENT" ? "" : "STUDENT")}
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+              source === "STUDENT"
+                ? "bg-sky-700 text-white shadow-sm"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${source === "STUDENT" ? "bg-white" : "bg-sky-500"}`}
+            />
+            Estudante
+          </button>
+        </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -187,11 +221,6 @@ export function Catalog() {
               <option value="">Todos acessos</option>
               <option value="gratuito">Gratuito</option>
               <option value="premium">Premium</option>
-            </Select>
-            <Select value={source} onChange={(e) => updateParam("source", e.target.value)}>
-              <option value="">Todas as origens</option>
-              <option value="FRONTODONTUS">FrontOdontus</option>
-              <option value="STUDENT">Estudante</option>
             </Select>
             <Select value={sort} onChange={(e) => updateParam("sort", e.target.value)}>
               <option value="recent">Mais recentes</option>
