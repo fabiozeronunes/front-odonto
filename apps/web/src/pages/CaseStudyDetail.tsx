@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Stethoscope, User, Building2, Tag as TagIcon, ArrowRight } from "lucide-react";
+import { Stethoscope, User, Building2, Tag as TagIcon, ArrowRight, Images as ImagesIcon, X } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { CaseStudy, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { resolveImageUrl } from "../lib/utils";
 
 interface CaseStudyDetail extends CaseStudy {
   videoCases: { video: Video }[];
@@ -20,6 +21,7 @@ export function CaseStudyDetail() {
   const [data, setData] = useState<CaseStudyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -136,6 +138,43 @@ export function CaseStudyDetail() {
         </section>
       )}
 
+      {data.images && data.images.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-900">
+            <ImagesIcon className="h-5 w-5 text-primary-700" /> Imagens deste caso
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {data.images.map((img) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setLightbox(img.url)}
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white text-left"
+                title="Ampliar imagem"
+              >
+                <img
+                  src={resolveImageUrl(img.url)}
+                  alt={img.alt ?? data.title}
+                  className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                />
+                {img.tags && img.tags.length > 0 && (
+                  <span className="flex flex-wrap gap-1 p-2">
+                    {img.tags.map(({ tag }) => (
+                      <span
+                        key={tag.id}
+                        className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                      >
+                        #{tag.name}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {data.relatedCases.length > 0 && (
         <section className="mt-10">
           <h2 className="mb-4 text-xl font-bold text-slate-900">Casos relacionados</h2>
@@ -157,6 +196,22 @@ export function CaseStudyDetail() {
             ))}
           </div>
         </section>
+      )}
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+            onClick={() => setLightbox(null)}
+            aria-label="Fechar imagem"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img src={resolveImageUrl(lightbox)} alt="" className="max-h-full max-w-full rounded-xl object-contain" />
+        </div>
       )}
     </div>
   );
