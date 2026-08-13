@@ -12,6 +12,11 @@ export const users = asyncHandler(async (req: Request, res: Response) => {
   res.json(result);
 });
 
+export const billingSummary = asyncHandler(async (_req: Request, res: Response) => {
+  const result = await service.getBillingSummary();
+  res.json({ data: result });
+});
+
 export const activate = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.setUserActive(req.params.id, true);
   res.json({ data: result });

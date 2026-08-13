@@ -12,6 +12,7 @@ adminRouter.use(authenticate, requireRole(Role.ADMIN));
 
 adminRouter.get("/dashboard", ctrl.dashboard);
 adminRouter.get("/users", ctrl.users);
+adminRouter.get("/users/summary", ctrl.billingSummary);
 adminRouter.post("/users/:id/activate", ctrl.activate);
 adminRouter.post("/users/:id/deactivate", ctrl.deactivate);
 adminRouter.post("/users/:id/whatsapp", ctrl.notifyWhatsApp);
