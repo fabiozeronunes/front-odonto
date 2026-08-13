@@ -10,6 +10,7 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
+import { YouTubeImport } from "../../components/YouTubeImport";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
@@ -185,6 +186,45 @@ export function MyCases() {
         ? editing.videoIds.filter((t) => t !== id)
         : [...editing.videoIds, id],
     });
+  }
+
+  async function importYouTubeVideo(info: {
+    title?: string;
+    author?: string;
+    thumbnailUrl?: string;
+    videoUrl: string;
+  }) {
+    if (!editing) return;
+    setError(null);
+    try {
+      const res = await api<{ data: Video }>("/api/videos", {
+        method: "POST",
+        body: JSON.stringify({
+          title: info.title || "Vídeo importado",
+          videoUrl: info.videoUrl,
+          thumbnailUrl: info.thumbnailUrl || undefined,
+          author: info.author || undefined,
+          isFree: true,
+          status: "DRAFT",
+        }),
+      });
+      setMyVideos((prev) =>
+        prev.some((v) => v.id === res.data.id)
+          ? prev
+          : [res.data, ...prev]
+      );
+      setEditing((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          videoIds: prev.videoIds.includes(res.data.id)
+            ? prev.videoIds
+            : [...prev.videoIds, res.data.id],
+        };
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao importar vídeo");
+    }
   }
 
   async function createTag(name: string) {
@@ -431,9 +471,11 @@ export function MyCases() {
             <div className="space-y-2">
               <Label>Vídeos do caso</Label>
               <p className="text-xs text-slate-500">
-                Selecione um ou mais vídeos seus para vincular a este estudo de caso.
+                Importe um vídeo do YouTube ou selecione um ou mais vídeos seus para vincular a este
+                estudo de caso.
               </p>
-              <div className="flex flex-wrap gap-2">
+              <YouTubeImport onInfo={importYouTubeVideo} />
+              <div className="flex flex-wrap gap-2 pt-2">
                 {myVideos.map((v) => {
                   const selected = editing.videoIds.includes(v.id);
                   return (
@@ -458,7 +500,7 @@ export function MyCases() {
                 })}
                 {myVideos.length === 0 && (
                   <p className="text-sm text-slate-400">
-                    Nenhum vídeo seu cadastrado. Crie vídeos em "Meus vídeos" para vincular aqui.
+                    Nenhum vídeo seu ainda. Use a importação do YouTube acima para criar o primeiro.
                   </p>
                 )}
               </div>
