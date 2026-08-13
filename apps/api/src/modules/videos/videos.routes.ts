@@ -16,6 +16,7 @@ videosRouter.get("/me/history", authenticate, ctrl.history);
 videosRouter.get("/me", authenticate, ctrl.myVideos);
 videosRouter.get("/image-tags", ctrl.imageTags);
 videosRouter.get("/images", ctrl.searchImages);
+videosRouter.get("/:slugOrId/related", authenticate, ctrl.related);
 videosRouter.get("/:slugOrId", ctrl.getOne);
 
 videosRouter.use(authenticate);

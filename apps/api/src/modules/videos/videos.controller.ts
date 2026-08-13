@@ -23,6 +23,11 @@ export const getOne = asyncHandler(async (req: Request, res: Response) => {
   res.json(result);
 });
 
+export const related = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.getVideoRelatedContent(req.params.id);
+  res.json(result);
+});
+
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const auth = req as AuthenticatedRequest;
   const video = await service.createVideo(

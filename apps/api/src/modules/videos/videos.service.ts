@@ -214,6 +214,48 @@ export async function getRelatedVideos(
   return related;
 }
 
+export async function getVideoRelatedContent(videoId: string) {
+  const caseStudies = await prisma.videoCaseStudy.findMany({
+    where: { videoId },
+    select: { caseStudyId: true },
+  });
+  const caseStudyIds = caseStudies.map((c) => c.caseStudyId);
+
+  if (caseStudyIds.length === 0) {
+    return { videos: [], images: [] };
+  }
+
+  const [videos, images] = await Promise.all([
+    prisma.video.findMany({
+      where: {
+        id: { not: videoId },
+        status: "PUBLISHED",
+        caseStudies: { some: { caseStudyId: { in: caseStudyIds } } },
+      },
+      orderBy: [{ publishedAt: "desc" }],
+      take: 6,
+      select: videoSelect,
+    }),
+    prisma.media.findMany({
+      where: {
+        caseStudyId: { in: caseStudyIds },
+        tags: { some: {} },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+      select: {
+        id: true,
+        url: true,
+        alt: true,
+        tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
+        caseStudy: { select: { id: true, title: true, slug: true } },
+      },
+    }),
+  ]);
+
+  return { videos, images };
+}
+
 export async function createVideo(input: CreateVideoInput, createdById: string, isAdmin = false) {
   const data: Prisma.VideoCreateInput = {
     title: input.title,
