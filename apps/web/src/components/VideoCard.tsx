@@ -26,7 +26,7 @@ export function VideoCard({ video }: { video: Video }) {
             {video.isFree ? (
               <Badge variant="free">GRATUITO</Badge>
             ) : (
-              <Badge variant="premium">PREMIUM</Badge>
+              <Badge variant="premium">Pago</Badge>
             )}
           </div>
           {video.durationSeconds ? (
