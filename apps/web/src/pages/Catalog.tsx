@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, X, Image as ImageIcon } from "lucide-react";
+import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame } from "lucide-react";
 import { api } from "../lib/api";
 import type { Paginated, Specialty, Tag, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
@@ -152,6 +152,34 @@ export function Catalog() {
               className={`h-2 w-2 rounded-full ${source === "STUDENT" ? "bg-white" : "bg-sky-500"}`}
             />
             Estudante
+          </button>
+        </div>
+
+        <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
+          <span className="mr-1 text-sm font-semibold text-slate-700">Ordenar:</span>
+          <button
+            type="button"
+            onClick={() => updateParam("sort", "recent")}
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+              sort === "recent"
+                ? "bg-primary-700 text-white shadow-sm"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            <Clock className="h-4 w-4" />
+            Vídeos novos
+          </button>
+          <button
+            type="button"
+            onClick={() => updateParam("sort", "popular")}
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+              sort === "popular"
+                ? "bg-accent-600 text-white shadow-sm"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            <Flame className="h-4 w-4" />
+            Mais assistidos
           </button>
         </div>
 

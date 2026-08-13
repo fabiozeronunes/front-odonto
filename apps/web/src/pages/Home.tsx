@@ -1,14 +1,70 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Flame, Clock } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { VideoCard } from "../components/VideoCard";
+import { api } from "../lib/api";
+import type { Paginated, Video } from "../types";
 
 const heroStats = [
   { value: "+40", label: "vídeos de estudo" },
   { value: "14", label: "especialidades" },
   { value: "100%", label: "online e gratuito" },
 ];
+
+function VideoSection({
+  title,
+  icon,
+  sort,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  sort: "recent" | "popular";
+}) {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api<Paginated<Video>>(`/api/videos?sort=${sort}&perPage=6`)
+      .then((d) => setVideos(d.data))
+      .finally(() => setLoading(false));
+  }, [sort]);
+
+  return (
+    <section className="py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
+            {icon}
+            {title}
+          </h2>
+          <Link to={`/catalogo?sort=${sort}`}>
+            <Button variant="ghost" size="sm">
+              Ver todos
+            </Button>
+          </Link>
+        </div>
+        {loading ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
+            ))}
+          </div>
+        ) : videos.length === 0 ? (
+          <p className="text-sm text-slate-500">Nenhum vídeo disponível ainda.</p>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
 
 export function Home() {
   return (
@@ -74,6 +130,15 @@ export function Home() {
         </div>
 
         <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
+      </section>
+
+      {/* ===== VIDEOS SECTIONS ===== */}
+      <section className="py-12 bg-white">
+        <VideoSection title="Vídeos novos" icon={<Clock className="h-5 w-5 text-primary-600" />} sort="recent" />
+      </section>
+
+      <section className="py-12 bg-slate-50">
+        <VideoSection title="Mais assistidos" icon={<Flame className="h-5 w-5 text-accent-500" />} sort="popular" />
       </section>
 
       {/* ===== PLANS SECTION ===== */}
