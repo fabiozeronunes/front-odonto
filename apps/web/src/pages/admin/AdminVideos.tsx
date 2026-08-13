@@ -254,14 +254,14 @@ export function AdminVideos() {
             </div>
 
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={editing.isFree}
-                  onChange={(e) => setEditing({ ...editing, isFree: e.target.checked })}
-                />
-                Conteúdo gratuito
-              </label>
+              <Label>Tipo de acesso</Label>
+              <Select
+                value={editing.isFree ? "gratuito" : "pago"}
+                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
+              >
+                <option value="gratuito">Gratuito</option>
+                <option value="pago">Pago</option>
+              </Select>
             </div>
 
             <div className="space-y-2">
