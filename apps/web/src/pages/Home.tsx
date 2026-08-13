@@ -134,31 +134,6 @@ export function Home() {
       {/* ===== FOOTER ===== */}
       <Footer />
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card">
-            <GraduationCap className="mx-auto h-8 w-8 text-primary-700" />
-            <h3 className="mt-3 font-semibold text-slate-900">Conteúdo estruturado</h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Organizado por especialidade, nível e estudo de caso.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card">
-            <Search className="mx-auto h-8 w-8 text-primary-700" />
-            <h3 className="mt-3 font-semibold text-slate-900">Busca inteligente</h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Encontre vídeos por título, tag, especialidade e autor.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card">
-            <ShieldCheck className="mx-auto h-8 w-8 text-primary-700" />
-            <h3 className="mt-3 font-semibold text-slate-900">Ambiente seguro</h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Dados protegidos em conformidade com a LGPD.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
