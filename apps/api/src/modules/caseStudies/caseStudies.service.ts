@@ -26,8 +26,28 @@ const caseStudySelect = {
   createdAt: true,
   specialty: { select: { id: true, name: true, slug: true } },
   tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
-  images: { select: { id: true, url: true, alt: true } },
+  images: {
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
+    },
+  },
   createdBy: { select: { id: true, name: true, email: true } },
+  videoCases: {
+    select: {
+      video: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          thumbnailUrl: true,
+          isFree: true,
+        },
+      },
+    },
+  },
 } satisfies Prisma.CaseStudySelect;
 
 function stripPrivateFields<T extends { observations?: string | null }>(item: T) {
@@ -80,21 +100,6 @@ export async function getCaseStudy(slugOrId: string, opts: { admin?: boolean } =
     },
     select: {
       ...caseStudySelect,
-      videoCases: {
-        select: {
-          video: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              thumbnailUrl: true,
-              durationSeconds: true,
-              difficulty: true,
-              isFree: true,
-            },
-          },
-        },
-      },
       relatedCases: {
         select: { related: { select: { id: true, title: true, slug: true, isFree: true, difficulty: true } } },
       },
@@ -153,6 +158,14 @@ export async function createCaseStudy(input: CreateCaseStudyInput, createdById: 
   }
   if (input.imageUrls.length > 0) {
     data.images = { create: input.imageUrls.map((url) => ({ url })) };
+  }
+  if (input.images.length > 0) {
+    data.images = {
+      create: input.images.map((img) => ({
+        url: img.url,
+        tags: { create: img.tagIds.map((tagId) => ({ tagId })) },
+      })),
+    };
   }
 
   return prisma.caseStudy.create({ data });
@@ -217,6 +230,15 @@ export async function updateCaseStudy(id: string, input: UpdateCaseStudyInput, u
   }
   if (input.imageUrls !== undefined) {
     data.images = { deleteMany: {}, create: input.imageUrls.map((url) => ({ url })) };
+  }
+  if (input.images !== undefined) {
+    data.images = {
+      deleteMany: {},
+      create: input.images.map((img) => ({
+        url: img.url,
+        tags: { create: img.tagIds.map((tagId) => ({ tagId })) },
+      })),
+    };
   }
 
   return prisma.caseStudy.update({ where: { id: caseStudy.id }, data });

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
 import { api } from "../../lib/api";
-import type { CaseStudy, Paginated, Specialty, Tag } from "../../types";
+import type { CaseStudy, Paginated, Specialty, Tag, Video } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -10,6 +10,14 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
+import { TagCreator } from "../../components/TagCreator";
+import { resolveImageUrl } from "../../lib/utils";
+
+interface ImageDraft {
+  id: string;
+  url: string;
+  tagIds: string[];
+}
 
 interface CaseFormState {
   id?: string;
@@ -24,7 +32,8 @@ interface CaseFormState {
   institution: string;
   observations: string;
   tagIds: string[];
-  imageUrls: string[];
+  videoIds: string[];
+  images: ImageDraft[];
 }
 
 const emptyForm: CaseFormState = {
@@ -39,13 +48,15 @@ const emptyForm: CaseFormState = {
   institution: "",
   observations: "",
   tagIds: [],
-  imageUrls: [],
+  videoIds: [],
+  images: [],
 };
 
 export function MyCases() {
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [myVideos, setMyVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CaseFormState | null>(null);
   const [saving, setSaving] = useState(false);
@@ -54,14 +65,23 @@ export function MyCases() {
   async function load() {
     setLoading(true);
     try {
-      const [c, s, t] = await Promise.all([
+      const [c, s, tagsPage, v] = await Promise.all([
         api<Paginated<CaseStudy>>("/api/case-studies/me?perPage=50"),
         api<{ data: Specialty[] }>("/api/specialties"),
-        api<{ data: Tag[] }>("/api/tags"),
+        api<Paginated<Tag>>("/api/tags?perPage=50"),
+        api<Paginated<Video>>("/api/videos/me?perPage=50"),
       ]);
+      let allTags = tagsPage.data;
+      if (tagsPage.pagination.total > allTags.length) {
+        for (let p = 2; p <= tagsPage.pagination.totalPages; p++) {
+          const next = await api<Paginated<Tag>>(`/api/tags?perPage=50&page=${p}`);
+          allTags = [...allTags, ...next.data];
+        }
+      }
       setCases(c.data);
       setSpecialties(s.data);
-      setTags(t.data);
+      setTags(allTags);
+      setMyVideos(v.data);
     } finally {
       setLoading(false);
     }
@@ -90,7 +110,12 @@ export function MyCases() {
       institution: c.institution ?? "",
       observations: c.observations ?? "",
       tagIds: c.tags.map((t) => t.id),
-      imageUrls: c.images?.map((i) => i.url) ?? [],
+      videoIds: c.videoCases?.map((vc) => vc.video.id) ?? c.videoIds ?? [],
+      images: c.images?.slice(0, 5).map((i) => ({
+        id: i.id,
+        url: i.url,
+        tagIds: i.tags?.map((t) => t.tag.id) ?? [],
+      })) ?? [],
     });
     setError(null);
   }
@@ -111,7 +136,8 @@ export function MyCases() {
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
       tagIds: editing.tagIds,
-      imageUrls: editing.imageUrls,
+      videoIds: editing.videoIds,
+      images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
     try {
       if (editing.id) {
@@ -149,6 +175,96 @@ export function MyCases() {
         ? editing.tagIds.filter((t) => t !== id)
         : [...editing.tagIds, id],
     });
+  }
+
+  function toggleVideo(id: string) {
+    if (!editing) return;
+    setEditing({
+      ...editing,
+      videoIds: editing.videoIds.includes(id)
+        ? editing.videoIds.filter((t) => t !== id)
+        : [...editing.videoIds, id],
+    });
+  }
+
+  async function createTag(name: string) {
+    if (!editing || !name.trim()) return null;
+    const trimmed = name.trim();
+    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing) {
+      if (!editing.tagIds.includes(existing.id)) {
+        setEditing({ ...editing, tagIds: [...editing.tagIds, existing.id] });
+      }
+      return existing.id;
+    }
+    try {
+      const res = await api<{ data: Tag }>("/api/tags", {
+        method: "POST",
+        body: JSON.stringify({ name: trimmed }),
+      });
+      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
+      setEditing({ ...editing, tagIds: [...editing.tagIds, res.data.id] });
+      return res.data.id;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao criar tag");
+      return null;
+    }
+  }
+
+  async function createImageTag(name: string, imageId: string) {
+    if (!editing || !name.trim()) return null;
+    const trimmed = name.trim();
+    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+    let tagId = existing?.id;
+    if (!tagId) {
+      try {
+        const res = await api<{ data: Tag }>("/api/tags", {
+          method: "POST",
+          body: JSON.stringify({ name: trimmed }),
+        });
+        tagId = res.data.id;
+        setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Falha ao criar tag");
+        return null;
+      }
+    }
+    setEditing((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        images: prev.images.map((img) =>
+          img.id === imageId && !img.tagIds.includes(tagId!)
+            ? { ...img, tagIds: [...img.tagIds, tagId!] }
+            : img
+        ),
+      };
+    });
+    return tagId;
+  }
+
+  async function deleteTag(tagId: string) {
+    if (!editing) return;
+    const tag = tags.find((t) => t.id === tagId);
+    if (!tag) return;
+    if (!confirm(`Excluir a tag #${tag.name} definitivamente? Ela será removida de todos os conteúdos.`)) return;
+    try {
+      await api(`/api/tags/${tagId}`, { method: "DELETE" });
+      setTags((prev) => prev.filter((t) => t.id !== tagId));
+      setEditing((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          tagIds: prev.tagIds.filter((t) => t !== tagId),
+          images: prev.images.map((img) => ({
+            ...img,
+            tagIds: img.tagIds.filter((t) => t !== tagId),
+          })),
+        };
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao excluir tag");
+    }
   }
 
   return (
@@ -219,33 +335,175 @@ export function MyCases() {
               <Textarea value={editing.observations} onChange={(e) => setEditing({ ...editing, observations: e.target.value })} rows={3} placeholder="Anotações privadas sobre este caso..." />
             </div>
 
-            <ImagePicker value={editing.imageUrls} onChange={(urls) => setEditing({ ...editing, imageUrls: urls })} label="Galeria de imagens (upload ou link)" />
+            <ImagePicker
+              value={editing.images.map((img) => img.url)}
+              onChange={(urls) =>
+                setEditing((prev) => {
+                  if (!prev) return prev;
+                  const used = new Set<string>();
+                  return {
+                    ...prev,
+                    images: urls
+                      .map((url) => {
+                        const existing = prev.images.find(
+                          (img) => img.url === url && !used.has(img.id)
+                        );
+                        if (existing) {
+                          used.add(existing.id);
+                          return existing;
+                        }
+                        return { id: crypto.randomUUID(), url, tagIds: [] };
+                      })
+                      .slice(0, 5),
+                  };
+                })
+              }
+              label="Galeria de imagens (upload ou link, máx. 5)"
+            />
+
+            {editing.images.length > 0 && (
+              <div className="space-y-3">
+                <Label>Tags de cada imagem</Label>
+                <p className="text-xs text-slate-500">
+                  Tags específicas para cada imagem, independentes das tags do caso. Máximo de 5
+                  imagens.
+                </p>
+                {editing.images.map((img, index) => {
+                  const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
+                  return (
+                    <div
+                      key={img.id}
+                      className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-start"
+                    >
+                      <div className="flex shrink-0 flex-col items-center gap-1.5">
+                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-slate-200">
+                          <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                        </div>
+                        <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
+                          Imagem {index + 1}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="mb-2 text-sm font-semibold text-slate-700">
+                          Tags da imagem {index + 1}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {imageTags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
+                            >
+                              #{tag.name}
+                              <button
+                                type="button"
+                                onClick={() => deleteTag(tag.id)}
+                                className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                                title="Excluir tag"
+                                aria-label={`Excluir tag ${tag.name}`}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
+                          {imageTags.length === 0 && (
+                            <p className="text-sm text-slate-400">Nenhuma tag nesta imagem ainda.</p>
+                          )}
+                        </div>
+                        <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={editing.isFree} onChange={(e) => setEditing({ ...editing, isFree: e.target.checked })} />
-                Conteúdo gratuito
-              </label>
+              <Label>Tipo de acesso</Label>
+              <Select
+                value={editing.isFree ? "gratuito" : "pago"}
+                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
+              >
+                <option value="gratuito">Gratuito</option>
+                <option value="pago">Pago</option>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Vídeos do caso</Label>
+              <p className="text-xs text-slate-500">
+                Selecione um ou mais vídeos seus para vincular a este estudo de caso.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {myVideos.map((v) => {
+                  const selected = editing.videoIds.includes(v.id);
+                  return (
+                    <span
+                      key={v.id}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        selected
+                          ? "bg-primary-700 text-white"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleVideo(v.id)}
+                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        title={selected ? "Remover vídeo do caso" : "Adicionar vídeo ao caso"}
+                      >
+                        {v.title}
+                      </button>
+                    </span>
+                  );
+                })}
+                {myVideos.length === 0 && (
+                  <p className="text-sm text-slate-400">
+                    Nenhum vídeo seu cadastrado. Crie vídeos em "Meus vídeos" para vincular aqui.
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label>Tags</Label>
               <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => toggleTag(tag.id)}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                      editing.tagIds.includes(tag.id)
-                        ? "bg-primary-700 text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    #{tag.name}
-                  </button>
-                ))}
+                {tags.map((tag) => {
+                  const selected = editing.tagIds.includes(tag.id);
+                  return (
+                    <span
+                      key={tag.id}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        selected
+                          ? "bg-primary-700 text-white"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleTag(tag.id)}
+                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        title={selected ? "Remover tag do caso" : "Adicionar tag ao caso"}
+                      >
+                        #{tag.name}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteTag(tag.id)}
+                        className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
+                          selected
+                            ? "bg-white/25 text-white hover:bg-white/40"
+                            : "text-slate-400 hover:bg-slate-200 hover:text-red-600"
+                        }`}
+                        title="Excluir tag"
+                        aria-label={`Excluir tag ${tag.name}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
+              <TagCreator onCreate={createTag} />
             </div>
 
             <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
@@ -266,15 +524,16 @@ export function MyCases() {
                 <tr>
                   <th className="px-5 py-3">Título</th>
                   <th className="px-5 py-3">Especialidade</th>
+                  <th className="px-5 py-3">Acesso</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">Carregando...</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Carregando...</td></tr>
                 ) : cases.length === 0 ? (
-                  <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-400">Nenhum estudo de caso cadastrado ainda.</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Nenhum estudo de caso cadastrado ainda.</td></tr>
                 ) : (
                   cases.map((c) => (
                     <tr key={c.id} className="hover:bg-slate-50">
@@ -283,6 +542,9 @@ export function MyCases() {
                         <p className="text-xs text-slate-400">{c.author ?? "—"} {c.observations ? "• com observações" : ""}</p>
                       </td>
                       <td className="px-5 py-3 text-slate-500">{c.specialty?.name ?? "—"}</td>
+                      <td className="px-5 py-3">
+                        <Badge variant={c.isFree ? "free" : "premium"}>{c.isFree ? "FREE" : "Pago"}</Badge>
+                      </td>
                       <td className="px-5 py-3">
                         <Badge variant={c.status === "PUBLISHED" ? "default" : "outline"}>{c.status}</Badge>
                       </td>

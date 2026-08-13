@@ -6,6 +6,11 @@ const imageUrl = z.string().refine(
   "URL de imagem inválida"
 );
 
+const imageItem = z.object({
+  url: imageUrl,
+  tagIds: z.array(z.string()).max(20).default([]),
+});
+
 export const createCaseStudySchema = z.object({
   title: z.string().min(2, "Título obrigatório").max(200),
   description: z.string().max(5000).optional(),
@@ -21,6 +26,7 @@ export const createCaseStudySchema = z.object({
   relatedIds: z.array(z.string()).max(10).default([]),
   observations: z.string().max(5000).optional().nullable(),
   imageUrls: z.array(imageUrl).max(10).default([]),
+  images: z.array(imageItem).max(5).default([]),
 });
 
 export const updateCaseStudySchema = createCaseStudySchema.partial();
