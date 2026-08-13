@@ -9,9 +9,13 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { formatDate, formatDuration, resolveImageUrl } from "../lib/utils";
 
+function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
+  return user?.role === "ADMIN" || user?.plan?.slug === "premium";
+}
+
 export function VideoDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<VideoDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,13 +29,13 @@ export function VideoDetail() {
     api<VideoDetail>(`/api/videos/${slug}`)
       .then((d) => {
         setData(d);
-        if (!d.video.isFree && !isAuthenticated) {
+        if (!d.video.isFree && !hasPremiumAccess(user)) {
           setIsPremiumLocked(true);
         }
       })
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar vídeo"))
       .finally(() => setLoading(false));
-  }, [slug, isAuthenticated]);
+  }, [slug, isAuthenticated, user]);
 
   if (loading) {
     return (
@@ -80,16 +84,25 @@ export function VideoDetail() {
           <Badge variant="premium" className="mb-4">CONTEÚDO PREMIUM</Badge>
           <h1 className="text-2xl font-bold text-slate-900">{video.title}</h1>
           <p className="mt-2 max-w-md text-slate-600">
-            Este vídeo é exclusivo para membros premium. Faça login ou assine o plano Premium para
-            desbloquear.
+            {isAuthenticated
+              ? "Você não tem permissão para assistir este conteúdo. Assine o plano Premium para desbloquear todos os vídeos exclusivos."
+              : "Este vídeo é exclusivo para membros premium. Faça login ou assine o plano Premium para desbloquear."}
           </p>
           <div className="mt-6 flex gap-3">
-            <Link to="/planos">
-              <Button variant="premium">Assinar Premium</Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline">Fazer login</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/planos">
+                <Button variant="premium">Assinar Premium</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/planos">
+                  <Button variant="premium">Assinar Premium</Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline">Fazer login</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       ) : (

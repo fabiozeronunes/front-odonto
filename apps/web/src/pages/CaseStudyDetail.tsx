@@ -14,9 +14,13 @@ interface CaseStudyDetail extends CaseStudy {
   relatedCases: { related: { id: string; title: string; slug: string; isFree: boolean; difficulty: string } }[];
 }
 
+function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
+  return user?.role === "ADMIN" || user?.plan?.slug === "premium";
+}
+
 export function CaseStudyDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<CaseStudyDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,21 +56,25 @@ export function CaseStudyDetail() {
     );
   }
 
-  if (!data.isFree && !isAuthenticated) {
+  if (!data.isFree && !hasPremiumAccess(user)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <Badge variant="premium" className="mb-4">CONTEÚDO PREMIUM</Badge>
         <h1 className="text-2xl font-bold text-slate-900">{data.title}</h1>
         <p className="mt-2 text-slate-600">
-          Este estudo de caso é exclusivo para membros premium.
+          {isAuthenticated
+            ? "Você não tem permissão para acessar este estudo de caso. Assine o plano Premium para desbloquear."
+            : "Este estudo de caso é exclusivo para membros premium. Faça login ou assine o plano Premium para desbloquear."}
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link to="/planos">
             <Button variant="premium">Assinar Premium</Button>
           </Link>
-          <Button variant="outline" onClick={() => navigate("/login")}>
-            Fazer login
-          </Button>
+          {!isAuthenticated && (
+            <Button variant="outline" onClick={() => navigate("/login")}>
+              Fazer login
+            </Button>
+          )}
         </div>
       </div>
     );
