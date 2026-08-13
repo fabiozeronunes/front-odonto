@@ -361,6 +361,44 @@ export function MyCases() {
             </div>
 
             <div className="space-y-2">
+              <Label>Vídeos do caso</Label>
+              <p className="text-xs text-slate-500">
+                Importe um vídeo do YouTube ou selecione um ou mais vídeos seus para vincular a este
+                estudo de caso.
+              </p>
+              <YouTubeImport onInfo={importYouTubeVideo} />
+              <div className="flex flex-wrap gap-2 pt-2">
+                {myVideos.map((v) => {
+                  const selected = editing.videoIds.includes(v.id);
+                  return (
+                    <span
+                      key={v.id}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        selected
+                          ? "bg-primary-700 text-white"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleVideo(v.id)}
+                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        title={selected ? "Remover vídeo do caso" : "Adicionar vídeo ao caso"}
+                      >
+                        {v.title}
+                      </button>
+                    </span>
+                  );
+                })}
+                {myVideos.length === 0 && (
+                  <p className="text-sm text-slate-400">
+                    Nenhum vídeo seu ainda. Use a importação do YouTube acima para criar o primeiro.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label>Descrição</Label>
               <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} />
             </div>
@@ -466,44 +504,6 @@ export function MyCases() {
                 <option value="gratuito">Gratuito</option>
                 <option value="pago">Pago</option>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Vídeos do caso</Label>
-              <p className="text-xs text-slate-500">
-                Importe um vídeo do YouTube ou selecione um ou mais vídeos seus para vincular a este
-                estudo de caso.
-              </p>
-              <YouTubeImport onInfo={importYouTubeVideo} />
-              <div className="flex flex-wrap gap-2 pt-2">
-                {myVideos.map((v) => {
-                  const selected = editing.videoIds.includes(v.id);
-                  return (
-                    <span
-                      key={v.id}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                        selected
-                          ? "bg-primary-700 text-white"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggleVideo(v.id)}
-                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
-                        title={selected ? "Remover vídeo do caso" : "Adicionar vídeo ao caso"}
-                      >
-                        {v.title}
-                      </button>
-                    </span>
-                  );
-                })}
-                {myVideos.length === 0 && (
-                  <p className="text-sm text-slate-400">
-                    Nenhum vídeo seu ainda. Use a importação do YouTube acima para criar o primeiro.
-                  </p>
-                )}
-              </div>
             </div>
 
             <div className="space-y-2">
