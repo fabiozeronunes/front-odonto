@@ -89,7 +89,7 @@ export function MyCases() {
       author: c.author ?? "",
       institution: c.institution ?? "",
       observations: c.observations ?? "",
-      tagIds: c.tags.map((t) => t.tag.id),
+      tagIds: c.tags.map((t) => t.id),
       imageUrls: c.images?.map((i) => i.url) ?? [],
     });
     setError(null);

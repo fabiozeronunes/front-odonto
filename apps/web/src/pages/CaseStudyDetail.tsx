@@ -116,7 +116,7 @@ export function CaseStudyDetail() {
         {data.tags.length > 0 && (
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <TagIcon className="h-4 w-4 text-slate-400" />
-            {data.tags.map(({ tag }) => (
+            {data.tags.map((tag) => (
               <Link key={tag.id} to={`/catalogo?tag=${tag.slug}`}>
                 <Badge variant="outline" className="hover:bg-slate-100">#{tag.name}</Badge>
               </Link>

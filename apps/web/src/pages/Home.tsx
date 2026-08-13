@@ -1,33 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, GraduationCap, Play, Plus, Search, ShieldCheck } from "lucide-react";
-import { api } from "../lib/api";
-import type {
-  Paginated,
-  Specialty,
-  Video,
-  CaseStudy,
-  MembershipPlan,
-} from "../types";
-import { VideoCard } from "../components/VideoCard";
-import { SpecialtyCard } from "../components/SpecialtyCard";
+import { Sparkles } from "lucide-react";
 import { Plans } from "./Plans";
-import { Footer } from "../components/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-
-function ToothIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M12 2.5c-2.6 0-4.6 1.4-5.6 3.6-.8 1.8-.7 3.8.5 5.3 1 1.2 1.5 2.8 1.7 4.5.2 1.6.9 4.1 2.2 4.1 1.5 0 1.1-2.5 2.2-2.5 1.1 0 .7 2.5 2.2 2.5 1.3 0 2-2.5 2.2-4.1.2-1.7.7-3.3 1.7-4.5 1.2-1.5 1.3-3.5.5-5.3C16.6 3.9 14.6 2.5 12 2.5z" />
-    </svg>
-  );
-}
 
 const heroStats = [
   { value: "+40", label: "vídeos de estudo" },
@@ -36,29 +11,6 @@ const heroStats = [
 ];
 
 export function Home() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
-  const [plans, setPlans] = useState<MembershipPlan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    Promise.all([
-      api<Paginated<Video>>("/api/videos?perPage=6&sort=popular"),
-      api<{ data: Specialty[] }>("/api/specialties"),
-      api<Paginated<CaseStudy>>("/api/case-studies?perPage=3"),
-      api<{ data: MembershipPlan[] }>("/api/plans"),
-    ])
-      .then(([v, s, c, p]) => {
-        setVideos(v.data);
-        setSpecialties(s.data);
-        setCaseStudies(c.data);
-        setPlans(p.data);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       {/* ===== FIRST FOLD: HERO ===== */}
@@ -124,16 +76,12 @@ export function Home() {
         <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
       </section>
 
-      {/* ===== PLANS SECTION (first fold) ===== */}
+      {/* ===== PLANS SECTION ===== */}
       <section className="py-12 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Plans />
         </div>
       </section>
-
-      {/* ===== FOOTER ===== */}
-      <Footer />
-
     </div>
   );
 }
