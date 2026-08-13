@@ -71,22 +71,7 @@ export function AdminDashboard() {
       <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
       <p className="mt-1 text-sm text-slate-500">Visão geral da plataforma</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <Card key={card.label}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-500">{card.label}</p>
-                <card.icon className="h-5 w-5 text-primary-600" />
-              </div>
-              <p className="mt-2 text-3xl font-extrabold text-slate-900">{card.value}</p>
-              <p className="text-xs text-slate-400">{card.sub}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="mt-8">
+      <Card className="mt-6">
         <CardHeader className="pb-3">
           <CardTitle>Resumo de receita por plano</CardTitle>
         </CardHeader>
@@ -145,6 +130,21 @@ export function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <Card key={card.label}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-slate-500">{card.label}</p>
+                <card.icon className="h-5 w-5 text-primary-600" />
+              </div>
+              <p className="mt-2 text-3xl font-extrabold text-slate-900">{card.value}</p>
+              <p className="text-xs text-slate-400">{card.sub}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card>
