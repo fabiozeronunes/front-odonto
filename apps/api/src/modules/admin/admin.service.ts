@@ -112,25 +112,31 @@ export async function listUsers(query: Request["query"]) {
     let lastPaymentAt: string | null = null;
     let expiresAt: string | null = null;
 
-    if (order && order.status === "PAID") {
-      paymentStatus = "PAGO";
-      lastPaymentAt = order.createdAt.toISOString();
-    }
-    if (sub && sub.status === "ACTIVE") {
-      paymentStatus = "PAGO";
-      lastPaymentAt = lastPaymentAt ?? sub.startsAt?.toISOString() ?? null;
-      expiresAt = sub.endsAt?.toISOString() ?? null;
-    }
-    if (isPremiumPlan && !(order && order.status === "PAID") && !(sub && sub.status === "ACTIVE")) {
-      paymentStatus = "EM_ATRASO";
-    }
-    if (sub && sub.status === "EXPIRED") {
-      paymentStatus = "EM_ATRASO";
-      expiresAt = sub.endsAt?.toISOString() ?? null;
-    }
-    if (sub && sub.status === "ACTIVE" && sub.endsAt && sub.endsAt < now) {
-      paymentStatus = "EM_ATRASO";
-      expiresAt = sub.endsAt.toISOString();
+    if (u.role === "ADMIN") {
+      paymentStatus = "GRATUITO";
+      lastPaymentAt = null;
+      expiresAt = null;
+    } else {
+      if (order && order.status === "PAID") {
+        paymentStatus = "PAGO";
+        lastPaymentAt = order.createdAt.toISOString();
+      }
+      if (sub && sub.status === "ACTIVE") {
+        paymentStatus = "PAGO";
+        lastPaymentAt = lastPaymentAt ?? sub.startsAt?.toISOString() ?? null;
+        expiresAt = sub.endsAt?.toISOString() ?? null;
+      }
+      if (isPremiumPlan && !(order && order.status === "PAID") && !(sub && sub.status === "ACTIVE")) {
+        paymentStatus = "EM_ATRASO";
+      }
+      if (sub && sub.status === "EXPIRED") {
+        paymentStatus = "EM_ATRASO";
+        expiresAt = sub.endsAt?.toISOString() ?? null;
+      }
+      if (sub && sub.status === "ACTIVE" && sub.endsAt && sub.endsAt < now) {
+        paymentStatus = "EM_ATRASO";
+        expiresAt = sub.endsAt.toISOString();
+      }
     }
 
     return {
