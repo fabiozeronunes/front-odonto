@@ -23,8 +23,8 @@ export function CaseStudyDetail() {
 
   useEffect(() => {
     setLoading(true);
-    api<{ data: CaseStudyDetail }>(`/api/case-studies/${slug}`)
-      .then((d) => setData(d.data))
+    api<CaseStudyDetail>(`/api/case-studies/${slug}`)
+      .then((d) => setData(d))
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar caso"))
       .finally(() => setLoading(false));
   }, [slug]);
