@@ -33,6 +33,11 @@ export function createApp() {
       max: env.rateLimitMax,
       standardHeaders: true,
       legacyHeaders: false,
+      handler: (_req, res) => {
+        res.status(429).json({
+          error: { message: "Muitas requisições. Aguarde alguns segundos e tente novamente." },
+        });
+      },
     })
   );
 
