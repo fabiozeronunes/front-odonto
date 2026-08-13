@@ -55,7 +55,7 @@ export function Plans() {
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardTitle className="text-xl">{plan.slug === "free" ? "Gratuito" : plan.slug === "premium" ? "Premium" : "Pro"}</CardTitle>
                   {plan.description && (
                     <p className="text-sm text-slate-500">{plan.description}</p>
                   )}
