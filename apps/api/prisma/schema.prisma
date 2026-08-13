@@ -48,6 +48,11 @@ enum Difficulty {
   AVANCADO
 }
 
+enum VideoSource {
+  FRONTODONTUS
+  STUDENT
+}
+
 enum AccessLevel {
   PUBLIC
   MEMBER
@@ -167,6 +172,7 @@ model Video {
   durationSeconds Int?
   difficulty      Difficulty     @default(BASICO)
   isFree          Boolean        @default(true)
+  source          VideoSource    @default(FRONTODONTUS)
   author          String?
   institution     String?
   status          ContentStatus  @default(DRAFT)

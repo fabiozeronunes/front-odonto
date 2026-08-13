@@ -28,6 +28,7 @@ interface VideoFormState {
   specialtyId: string;
   difficulty: string;
   isFree: boolean;
+  source: "FRONTODONTUS" | "STUDENT";
   status: string;
   author: string;
   institution: string;
@@ -44,6 +45,7 @@ const emptyForm: VideoFormState = {
   specialtyId: "",
   difficulty: "BASICO",
   isFree: true,
+  source: "STUDENT",
   status: "DRAFT",
   author: "",
   institution: "",
@@ -103,6 +105,7 @@ export function MyVideos() {
       specialtyId: video.specialty?.id ?? "",
       difficulty: video.difficulty,
       isFree: video.isFree,
+      source: video.source ?? "STUDENT",
       status: video.status,
       author: video.author ?? "",
       institution: video.institution ?? "",
@@ -147,6 +150,7 @@ export function MyVideos() {
       specialtyId: editing.specialtyId || null,
       difficulty: editing.difficulty,
       isFree: editing.isFree,
+      source: editing.source,
       status: editing.status,
       author: editing.author || undefined,
       institution: editing.institution || undefined,
@@ -447,6 +451,22 @@ export function MyVideos() {
                 <option value="gratuito">Gratuito</option>
                 <option value="pago">Pago</option>
               </Select>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Label>Origem do vídeo</Label>
+              <Select
+                value={editing.source}
+                onChange={(e) =>
+                  setEditing({ ...editing, source: e.target.value as "FRONTODONTUS" | "STUDENT" })
+                }
+              >
+                <option value="STUDENT">Estudante</option>
+                <option value="FRONTODONTUS">FrontOdontus</option>
+              </Select>
+              <p className="text-xs text-slate-500">
+                Marque como "Estudante" para separar dos vídeos do administrador.
+              </p>
             </div>
 
             <div className="space-y-2">

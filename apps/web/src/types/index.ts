@@ -2,6 +2,7 @@ export type Role = "ADMIN" | "USER";
 export type ContentStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export type Difficulty = "BASICO" | "INTERMEDIARIO" | "AVANCADO";
 export type VideoType = "EMBED" | "EXTERNAL" | "UPLOAD";
+export type VideoSource = "FRONTODONTUS" | "STUDENT";
 export type PlanStatus = "ACTIVE" | "INACTIVE";
 export type BillingPeriod = "MONTHLY" | "YEARLY";
 
@@ -57,6 +58,7 @@ export interface Video {
   durationSeconds?: number | null;
   difficulty: Difficulty;
   isFree: boolean;
+  source: VideoSource;
   author?: string | null;
   institution?: string | null;
   observations?: string | null;

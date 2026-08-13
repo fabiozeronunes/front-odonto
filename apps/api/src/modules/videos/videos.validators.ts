@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ContentStatus, Difficulty, VideoType } from "@prisma/client";
+import { ContentStatus, Difficulty, VideoSource, VideoType } from "@prisma/client";
 
 const imageUrl = z.string().refine(
   (v) => /^https?:\/\//.test(v) || /^\/uploads\//.test(v),
@@ -20,6 +20,7 @@ export const createVideoSchema = z.object({
   durationSeconds: z.number().int().min(0).optional(),
   difficulty: z.nativeEnum(Difficulty).default(Difficulty.BASICO),
   isFree: z.boolean().default(true),
+  source: z.nativeEnum(VideoSource).default(VideoSource.FRONTODONTUS),
   author: z.string().max(120).optional(),
   institution: z.string().max(200).optional(),
   observations: z.string().max(5000).optional(),
@@ -43,6 +44,7 @@ export const videoQuerySchema = z.object({
   imageTag: z.string().optional(),
   difficulty: z.nativeEnum(Difficulty).optional(),
   isFree: z.enum(["true", "false"]).optional(),
+  source: z.nativeEnum(VideoSource).optional(),
   sort: z.enum(["recent", "popular", "oldest"]).optional(),
 });
 

@@ -55,6 +55,9 @@ function buildWhere(query: VideoQueryInput, opts: { admin?: boolean } = {}) {
   if (query.isFree) {
     where.isFree = query.isFree === "true";
   }
+  if (query.source) {
+    where.source = query.source;
+  }
 
   return where;
 }
@@ -81,6 +84,7 @@ const videoSelect = {
   durationSeconds: true,
   difficulty: true,
   isFree: true,
+  source: true,
   author: true,
   institution: true,
   observations: true,
@@ -221,6 +225,7 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
     durationSeconds: input.durationSeconds,
     difficulty: input.difficulty,
     isFree: input.isFree,
+    source: isAdmin ? input.source ?? "FRONTODONTUS" : "STUDENT",
     author: input.author,
     institution: input.institution,
     observations: input.observations,
@@ -275,6 +280,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "durationSeconds",
     "difficulty",
     "isFree",
+    "source",
     "author",
     "institution",
     "observations",

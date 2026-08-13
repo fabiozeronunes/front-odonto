@@ -36,6 +36,7 @@ export function Catalog() {
   const imageTag = searchParams.get("imageTag") ?? "";
   const difficulty = searchParams.get("difficulty") ?? "";
   const access = searchParams.get("access") ?? "";
+  const source = searchParams.get("source") ?? "";
   const sort = searchParams.get("sort") ?? "recent";
 
   useEffect(() => {
@@ -75,6 +76,7 @@ export function Catalog() {
     if (imageTag) params.set("imageTag", imageTag);
     if (difficulty) params.set("difficulty", difficulty);
     if (access) params.set("isFree", access === "gratuito" ? "true" : "false");
+    if (source) params.set("source", source);
 
     api<Paginated<Video>>(`/api/videos?${params.toString()}`)
       .then((data) => {
@@ -83,7 +85,7 @@ export function Catalog() {
         setTotalPages(data.pagination.totalPages);
       })
       .finally(() => setLoading(false));
-  }, [page, search, specialty, tag, imageTag, difficulty, access, sort]);
+  }, [page, search, specialty, tag, imageTag, difficulty, access, source, sort]);
 
   function updateParam(key: string, value: string) {
     const next = new URLSearchParams(searchParams);
@@ -93,7 +95,7 @@ export function Catalog() {
     setSearchParams(next);
   }
 
-  const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length;
+  const activeFilterCount = [specialty, tag, imageTag, difficulty, access, source].filter(Boolean).length;
 
   const matchingImages = videos.flatMap((video) =>
     (video.images ?? [])
@@ -185,6 +187,11 @@ export function Catalog() {
               <option value="">Todos acessos</option>
               <option value="gratuito">Gratuito</option>
               <option value="premium">Premium</option>
+            </Select>
+            <Select value={source} onChange={(e) => updateParam("source", e.target.value)}>
+              <option value="">Todas as origens</option>
+              <option value="FRONTODONTUS">FrontOdontus</option>
+              <option value="STUDENT">Estudante</option>
             </Select>
             <Select value={sort} onChange={(e) => updateParam("sort", e.target.value)}>
               <option value="recent">Mais recentes</option>

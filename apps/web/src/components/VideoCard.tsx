@@ -28,6 +28,7 @@ export function VideoCard({ video }: { video: Video }) {
             ) : (
               <Badge variant="premium">Pago</Badge>
             )}
+            {video.source === "STUDENT" && <Badge variant="info">Estudante</Badge>}
           </div>
           {video.durationSeconds ? (
             <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">
