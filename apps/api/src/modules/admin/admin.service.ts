@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../config/env.js";
-import { NotFoundError } from "../../utils/errors.js";
+import { ConflictError, NotFoundError } from "../../utils/errors.js";
 import { getPagination, paginated } from "../../utils/pagination.js";
 import type { Request } from "express";
 
@@ -257,6 +257,22 @@ export async function updateUserContact(id: string, data: { phone?: string | nul
     where: { id },
     data: { phone: data.phone ?? null },
   });
+}
+
+export async function deleteUser(id: string, requestingUserId: string) {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new NotFoundError("Usuário não encontrado");
+  if (id === requestingUserId) {
+    throw new ConflictError("Você não pode excluir a própria conta.");
+  }
+  if (user.role === "ADMIN") {
+    const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
+    if (adminCount <= 1) {
+      throw new ConflictError("Não é possível excluir o último administrador.");
+    }
+  }
+  await prisma.user.delete({ where: { id } });
+  return { id, name: user.name, deleted: true };
 }
 
 function buildWhatsAppMessage(user: { name: string; planName?: string }) {

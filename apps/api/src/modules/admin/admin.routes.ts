@@ -31,3 +31,4 @@ adminRouter.put(
   validate(z.object({ phone: z.string().max(30).optional().nullable() })),
   ctrl.updateContact
 );
+adminRouter.delete("/users/:id", ctrl.remove);

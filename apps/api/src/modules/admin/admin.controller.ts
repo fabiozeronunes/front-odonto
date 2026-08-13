@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { AuthenticatedRequest } from "../../types/auth.js";
 import * as service from "./admin.service.js";
 
 export const dashboard = asyncHandler(async (_req: Request, res: Response) => {
@@ -44,5 +45,13 @@ export const updateContact = asyncHandler(async (req: Request, res: Response) =>
 
 export const notifyWhatsApp = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.notifyUserWhatsApp(req.params.id);
+  res.json({ data: result });
+});
+
+export const remove = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.deleteUser(
+    req.params.id,
+    (req as AuthenticatedRequest).user.id
+  );
   res.json({ data: result });
 });

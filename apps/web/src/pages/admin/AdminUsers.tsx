@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, Search, Link2 } from "lucide-react";
+import { MessageCircle, Search, Link2, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
+import { useAuth } from "../../lib/auth";
 import type { Paginated, MembershipPlan, User } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -26,6 +27,7 @@ interface PlanSummary {
 const PLAN_COLORS = ["#0ea5e9", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
 
 export function AdminUsers() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [total, setTotal] = useState(0);
@@ -122,8 +124,25 @@ export function AdminUsers() {
     }
   }
 
-  async function toggleAffiliate(user: User) {
+  async function deleteUser(user: User) {
+    if (!confirm(`Excluir definitivamente o usuário ${user.name} (${user.email})? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
     setBusy(user.id);
+    try {
+      await api(`/api/admin/users/${user.id}`, { method: "DELETE" });
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      setNotice("Usuário excluído.");
+      setTimeout(() => setNotice(null), 3000);
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Erro ao excluir usuário");
+      setTimeout(() => setNotice(null), 4000);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function toggleAffiliate(user: User) {    setBusy(user.id);
     try {
       if (user.isAffiliate) {
         await api(`/api/affiliates/${user.id}/disable`, { method: "PUT" });
@@ -362,6 +381,16 @@ export function AdminUsers() {
                             onClick={() => toggleActive(u.id, u.isActive ?? true)}
                           >
                             {u.isActive === false ? "Ativar" : "Desativar"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={busy === u.id || currentUser?.id === u.id}
+                            onClick={() => deleteUser(u)}
+                            className="text-red-600"
+                            title={currentUser?.id === u.id ? "Você não pode excluir a própria conta" : "Excluir usuário"}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>

@@ -108,7 +108,7 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="animate-pulse space-y-4">
           <div className="h-10 w-64 rounded-lg bg-slate-200" />
           <div className="h-40 rounded-2xl bg-slate-200" />
@@ -127,7 +127,7 @@ export function Profile() {
   ];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">
         <UserIcon className="h-7 w-7 text-primary-700" /> Meu perfil
       </h1>
