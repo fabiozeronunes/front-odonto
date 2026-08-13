@@ -127,6 +127,21 @@ export interface AuthResponse {
 export interface VideoDetail {
   video: Video & { caseStudies?: { caseStudy: CaseStudy }[] };
   related: Video[];
+  relatedImages?: {
+    id: string;
+    url: string;
+    alt?: string | null;
+    tags: { tag: Tag }[];
+    video?: { id: string; title: string; slug: string } | null;
+    caseStudy?: { id: string; title: string; slug: string } | null;
+  }[];
+  relatedCaseStudies?: {
+    id: string;
+    title: string;
+    slug: string;
+    difficulty: Difficulty;
+    isFree: boolean;
+  }[];
 }
 
 export interface DashboardMetrics {

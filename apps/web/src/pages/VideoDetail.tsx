@@ -248,6 +248,62 @@ export function VideoDetail() {
           </div>
         </section>
       )}
+
+      {data.relatedImages && data.relatedImages.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-5 text-xl font-bold text-slate-900">Imagens relacionadas</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {data.relatedImages.map((img) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setLightbox(img.url)}
+                className="group overflow-hidden rounded-xl border border-slate-200 text-left"
+                title="Ampliar imagem"
+              >
+                <img
+                  src={resolveImageUrl(img.url)}
+                  alt={img.alt ?? video.title}
+                  className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                />
+                <span className="flex flex-wrap gap-1 p-2">
+                  {img.tags.map(({ tag }) => (
+                    <span
+                      key={tag.id}
+                      className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                    >
+                      #{tag.name}
+                    </span>
+                  ))}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {data.relatedCaseStudies && data.relatedCaseStudies.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-5 text-xl font-bold text-slate-900">Estudos de caso relacionados</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {data.relatedCaseStudies.map((cs) => (
+              <Link
+                key={cs.id}
+                to={`/casos/${cs.slug}`}
+                className="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-shadow hover:shadow-lift"
+              >
+                <div>
+                  <p className="font-medium text-slate-900 group-hover:text-primary-800">{cs.title}</p>
+                  <p className="text-xs capitalize text-slate-400">{cs.difficulty.toLowerCase()}</p>
+                </div>
+                <Badge variant={cs.isFree ? "free" : "premium"}>
+                  {cs.isFree ? "GRATUITO" : "PREMIUM"}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

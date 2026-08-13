@@ -186,8 +186,59 @@ export async function getVideo(slugOrId: string, opts: { admin?: boolean } = {})
   }
 
   const related = await getRelatedVideos(video.id, video.specialty?.id ?? null, video.tags.map((t) => t.tag.id));
+  const relatedImages = await getRelatedImages(video.id, video.tags.map((t) => t.tag.id));
+  const relatedCaseStudies = await getRelatedCaseStudies(video.tags.map((t) => t.tag.id));
 
-  return { video: opts.admin ? video : stripPrivateFields(video), related: related.map(stripPrivateFields) };
+  return {
+    video: opts.admin ? video : stripPrivateFields(video),
+    related: related.map(stripPrivateFields),
+    relatedImages,
+    relatedCaseStudies,
+  };
+}
+
+export async function getRelatedImages(videoId: string, tagIds: string[]) {
+  if (tagIds.length === 0) return [];
+
+  return prisma.media.findMany({
+    where: {
+      OR: [
+        { videoId: { not: videoId }, video: { status: "PUBLISHED" } },
+        { videoId: null, caseStudy: { status: "PUBLISHED" } },
+      ],
+      tags: { some: { tagId: { in: tagIds } } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
+      video: { select: { id: true, title: true, slug: true } },
+      caseStudy: { select: { id: true, title: true, slug: true } },
+    },
+  });
+}
+
+export async function getRelatedCaseStudies(tagIds: string[]) {
+  if (tagIds.length === 0) return [];
+
+  return prisma.caseStudy.findMany({
+    where: {
+      status: "PUBLISHED",
+      tags: { some: { tagId: { in: tagIds } } },
+    },
+    orderBy: { publishedAt: "desc" },
+    take: 4,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      difficulty: true,
+      isFree: true,
+    },
+  });
 }
 
 export async function getRelatedVideos(
