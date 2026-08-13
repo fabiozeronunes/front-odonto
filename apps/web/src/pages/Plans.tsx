@@ -35,13 +35,13 @@ export function Plans() {
       </div>
 
       {loading ? (
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          {Array.from({ length: 2 }).map((_, i) => (
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-72 animate-pulse rounded-2xl bg-slate-200" />
           ))}
         </div>
       ) : (
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
             const isPremium = plan.slug === "premium";
             return (
