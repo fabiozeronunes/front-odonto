@@ -114,7 +114,7 @@ export function MyCases() {
       institution: c.institution ?? "",
       observations: c.observations ?? "",
       audioUrl: c.audioUrl ?? "",
-      tagIds: c.tags.map((t) => t.id),
+      tagIds: c.tags.map((t) => t.tag.id),
       videoIds: c.videoCases?.map((vc) => vc.video.id) ?? c.videoIds ?? [],
       images: c.images?.slice(0, 5).map((i) => ({
         id: i.id,

@@ -87,7 +87,7 @@ export interface CaseStudy {
   audioUrl?: string | null;
   publishedAt?: string | null;
   specialty?: Specialty | null;
-  tags: Tag[];
+  tags: { tag: Tag }[];
   images?: Media[];
   videoIds?: string[];
   videoCases?: { video: { id: string; title: string; slug: string; isFree: boolean } }[];
