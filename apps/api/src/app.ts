@@ -10,6 +10,7 @@ import { videosRouter } from "./modules/videos/videos.routes.js";
 import { caseStudiesRouter } from "./modules/caseStudies/caseStudies.routes.js";
 import { plansRouter } from "./modules/plans/plans.routes.js";
 import { adminRouter } from "./modules/admin/admin.routes.js";
+import { affiliatesRouter } from "./modules/affiliates/affiliates.routes.js";
 import { uploadsRouter } from "./modules/uploads/uploads.routes.js";
 import { youtubeRouter } from "./modules/youtube/youtube.routes.js";
 
@@ -60,6 +61,7 @@ export function createApp() {
   app.use("/api/case-studies", caseStudiesRouter);
   app.use("/api/plans", plansRouter);
   app.use("/api/admin", adminRouter);
+  app.use("/api/affiliates", affiliatesRouter);
   app.use("/api/uploads", uploadsRouter);
   app.use("/api/youtube", youtubeRouter);
 

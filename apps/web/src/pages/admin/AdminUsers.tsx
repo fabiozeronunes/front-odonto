@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, Search } from "lucide-react";
+import { MessageCircle, Search, Link2 } from "lucide-react";
 import { api } from "../../lib/api";
 import type { Paginated, MembershipPlan, User } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -117,6 +117,26 @@ export function AdminUsers() {
         setNotice(res.data.error ?? "Não foi possível enviar o aviso.");
       }
       setTimeout(() => setNotice(null), 4000);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function toggleAffiliate(user: User) {
+    setBusy(user.id);
+    try {
+      if (user.isAffiliate) {
+        await api(`/api/affiliates/${user.id}/disable`, { method: "PUT" });
+        setNotice(`${user.name} deixou de ser afiliado.`);
+      } else {
+        await api(`/api/affiliates/${user.id}/enable`, {
+          method: "PUT",
+          body: JSON.stringify({}),
+        });
+        setNotice(`${user.name} agora é afiliado. Código gerado!`);
+      }
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, isAffiliate: !u.isAffiliate } : u)));
+      setTimeout(() => setNotice(null), 3000);
     } finally {
       setBusy(null);
     }
@@ -317,6 +337,16 @@ export function AdminUsers() {
                       <td className="px-5 py-3 text-slate-500">{formatDate(u.createdAt)}</td>
                       <td className="px-5 py-3">
                         <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={busy === u.id}
+                            onClick={() => toggleAffiliate(u)}
+                            title={u.isAffiliate ? "Remover como afiliado" : "Tornar afiliado"}
+                          >
+                            <Link2 className={`h-4 w-4 ${u.isAffiliate ? "text-primary-600" : "text-slate-400"}`} />
+                            {u.isAffiliate ? "Afiliado" : "Afiliar"}
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

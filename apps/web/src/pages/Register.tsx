@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { GraduationCap, AlertCircle } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { ApiRequestError } from "../lib/api";
@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../co
 export function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ref = searchParams.get("ref") ?? undefined;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ export function Register() {
     setError(null);
     setLoading(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, ref);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof ApiRequestError ? err.message : "Erro ao cadastrar");

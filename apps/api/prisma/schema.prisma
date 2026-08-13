@@ -67,6 +67,12 @@ enum OrderStatus {
   CANCELED
 }
 
+enum CommissionStatus {
+  PENDING
+  PAID
+  CANCELED
+}
+
 model User {
   id           String         @id @default(cuid())
   name         String
@@ -77,6 +83,11 @@ model User {
   isActive     Boolean        @default(true)
   plan         MembershipPlan @relation(fields: [planId], references: [id])
   planId       String
+  isAffiliate  Boolean        @default(false)
+  affiliateCode String?       @unique
+  commissionRate Decimal      @default(20)
+  referredBy   User?          @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referredById String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -88,8 +99,12 @@ model User {
   orders        Order[]
   specialties   Specialty[]
   tags          Tag[]
+  referrals     User[]           @relation("Referrals")
+  affiliateCommissions AffiliateCommission[] @relation("AffiliateCommissions")
+  referredCommissions  AffiliateCommission[] @relation("ReferredCommissions")
 
   @@index([email])
+  @@index([referredById])
 }
 
 model MembershipPlan {
@@ -400,4 +415,20 @@ model OrderItem {
   unitPrice Decimal @default(0)
 
   @@index([orderId])
+}
+
+model AffiliateCommission {
+  id            String           @id @default(cuid())
+  affiliate     User             @relation("AffiliateCommissions", fields: [affiliateId], references: [id], onDelete: Cascade)
+  affiliateId   String
+  referred      User             @relation("ReferredCommissions", fields: [referredUserId], references: [id], onDelete: Cascade)
+  referredUserId String
+  amount        Decimal          @default(0)
+  percent       Decimal          @default(20)
+  status        CommissionStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+  paidAt        DateTime?
+
+  @@index([affiliateId])
+  @@index([referredUserId])
 }

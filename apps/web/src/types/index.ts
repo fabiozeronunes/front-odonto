@@ -121,6 +121,8 @@ export interface User {
   lastPaymentAt?: string | null;
   expiresAt?: string | null;
   subscriptionStatus?: string | null;
+  isAffiliate?: boolean;
+  affiliateCode?: string | null;
   createdAt?: string;
 }
 

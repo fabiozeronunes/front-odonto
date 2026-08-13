@@ -102,6 +102,8 @@ interface UserBillingRow {
   phone: string | null;
   role: string;
   isActive: boolean;
+  isAffiliate: boolean;
+  affiliateCode: string | null;
   createdAt: Date;
   plan: { id: string; name: string; slug: string } | null;
   subscriptions: { id: string; status: string; startsAt: Date | null; endsAt: Date | null }[];
@@ -115,6 +117,8 @@ const userBillingSelect = {
   phone: true,
   role: true,
   isActive: true,
+  isAffiliate: true,
+  affiliateCode: true,
   createdAt: true,
   plan: { select: { id: true, name: true, slug: true } },
   subscriptions: {
@@ -173,6 +177,8 @@ function classifyUser(u: UserBillingRow) {
     phone: u.phone,
     role: u.role,
     isActive: u.isActive,
+    isAffiliate: u.isAffiliate,
+    affiliateCode: u.affiliateCode,
     createdAt: u.createdAt,
     plan: u.plan,
     paymentStatus,

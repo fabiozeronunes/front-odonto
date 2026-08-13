@@ -41,12 +41,24 @@ export async function registerUser(input: RegisterInput) {
   const freePlanId = await getFreePlanId();
   const passwordHash = await bcrypt.hash(input.password, 10);
 
+  let referredById: string | null = null;
+  if (input.ref) {
+    const affiliate = await prisma.user.findUnique({
+      where: { affiliateCode: input.ref },
+      select: { id: true, isAffiliate: true },
+    });
+    if (affiliate?.isAffiliate) {
+      referredById = affiliate.id;
+    }
+  }
+
   const user = await prisma.user.create({
     data: {
       name: input.name,
       email: input.email,
       passwordHash,
       planId: freePlanId,
+      referredById,
     },
     select: { id: true, name: true, email: true, role: true, planId: true },
   });
