@@ -1,7 +1,6 @@
 import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
-import path from "node:path";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/errorHandler.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
@@ -26,7 +25,6 @@ export function createApp() {
     })
   );
   app.use(express.json({ limit: "1mb" }));
-  app.use("/uploads", express.static(path.join(process.cwd(), "public", "uploads")));
 
   app.use(
     rateLimit({

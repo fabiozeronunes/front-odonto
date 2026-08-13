@@ -22,4 +22,6 @@ export const env = {
   webUrl: process.env.WEB_URL ?? "http://localhost:5173",
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX ?? 120),
+  whatsappApiUrl: process.env.WHATSAPP_API_URL ?? "",
+  whatsappApiToken: process.env.WHATSAPP_API_TOKEN ?? "",
 };

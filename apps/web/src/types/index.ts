@@ -113,9 +113,14 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string | null;
   role: Role;
   isActive?: boolean;
   plan?: { id: string; name: string; slug: string; price: string | number; billing: BillingPeriod };
+  paymentStatus?: "PAGO" | "EM_ATRASO" | "GRATUITO";
+  lastPaymentAt?: string | null;
+  expiresAt?: string | null;
+  subscriptionStatus?: string | null;
   createdAt?: string;
 }
 

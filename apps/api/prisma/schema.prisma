@@ -72,6 +72,7 @@ model User {
   name         String
   email        String         @unique
   passwordHash String
+  phone        String?
   role         Role           @default(USER)
   isActive     Boolean        @default(true)
   plan         MembershipPlan @relation(fields: [planId], references: [id])

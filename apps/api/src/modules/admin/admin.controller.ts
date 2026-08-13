@@ -26,3 +26,18 @@ export const setRole = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.setUserRole(req.params.id, req.body.role);
   res.json({ data: result });
 });
+
+export const setPlan = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.setUserPlan(req.params.id, req.body.planId);
+  res.json({ data: result });
+});
+
+export const updateContact = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.updateUserContact(req.params.id, { phone: req.body.phone ?? null });
+  res.json({ data: result });
+});
+
+export const notifyWhatsApp = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.notifyUserWhatsApp(req.params.id);
+  res.json({ data: result });
+});

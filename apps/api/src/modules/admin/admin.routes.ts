@@ -14,8 +14,19 @@ adminRouter.get("/dashboard", ctrl.dashboard);
 adminRouter.get("/users", ctrl.users);
 adminRouter.post("/users/:id/activate", ctrl.activate);
 adminRouter.post("/users/:id/deactivate", ctrl.deactivate);
+adminRouter.post("/users/:id/whatsapp", ctrl.notifyWhatsApp);
 adminRouter.put(
   "/users/:id/role",
   validate(z.object({ role: z.enum(["ADMIN", "USER"]) })),
   ctrl.setRole
+);
+adminRouter.put(
+  "/users/:id/plan",
+  validate(z.object({ planId: z.string().min(1) })),
+  ctrl.setPlan
+);
+adminRouter.put(
+  "/users/:id/contact",
+  validate(z.object({ phone: z.string().max(30).optional().nullable() })),
+  ctrl.updateContact
 );
