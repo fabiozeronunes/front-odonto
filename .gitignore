@@ -9,3 +9,5 @@ coverage/
 .cache/
 *.tsbuildinfo
 apps/api/public/uploads/
+.vercel
+.env*
