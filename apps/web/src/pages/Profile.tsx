@@ -20,6 +20,7 @@ import { formatDate } from "../lib/utils";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 
 interface ProfileStats {
@@ -239,6 +240,8 @@ export function Profile() {
         </div>
 
         <div className="space-y-6">
+          {user.isAffiliate && <AffiliateShareCard />}
+
           <Card>
             <CardContent className="pt-5">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-700 text-2xl font-bold text-white">

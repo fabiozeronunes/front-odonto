@@ -24,4 +24,7 @@ export const env = {
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX ?? 120),
   whatsappApiUrl: process.env.WHATSAPP_API_URL ?? "",
   whatsappApiToken: process.env.WHATSAPP_API_TOKEN ?? "",
+  paymentGateway: process.env.PAYMENT_GATEWAY ?? "",
+  paymentGatewaySecret: process.env.PAYMENT_GATEWAY_SECRET ?? "",
+  paymentGatewayPublicKey: process.env.PAYMENT_GATEWAY_PUBLIC_KEY ?? "",
 };

@@ -82,9 +82,15 @@ export function Plans() {
 
                   <div className="mt-8">
                     {isPremium ? (
-                      <Link to={isAuthenticated ? "/dashboard" : "/cadastro"}>
+                      <Link to={isAuthenticated ? `/checkout?plan=${plan.slug}` : `/cadastro?plan=${plan.slug}`}>
                         <Button variant="premium" size="lg" className="w-full">
                           Assinar Premium
+                        </Button>
+                      </Link>
+                    ) : plan.slug === "odonto-pro" ? (
+                      <Link to={isAuthenticated ? `/checkout?plan=${plan.slug}` : `/cadastro?plan=${plan.slug}`}>
+                        <Button variant="outline" size="lg" className="w-full">
+                          Assinar Pro
                         </Button>
                       </Link>
                     ) : (
@@ -103,7 +109,7 @@ export function Plans() {
       )}
 
       <p className="mt-10 text-center text-sm text-slate-500">
-        Pagamentos e assinaturas serão habilitados em breve.
+        O acesso ao plano é liberado imediatamente após a confirmação do pagamento.
       </p>
     </div>
   );

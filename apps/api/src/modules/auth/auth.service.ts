@@ -38,7 +38,17 @@ export async function registerUser(input: RegisterInput) {
     throw new ConflictError("E-mail já cadastrado");
   }
 
-  const freePlanId = await getFreePlanId();
+  let planId = await getFreePlanId();
+  if (input.planSlug && input.planSlug !== "gratuito") {
+    const plan = await prisma.membershipPlan.findUnique({
+      where: { slug: input.planSlug },
+      select: { id: true, status: true },
+    });
+    if (plan && plan.status === "ACTIVE") {
+      planId = plan.id;
+    }
+  }
+
   const passwordHash = await bcrypt.hash(input.password, 10);
 
   let referredById: string | null = null;
@@ -57,7 +67,7 @@ export async function registerUser(input: RegisterInput) {
       name: input.name,
       email: input.email,
       passwordHash,
-      planId: freePlanId,
+      planId,
       referredById,
     },
     select: { id: true, name: true, email: true, role: true, planId: true },
@@ -134,6 +144,8 @@ export async function getProfile(userId: string) {
       name: true,
       email: true,
       role: true,
+      isAffiliate: true,
+      affiliateCode: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
       createdAt: true,
     },
@@ -151,6 +163,8 @@ export async function updateProfile(userId: string, name: string) {
       name: true,
       email: true,
       role: true,
+      isAffiliate: true,
+      affiliateCode: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
       createdAt: true,
     },

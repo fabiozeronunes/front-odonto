@@ -5,6 +5,7 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
+import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 
@@ -50,6 +51,12 @@ export function Dashboard() {
           </Link>
         </div>
       </div>
+
+      {user?.isAffiliate && (
+        <div className="mt-8">
+          <AffiliateShareCard />
+        </div>
+      )}
 
       {!isPremium && (
         <div className="mt-8 flex flex-col justify-between gap-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 p-6 text-white sm:flex-row sm:items-center">

@@ -102,3 +102,71 @@ describe("Conteúdo por membro", () => {
     expect(specialty.status).toBe(403);
   });
 });
+
+describe("Checkout de planos", () => {
+  it("cria checkout e confirma, ativando o plano pago", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
+    const plans = await request(app).get("/api/plans");
+    const premium = plans.body.data.find((p: { slug: string }) => p.slug === "premium");
+
+    const checkout = await request(app)
+      .post("/api/checkout")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ planId: premium.id });
+    expect(checkout.status).toBe(201);
+    expect(checkout.body.data.status).toBe("PENDING");
+    expect(checkout.body.data.orderId).toBeDefined();
+
+    const confirm = await request(app)
+      .post(`/api/checkout/${checkout.body.data.orderId}/confirm`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(confirm.status).toBe(200);
+    expect(confirm.body.data.ok).toBe(true);
+    expect(confirm.body.data.planId).toBe(premium.id);
+
+    const me = await request(app).get("/api/auth/me").set("Authorization", `Bearer ${token}`);
+    expect(me.body.user.plan.id).toBe(premium.id);
+  });
+
+  it("rejeita checkout para o plano gratuito", async () => {
+    const token = await login("test-paid@odonto.study", "Senha@123");
+    const plans = await request(app).get("/api/plans");
+    const free = plans.body.data.find((p: { slug: string }) => p.slug === "gratuito");
+
+    const res = await request(app)
+      .post("/api/checkout")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ planId: free.id });
+    expect(res.status).toBe(409);
+  });
+
+  it("bloqueia checkout sem autenticação", async () => {
+    const plans = await request(app).get("/api/plans");
+    const premium = plans.body.data.find((p: { slug: string }) => p.slug === "premium");
+    const res = await request(app).post("/api/checkout").send({ planId: premium.id });
+    expect(res.status).toBe(401);
+  });
+
+  it("cadastro aceita plano gratuito por padrão e planSlug pago", async () => {
+    const email = `checkout-free-${Date.now()}@odonto.study`;
+    const free = await request(app).post("/api/auth/register").send({
+      name: "Checkout Free",
+      email,
+      password: "Senha@123",
+    });
+    expect(free.status).toBe(201);
+    expect(free.body.user.planId).toBeDefined();
+
+    const paidEmail = `checkout-paid-${Date.now()}@odonto.study`;
+    const plans = await request(app).get("/api/plans");
+    const premium = plans.body.data.find((p: { slug: string }) => p.slug === "premium");
+    const paid = await request(app).post("/api/auth/register").send({
+      name: "Checkout Paid",
+      email: paidEmail,
+      password: "Senha@123",
+      planSlug: "premium",
+    });
+    expect(paid.status).toBe(201);
+    expect(paid.body.user.planId).toBe(premium.id);
+  });
+});

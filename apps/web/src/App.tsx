@@ -9,6 +9,7 @@ import { Specialties } from "./pages/Specialties";
 import { CaseStudies } from "./pages/CaseStudies";
 import { CaseStudyDetail } from "./pages/CaseStudyDetail";
 import { Plans } from "./pages/Plans";
+import { Checkout } from "./pages/Checkout";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
@@ -46,6 +47,14 @@ export default function App() {
           <Route path="/privacidade" element={<Legal type="privacidade" />} />
           <Route path="/termos" element={<Legal type="termos" />} />
 
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
