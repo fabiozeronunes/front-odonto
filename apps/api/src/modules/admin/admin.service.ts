@@ -189,9 +189,9 @@ export async function getBillingSummary() {
   });
   const users = await prisma.user.findMany({ select: userBillingSelect });
 
-  const byPlan = new Map<string, { count: number; paidCount: number; overdueCount: number; paidTotal: number }>();
+  const byPlan = new Map<string, { count: number; paidCount: number; overdueCount: number }>();
   for (const p of plans) {
-    byPlan.set(p.id, { count: 0, paidCount: 0, overdueCount: 0, paidTotal: 0 });
+    byPlan.set(p.id, { count: 0, paidCount: 0, overdueCount: 0 });
   }
 
   for (const u of users) {
@@ -202,7 +202,6 @@ export async function getBillingSummary() {
     entry.count += 1;
     if (row.paymentStatus === "PAGO") {
       entry.paidCount += 1;
-      entry.paidTotal += Number(u.orders[0]?.total ?? 0);
     }
     if (row.paymentStatus === "EM_ATRASO") entry.overdueCount += 1;
   }
@@ -210,15 +209,16 @@ export async function getBillingSummary() {
   return {
     plans: plans.map((p) => {
       const entry = byPlan.get(p.id)!;
+      const price = Number(p.price);
       return {
         id: p.id,
         name: p.name,
         slug: p.slug,
-        price: Number(p.price),
+        price,
         count: entry.count,
         paidCount: entry.paidCount,
         overdueCount: entry.overdueCount,
-        paidTotal: entry.paidTotal,
+        paidTotal: price * entry.paidCount,
       };
     }),
   };
