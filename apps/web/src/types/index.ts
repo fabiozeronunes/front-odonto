@@ -84,8 +84,10 @@ export interface CaseStudy {
   observations?: string | null;
   publishedAt?: string | null;
   specialty?: Specialty | null;
-  tags: VideoTag[];
+  tags: Tag[];
   images?: Media[];
+  videoIds?: string[];
+  tagIds?: string[];
   createdById?: string | null;
   createdBy?: { id: string; name: string; email: string } | null;
 }
