@@ -25,6 +25,7 @@ export const createCaseStudySchema = z.object({
   videoIds: z.array(z.string()).max(20).default([]),
   relatedIds: z.array(z.string()).max(10).default([]),
   observations: z.string().max(5000).optional().nullable(),
+  audioUrl: z.string().max(1000).optional().nullable(),
   imageUrls: z.array(imageUrl).max(10).default([]),
   images: z.array(imageItem).max(5).default([]),
 });

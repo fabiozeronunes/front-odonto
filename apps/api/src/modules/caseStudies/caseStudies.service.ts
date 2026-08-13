@@ -22,6 +22,7 @@ const caseStudySelect = {
   author: true,
   institution: true,
   observations: true,
+  audioUrl: true,
   publishedAt: true,
   createdAt: true,
   specialty: { select: { id: true, name: true, slug: true } },
@@ -134,6 +135,7 @@ export async function createCaseStudy(input: CreateCaseStudyInput, createdById: 
     difficulty: input.difficulty,
     isFree: input.isFree,
     observations: input.observations,
+    audioUrl: input.audioUrl,
     status: input.status,
     author: input.author,
     institution: input.institution,
@@ -196,6 +198,7 @@ export async function updateCaseStudy(id: string, input: UpdateCaseStudyInput, u
     "author",
     "institution",
     "observations",
+    "audioUrl",
   ] as const;
 
   for (const field of simpleFields) {

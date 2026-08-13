@@ -215,6 +215,7 @@ model CaseStudy {
   author      String?
   institution String?
   observations String?
+  audioUrl    String?
   specialty   Specialty?    @relation(fields: [specialtyId], references: [id])
   specialtyId String?
   createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)

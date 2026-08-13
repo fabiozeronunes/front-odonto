@@ -82,6 +82,7 @@ export interface CaseStudy {
   author?: string | null;
   institution?: string | null;
   observations?: string | null;
+  audioUrl?: string | null;
   publishedAt?: string | null;
   specialty?: Specialty | null;
   tags: Tag[];

@@ -11,6 +11,7 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
 import { YouTubeImport } from "../../components/YouTubeImport";
+import { AudioRecorder } from "../../components/AudioRecorder";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
@@ -32,6 +33,7 @@ interface CaseFormState {
   author: string;
   institution: string;
   observations: string;
+  audioUrl: string;
   tagIds: string[];
   videoIds: string[];
   images: ImageDraft[];
@@ -48,6 +50,7 @@ const emptyForm: CaseFormState = {
   author: "",
   institution: "",
   observations: "",
+  audioUrl: "",
   tagIds: [],
   videoIds: [],
   images: [],
@@ -110,6 +113,7 @@ export function MyCases() {
       author: c.author ?? "",
       institution: c.institution ?? "",
       observations: c.observations ?? "",
+      audioUrl: c.audioUrl ?? "",
       tagIds: c.tags.map((t) => t.id),
       videoIds: c.videoCases?.map((vc) => vc.video.id) ?? c.videoIds ?? [],
       images: c.images?.slice(0, 5).map((i) => ({
@@ -136,6 +140,7 @@ export function MyCases() {
       author: editing.author || undefined,
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
+      audioUrl: editing.audioUrl || undefined,
       tagIds: editing.tagIds,
       videoIds: editing.videoIds,
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
@@ -397,6 +402,12 @@ export function MyCases() {
                 )}
               </div>
             </div>
+
+            <AudioRecorder
+              value={editing.audioUrl}
+              onChange={(audioUrl) => setEditing({ ...editing, audioUrl })}
+              label="Áudio (gravar ou importar)"
+            />
 
             <div className="space-y-2">
               <Label>Descrição</Label>

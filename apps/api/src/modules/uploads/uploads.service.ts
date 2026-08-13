@@ -12,6 +12,13 @@ const ALLOWED_MIMES: Record<string, string> = {
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
+  "audio/webm": ".webm",
+  "audio/mpeg": ".mp3",
+  "audio/mp3": ".mp3",
+  "audio/ogg": ".ogg",
+  "audio/wav": ".wav",
+  "audio/wave": ".wav",
+  "audio/mp4": ".m4a",
 };
 
 const storage = multer.diskStorage({
@@ -29,10 +36,10 @@ const storage = multer.diskStorage({
 
 export const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (ALLOWED_MIMES[file.mimetype]) return cb(null, true);
-    cb(new Error("Formato de imagem inválido. Use JPG, PNG, WEBP ou GIF."));
+    cb(new Error("Formato inválido. Use imagens (JPG, PNG, WEBP, GIF) ou áudio (WEBM, MP3, OGG, WAV)."));
   },
 });
 
