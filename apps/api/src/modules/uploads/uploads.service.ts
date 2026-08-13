@@ -1,11 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
 import crypto from "node:crypto";
 import multer from "multer";
+import { createClient } from "@supabase/supabase-js";
 
-const UPLOADS_BASE = path.resolve(process.cwd(), "public", "uploads");
+const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "";
 
-fs.mkdirSync(UPLOADS_BASE, { recursive: true });
+export const storage = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+export const STORAGE_BUCKET = "uploads";
 
 const ALLOWED_MIMES: Record<string, string> = {
   "image/jpeg": ".jpg",
@@ -21,21 +23,8 @@ const ALLOWED_MIMES: Record<string, string> = {
   "audio/mp4": ".m4a",
 };
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    const userId = (_req as { user?: { id: string } }).user?.id ?? "anon";
-    const dir = path.join(UPLOADS_BASE, userId);
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = ALLOWED_MIMES[file.mimetype] ?? path.extname(file.originalname);
-    cb(null, `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`);
-  },
-});
-
 export const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (ALLOWED_MIMES[file.mimetype]) return cb(null, true);
@@ -43,18 +32,45 @@ export const upload = multer({
   },
 });
 
-export function toPublicUrl(userId: string, filename: string) {
-  return `/uploads/${userId}/${filename}`;
+export async function saveUploadedFile(
+  userId: string,
+  file: Express.Multer.File
+): Promise<string> {
+  const ext = ALLOWED_MIMES[file.mimetype] ?? ".bin";
+  const filename = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
+  const path = `${userId}/${filename}`;
+
+  const { error } = await storage.storage.from(STORAGE_BUCKET).upload(path, file.buffer, {
+    contentType: file.mimetype,
+    upsert: true,
+  });
+  if (error) {
+    throw new Error(`Falha ao enviar arquivo para o armazenamento: ${error.message}`);
+  }
+
+  return toPublicUrl(path);
+}
+
+export function toPublicUrl(path: string) {
+  return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
 }
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
-export function listMyUploads(userId: string): { url: string; name: string }[] {
-  const dir = path.join(UPLOADS_BASE, userId);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((name) => IMAGE_EXT.has(path.extname(name).toLowerCase()))
-    .map((name) => ({ url: toPublicUrl(userId, name), name }))
-    .sort((a, b) => b.name.localeCompare(a.name));
+export async function listMyUploads(userId: string): Promise<{ url: string; name: string }[]> {
+  const { data } = await storage.storage
+    .from(STORAGE_BUCKET)
+    .list(userId, { sortBy: { column: "name", order: "desc" } });
+
+  if (!data) return [];
+
+  return (data ?? [])
+    .filter((item) => {
+      const ext = "." + (item.name.split(".").pop()?.toLowerCase() ?? "");
+      return IMAGE_EXT.has(ext);
+    })
+    .map((item) => ({
+      url: toPublicUrl(`${userId}/${item.name}`),
+      name: item.name,
+    }));
 }
