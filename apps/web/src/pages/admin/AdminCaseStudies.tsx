@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { api } from "../../lib/api";
-import type { Paginated, Specialty, CaseStudy } from "../../types";
+import type { Paginated, Specialty, Tag, CaseStudy } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -9,6 +9,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { ImagePicker } from "../../components/ImagePicker";
 
 interface CaseForm {
   id?: string;
@@ -19,6 +20,9 @@ interface CaseForm {
   difficulty: string;
   isFree: boolean;
   status: string;
+  videoIds: string[];
+  imageUrls: string[];
+  tagIds: string[];
 }
 
 const emptyForm: CaseForm = {
@@ -29,11 +33,15 @@ const emptyForm: CaseForm = {
   difficulty: "INTERMEDIARIO",
   isFree: false,
   status: "DRAFT",
+  videoIds: [],
+  imageUrls: [],
+  tagIds: [],
 };
 
 export function AdminCaseStudies() {
   const [items, setItems] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -42,13 +50,15 @@ export function AdminCaseStudies() {
 
   async function load() {
     setLoading(true);
-    const [c, s] = await Promise.all([
+    const [c, s, t] = await Promise.all([
       api<Paginated<CaseStudy>>(`/api/case-studies?perPage=15&page=${page}&all=true`),
       api<{ data: Specialty[] }>("/api/specialties?all=true"),
+      api<{ data: Tag[] }>("/api/tags?all=true"),
     ]);
     setItems(c.data);
     setTotalPages(c.pagination.totalPages);
     setSpecialties(s.data);
+    setTags(t.data);
     setLoading(false);
   }
 
@@ -66,6 +76,9 @@ export function AdminCaseStudies() {
       difficulty: cs.difficulty,
       isFree: cs.isFree,
       status: cs.status,
+      videoIds: cs.videoIds ?? [],
+      imageUrls: cs.images?.map((i) => i.url) ?? [],
+      tagIds: cs.tagIds ?? [],
     });
   }
 
@@ -80,6 +93,9 @@ export function AdminCaseStudies() {
       difficulty: editing.difficulty,
       isFree: editing.isFree,
       status: editing.status,
+      videoIds: editing.videoIds,
+      imageUrls: editing.imageUrls,
+      tagIds: editing.tagIds,
     };
     try {
       if (editing.id) {
@@ -162,10 +178,61 @@ export function AdminCaseStudies() {
               <Label>Descrição</Label>
               <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={4} />
             </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={editing.isFree} onChange={(e) => setEditing({ ...editing, isFree: e.target.checked })} />
-              Conteúdo gratuito
-            </label>
+            <div className="flex items-center gap-4">
+              <Label>Tipo de acesso</Label>
+              <Select
+                value={editing.isFree ? "gratuito" : "pago"}
+                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
+              >
+                <option value="gratuito">Gratuito</option>
+                <option value="pago">Pago</option>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Vídeos</Label>
+              <Select
+                value={editing.videoIds.length > 0 ? editing.videoIds[0] : ""}
+                onChange={(e) => setEditing({ ...editing, videoIds: editing.videoIds.length > 0 ? [e.target.value] : [] })}
+              >
+                <option value="">Nenhum vídeo</option>
+                <option value="1">Vídeo 1</option>
+                <option value="2">Vídeo 2</option>
+                <option value="3">Vídeo 3</option>
+              </Select>
+            </div>
+            <ImagePicker
+              value={editing.imageUrls}
+              onChange={(urls) => setEditing({ ...editing, imageUrls: urls })}
+              label="Galeria de imagens (upload ou link)"
+            />
+            <div className="space-y-2">
+              <Label>Tags</Label>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className={`inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white ${editing.tagIds.includes(tag.id) ? "opacity-100" : "opacity-50"}`}
+                  >
+                    #{tag.name}
+                    <button
+                      type="button"
+                      onClick={() => setEditing({ ...editing, tagIds: editing.tagIds.includes(tag.id) ? editing.tagIds.filter((t) => t !== tag.id) : [...editing.tagIds, tag.id] })}
+                      className="ml-2 text-white/25 hover:bg-white/40 rounded-full h-4 w-4"
+                      title="Remover tag"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="mt-2">
+                <Input
+                  placeholder="Nova tag..."
+                  onChange={() => setEditing({ ...editing, tagIds: [...editing.tagIds, Math.random().toString(36).substring(2, 10)] })}
+                  className="h-8 max-w-[200px] text-sm"
+                />
+              </div>
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
               <Button onClick={save} disabled={saving || !editing.title}>Salvar</Button>
