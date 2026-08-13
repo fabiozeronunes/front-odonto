@@ -47,7 +47,7 @@ function VideoSection({
           </Link>
         </div>
         {loading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
             ))}
@@ -55,7 +55,7 @@ function VideoSection({
         ) : videos.length === 0 ? (
           <p className="text-sm text-slate-500">Nenhum vídeo disponível ainda.</p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-6">
             {videos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
