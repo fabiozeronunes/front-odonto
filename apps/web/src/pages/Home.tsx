@@ -78,17 +78,14 @@ export function Home() {
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
-              Domine a <span className="relative inline-block">
-                <span className="absolute inset-x-0 -bottom-1 h-1.5 rounded-full bg-gradient-to-r from-teal-300 to-accent-400" />
-                Odontologia
-              </span>
-              com aulas em vídeo, Imagens e Estudos de Casos.
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight text-justify sm:text-5xl lg:text-6xl">
+              Domine a <span className="inline-block">Odontologia</span> com aulas em vídeo, Imagens e
+              Estudos de Casos.
             </h1>
 
-            <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed">
-              Aprenda por especialidade, acompanhe estudos de caso reais e evolua seus estudos com
-              conteúdos gratuitos e premium feitos para a sua formação.
+            <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed text-justify">
+              Aprenda por especialidades, estudos de casos reais e evolua seus estudos com Quizz,
+              Flashcards, Questionários que vão ajudar na sua formação e aprendizado.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
