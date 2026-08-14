@@ -24,20 +24,20 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">
         <Link to="/" className="flex items-center gap-2">
           {logoUrl ? (
             <img
               src={logoUrl}
               alt="OdontoStudy"
-              className="h-9 w-auto max-w-[180px] object-contain"
+              className="h-11 w-auto max-w-[170px] object-contain sm:max-w-[220px] md:h-14 md:max-w-[260px] lg:h-16 lg:max-w-[320px]"
             />
           ) : (
             <>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-400 text-slate-950">
-                <GraduationCap className="h-5 w-5" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-400 text-slate-950 md:h-12 md:w-12">
+                <GraduationCap className="h-6 w-6 md:h-7 md:w-7" />
               </span>
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-white md:text-2xl">
                 Odonto<span className="text-teal-400">Study</span>
               </span>
             </>

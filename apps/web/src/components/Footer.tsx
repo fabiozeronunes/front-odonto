@@ -13,10 +13,10 @@ export function Footer() {
               <img
                 src={logoUrl}
                 alt="OdontoStudy"
-                className="h-10 w-auto max-w-[200px] object-contain"
+                className="h-12 w-auto max-w-[220px] object-contain sm:max-w-[280px] md:h-16 md:max-w-[360px]"
               />
             ) : (
-              <p className="text-lg font-bold text-white">
+              <p className="text-lg font-bold text-white md:text-2xl">
                 Odonto<span className="text-teal-400">Study</span>
               </p>
             )}
