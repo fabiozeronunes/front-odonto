@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import { GraduationCap, Search, User as UserIcon, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
+import { useSiteLogo } from "../lib/useSiteLogo";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 
@@ -18,18 +19,29 @@ const darkGhost = "text-slate-300 hover:bg-slate-800 hover:text-white";
 
 export function Navbar() {
   const { user, isAdmin, logout } = useAuth();
+  const logoUrl = useSiteLogo();
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-400 text-slate-950">
-            <GraduationCap className="h-5 w-5" />
-          </span>
-          <span className="text-lg font-bold text-white">
-            Odonto<span className="text-teal-400">Study</span>
-          </span>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="OdontoStudy"
+              className="h-9 w-auto max-w-[180px] object-contain"
+            />
+          ) : (
+            <>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-400 text-slate-950">
+                <GraduationCap className="h-5 w-5" />
+              </span>
+              <span className="text-lg font-bold text-white">
+                Odonto<span className="text-teal-400">Study</span>
+              </span>
+            </>
+          )}
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

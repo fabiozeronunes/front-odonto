@@ -5,6 +5,7 @@ import { requireRole } from "../../middlewares/requireRole.js";
 import { validate } from "../../middlewares/validate.js";
 import { z } from "zod";
 import * as ctrl from "./admin.controller.js";
+import { logoPost } from "../settings/settings.controller.js";
 
 export const adminRouter = Router();
 
@@ -32,3 +33,9 @@ adminRouter.put(
   ctrl.updateContact
 );
 adminRouter.delete("/users/:id", ctrl.remove);
+
+adminRouter.post(
+  "/settings/logo",
+  validate(z.object({ url: z.string().min(1).max(500) })),
+  logoPost
+);

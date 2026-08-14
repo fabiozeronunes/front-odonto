@@ -1,14 +1,25 @@
 import { Link } from "react-router-dom";
+import { useSiteLogo } from "../lib/useSiteLogo";
 
 export function Footer() {
+  const logoUrl = useSiteLogo();
+
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
-            <p className="text-lg font-bold text-white">
-              Odonto<span className="text-teal-400">Study</span>
-            </p>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="OdontoStudy"
+                className="h-10 w-auto max-w-[200px] object-contain"
+              />
+            ) : (
+              <p className="text-lg font-bold text-white">
+                Odonto<span className="text-teal-400">Study</span>
+              </p>
+            )}
             <p className="mt-3 max-w-md text-sm">
               Plataforma de estudos odontológicos com vídeos, especialidades e estudos de caso
               para estudantes e profissionais.
