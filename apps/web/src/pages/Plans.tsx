@@ -79,14 +79,33 @@ export function Plans() {
                   )}
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">
-                      {formatPrice(plan.price)}
-                    </span>
-                    <span className="text-sm text-slate-500">
-                      / {plan.billing === "MONTHLY" ? "mês" : "ano"}
-                    </span>
-                  </div>
+                  {plan.billing === "YEARLY" ? (
+                    <div>
+                      <p className="text-sm font-medium uppercase tracking-wide text-slate-400">
+                        Anual
+                      </p>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="text-4xl font-extrabold text-slate-900">
+                          {formatPrice(plan.price)}
+                        </span>
+                        <span className="text-sm text-slate-500">/ ano</span>
+                      </div>
+                      <p className="mt-1 text-sm text-slate-500">
+                        sai a{" "}
+                        <span className="font-semibold text-slate-700">
+                          {formatPrice(Number(plan.price) / 12)}
+                        </span>{" "}
+                        mensal
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-extrabold text-slate-900">
+                        {formatPrice(plan.price)}
+                      </span>
+                      <span className="text-sm text-slate-500">/ mês</span>
+                    </div>
+                  )}
 
                   <ul className="mt-6 flex-1 space-y-3">
                     {Array.isArray(plan.benefits) &&
