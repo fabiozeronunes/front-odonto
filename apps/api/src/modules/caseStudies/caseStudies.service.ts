@@ -23,6 +23,8 @@ const caseStudySelect = {
   institution: true,
   observations: true,
   audioUrl: true,
+  audioTitle: true,
+  audioTags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
   publishedAt: true,
   createdAt: true,
   specialty: { select: { id: true, name: true, slug: true } },
@@ -140,6 +142,7 @@ export async function createCaseStudy(input: CreateCaseStudyInput, createdById: 
     isFree: input.isFree,
     observations: input.observations,
     audioUrl: input.audioUrl,
+    audioTitle: input.audioTitle,
     status: input.status,
     author: input.author,
     institution: input.institution,
@@ -153,6 +156,9 @@ export async function createCaseStudy(input: CreateCaseStudyInput, createdById: 
 
   if (input.tagIds.length > 0) {
     data.tags = { create: input.tagIds.map((tagId) => ({ tagId })) };
+  }
+  if (input.audioTagIds.length > 0) {
+    data.audioTags = { create: input.audioTagIds.map((tagId) => ({ tagId })) };
   }
   if (input.videoIds.length > 0) {
     data.videoCases = { create: input.videoIds.map((videoId) => ({ videoId })) };
@@ -203,12 +209,21 @@ export async function updateCaseStudy(id: string, input: UpdateCaseStudyInput, u
     "institution",
     "observations",
     "audioUrl",
+    "audioTitle",
   ] as const;
 
   for (const field of simpleFields) {
     if (input[field] !== undefined) {
       data[field] = (input[field] === "" ? null : input[field]) as never;
     }
+  }
+
+  if (input.audioUrl === null && input.audioTitle === undefined) {
+    data.audioTitle = null;
+    data.audioTags = { deleteMany: {} };
+  }
+  if (input.audioTagIds !== undefined) {
+    data.audioTags = { deleteMany: {}, create: input.audioTagIds.map((tagId) => ({ tagId })) };
   }
 
   if (input.title) {

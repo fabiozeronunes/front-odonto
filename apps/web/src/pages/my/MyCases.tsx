@@ -34,6 +34,8 @@ interface CaseFormState {
   institution: string;
   observations: string;
   audioUrl: string;
+  audioTitle: string;
+  audioTagIds: string[];
   tagIds: string[];
   videoIds: string[];
   images: ImageDraft[];
@@ -51,6 +53,8 @@ const emptyForm: CaseFormState = {
   institution: "",
   observations: "",
   audioUrl: "",
+  audioTitle: "",
+  audioTagIds: [],
   tagIds: [],
   videoIds: [],
   images: [],
@@ -114,6 +118,8 @@ export function MyCases() {
       institution: c.institution ?? "",
       observations: c.observations ?? "",
       audioUrl: c.audioUrl ?? "",
+      audioTitle: c.audioTitle ?? "",
+      audioTagIds: c.audioTags?.map((t) => t.tag.id) ?? [],
       tagIds: c.tags.map((t) => t.tag.id),
       videoIds: c.videoCases?.map((vc) => vc.video.id) ?? c.videoIds ?? [],
       images: c.images?.slice(0, 5).map((i) => ({
@@ -141,6 +147,8 @@ export function MyCases() {
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
       audioUrl: editing.audioUrl || undefined,
+      audioTitle: editing.audioTitle || undefined,
+      audioTagIds: editing.audioTagIds,
       tagIds: editing.tagIds,
       videoIds: editing.videoIds,
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
@@ -249,6 +257,40 @@ export function MyCases() {
       });
       setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
       setEditing({ ...editing, tagIds: [...editing.tagIds, res.data.id] });
+      return res.data.id;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao criar tag");
+      return null;
+    }
+  }
+
+  function toggleAudioTag(id: string) {
+    if (!editing) return;
+    setEditing({
+      ...editing,
+      audioTagIds: editing.audioTagIds.includes(id)
+        ? editing.audioTagIds.filter((t) => t !== id)
+        : [...editing.audioTagIds, id],
+    });
+  }
+
+  async function createAudioTag(name: string) {
+    if (!editing || !name.trim()) return null;
+    const trimmed = name.trim();
+    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing) {
+      if (!editing.audioTagIds.includes(existing.id)) {
+        setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, existing.id] });
+      }
+      return existing.id;
+    }
+    try {
+      const res = await api<{ data: Tag }>("/api/tags", {
+        method: "POST",
+        body: JSON.stringify({ name: trimmed }),
+      });
+      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
+      setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, res.data.id] });
       return res.data.id;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao criar tag");
@@ -405,9 +447,60 @@ export function MyCases() {
 
             <AudioRecorder
               value={editing.audioUrl}
-              onChange={(audioUrl) => setEditing({ ...editing, audioUrl })}
+              onChange={(audioUrl) =>
+                setEditing({
+                  ...editing,
+                  audioUrl,
+                  ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }),
+                })
+              }
               label="Áudio (gravar ou importar)"
             />
+
+            {editing.audioUrl && (
+              <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 p-4">
+                <p className="text-sm font-semibold text-slate-800">Detalhes do áudio</p>
+                <div className="space-y-2">
+                  <Label>Título do áudio</Label>
+                  <Input
+                    value={editing.audioTitle}
+                    onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })}
+                    placeholder="Ex.: Explicação do caso clínico"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tags do áudio</Label>
+                  <p className="text-xs text-slate-500">
+                    Tags específicas para o áudio, independentes das tags do caso.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => {
+                      const selected = editing.audioTagIds.includes(tag.id);
+                      return (
+                        <span
+                          key={tag.id}
+                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                            selected
+                              ? "bg-accent-600 text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => toggleAudioTag(tag.id)}
+                            className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                            title={selected ? "Remover tag do áudio" : "Adicionar tag ao áudio"}
+                          >
+                            #{tag.name}
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <TagCreator onCreate={createAudioTag} />
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Descrição</Label>

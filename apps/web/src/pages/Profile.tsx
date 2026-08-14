@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Crown,
   CalendarDays,
+  Hash,
   Film,
   BookOpen,
   Heart,
@@ -259,6 +260,12 @@ export function Profile() {
                   <dd className="font-medium text-slate-900">
                     {user.role === "ADMIN" ? "Administrador" : "Membro"}
                   </dd>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="flex items-center gap-1.5 text-slate-500">
+                    <Hash className="h-4 w-4" /> Nº de matrícula
+                  </dt>
+                  <dd className="font-medium text-slate-900">{user.registrationNumber ?? "—"}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <dt className="flex items-center gap-1.5 text-slate-500">

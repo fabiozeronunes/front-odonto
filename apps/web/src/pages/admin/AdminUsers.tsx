@@ -290,6 +290,7 @@ export function AdminUsers() {
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
                 <tr>
                   <th className="px-5 py-3">Nome</th>
+                  <th className="px-5 py-3">Matrícula</th>
                   <th className="px-5 py-3">E-mail</th>
                   <th className="px-5 py-3">Telefone</th>
                   <th className="px-5 py-3">Plano / Acesso</th>
@@ -302,12 +303,13 @@ export function AdminUsers() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
+                    <td colSpan={9} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
                   </tr>
                 ) : (
                   users.map((u) => (
                     <tr key={u.id} className="hover:bg-slate-50">
                       <td className="px-5 py-3 font-medium text-slate-800">{u.name}</td>
+                      <td className="px-5 py-3 text-slate-500">{u.registrationNumber ?? "—"}</td>
                       <td className="px-5 py-3 text-slate-500">{u.email}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-1">

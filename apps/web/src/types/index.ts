@@ -85,6 +85,8 @@ export interface CaseStudy {
   institution?: string | null;
   observations?: string | null;
   audioUrl?: string | null;
+  audioTitle?: string | null;
+  audioTags?: { tag: Tag }[];
   publishedAt?: string | null;
   specialty?: Specialty | null;
   tags: { tag: Tag }[];
@@ -114,6 +116,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string | null;
+  registrationNumber?: string | null;
   role: Role;
   isActive?: boolean;
   plan?: { id: string; name: string; slug: string; price: string | number; billing: BillingPeriod };

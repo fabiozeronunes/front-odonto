@@ -12,14 +12,34 @@ import {
 } from "../../utils/jwt.js";
 import type { RegisterInput, LoginInput } from "./auth.validators.js";
 
-function publicUser(user: { id: string; name: string; email: string; role: string; planId: string }) {
+function publicUser(user: {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  planId: string;
+  registrationNumber?: string | null;
+}) {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
     planId: user.planId,
+    registrationNumber: user.registrationNumber ?? null,
   };
+}
+
+async function generateRegistrationNumber(): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const candidate = String(Math.floor(100000 + Math.random() * 900000));
+    const exists = await prisma.user.findUnique({
+      where: { registrationNumber: candidate },
+      select: { id: true },
+    });
+    if (!exists) return candidate;
+  }
+  throw new Error("Não foi possível gerar um número de matrícula único");
 }
 
 async function getFreePlanId() {
@@ -62,6 +82,8 @@ export async function registerUser(input: RegisterInput) {
     }
   }
 
+  const registrationNumber = await generateRegistrationNumber();
+
   const user = await prisma.user.create({
     data: {
       name: input.name,
@@ -69,8 +91,9 @@ export async function registerUser(input: RegisterInput) {
       passwordHash,
       planId,
       referredById,
+      registrationNumber,
     },
-    select: { id: true, name: true, email: true, role: true, planId: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true },
   });
 
   return {
@@ -94,7 +117,7 @@ export function issueTokens(user: { id: string; email: string; role: string; pla
 export async function loginUser(input: LoginInput) {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
-    select: { id: true, name: true, email: true, role: true, planId: true, passwordHash: true, isActive: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, passwordHash: true, isActive: true },
   });
 
   if (!user || !(await bcrypt.compare(input.password, user.passwordHash))) {
@@ -119,7 +142,7 @@ export async function refreshAccess(refreshToken: string) {
 
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
-    select: { id: true, name: true, email: true, role: true, planId: true, isActive: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true },
   });
 
   if (!user || !user.isActive) {
@@ -144,6 +167,7 @@ export async function getProfile(userId: string) {
       name: true,
       email: true,
       role: true,
+      registrationNumber: true,
       isAffiliate: true,
       affiliateCode: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
@@ -163,6 +187,7 @@ export async function updateProfile(userId: string, name: string) {
       name: true,
       email: true,
       role: true,
+      registrationNumber: true,
       isAffiliate: true,
       affiliateCode: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },

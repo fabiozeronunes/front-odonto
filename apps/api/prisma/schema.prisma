@@ -78,6 +78,7 @@ model User {
   name         String
   email        String         @unique
   passwordHash String
+  registrationNumber String?  @unique
   phone        String?
   role         Role           @default(USER)
   isActive     Boolean        @default(true)
@@ -173,6 +174,7 @@ model Tag {
   caseStudies CaseStudyTag[]
   products    ProductTag[]
   media       MediaTag[]
+  caseStudyAudios CaseStudyAudioTag[]
 
   @@index([createdById])
 }
@@ -238,6 +240,7 @@ model CaseStudy {
   institution String?
   observations String?
   audioUrl    String?
+  audioTitle  String?
   specialty   Specialty?    @relation(fields: [specialtyId], references: [id])
   specialtyId String?
   createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
@@ -247,6 +250,7 @@ model CaseStudy {
   updatedAt   DateTime      @updatedAt
 
   tags          CaseStudyTag[]
+  audioTags     CaseStudyAudioTag[]
   videoCases    VideoCaseStudy[]
   relatedCases  CaseStudyRelated[] @relation("related")
   relatedFrom   CaseStudyRelated[] @relation("relatedFrom")
@@ -255,6 +259,16 @@ model CaseStudy {
   @@index([specialtyId, status])
   @@index([createdById])
   @@index([title])
+}
+
+model CaseStudyAudioTag {
+  caseStudy   CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId       String
+
+  @@id([caseStudyId, tagId])
+  @@index([tagId])
 }
 
 model CaseStudyTag {

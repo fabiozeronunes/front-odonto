@@ -6,7 +6,7 @@ process.env.DATABASE_URL =
   process.env.TEST_DATABASE_URL ??
   "postgresql://odonto:odonto_dev_password@localhost:5432/odonto_study_test";
 
-execSync("npx prisma db push --skip-generate", {
+execSync("npx prisma db push --skip-generate --accept-data-loss", {
   stdio: "inherit",
   env: { ...process.env },
 });

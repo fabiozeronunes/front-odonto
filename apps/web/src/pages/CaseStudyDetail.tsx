@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Stethoscope, User, Building2, Tag as TagIcon, ArrowRight, Images as ImagesIcon, X } from "lucide-react";
+import { Stethoscope, User, Building2, Tag as TagIcon, ArrowRight, Images as ImagesIcon, AudioLines, X } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { CaseStudy, Video } from "../types";
@@ -131,6 +131,30 @@ export function CaseStudyDetail() {
                 <Badge variant="outline" className="hover:bg-slate-100">#{tag.name}</Badge>
               </Link>
             ))}
+          </div>
+        )}
+
+        {data.audioUrl && (
+          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <AudioLines className="h-4 w-4 text-primary-700" /> Áudio do caso
+            </p>
+            {data.audioTitle && (
+              <p className="mt-1 text-slate-600">{data.audioTitle}</p>
+            )}
+            <audio controls src={resolveImageUrl(data.audioUrl)} className="mt-3 h-10 w-full" preload="metadata" />
+            {data.audioTags && data.audioTags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {data.audioTags.map(({ tag }) => (
+                  <span
+                    key={tag.id}
+                    className="rounded-full bg-accent-50 px-2.5 py-0.5 text-xs font-medium text-accent-700"
+                  >
+                    #{tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
