@@ -8,12 +8,6 @@ import { VideoCard } from "../components/VideoCard";
 import { api } from "../lib/api";
 import type { Paginated, Video } from "../types";
 
-const heroStats = [
-  { value: "+40", label: "vídeos de estudo" },
-  { value: "14", label: "especialidades" },
-  { value: "100%", label: "online e gratuito" },
-];
-
 function VideoSection({
   title,
   icon,
@@ -89,7 +83,7 @@ export function Home() {
                 <span className="absolute inset-x-0 -bottom-1 h-1.5 rounded-full bg-gradient-to-r from-teal-300 to-accent-400" />
                 Odontologia
               </span>
-              com aulas em vídeo
+              com aulas em vídeo, Imagens e Estudos de Casos.
             </h1>
 
             <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed">
@@ -111,20 +105,11 @@ export function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-12 px-8 font-medium text-white border-2 border-white/20 hover:bg-white/10 transition-colors"
+                  className="h-12 px-8 font-medium bg-white text-slate-900 border-2 border-white/20 hover:bg-white/90 hover:text-slate-900 transition-colors"
                 >
                   Acesso Gratuito
                 </Button>
               </Link>
-            </div>
-
-            <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 animate-fade-in">
-              {heroStats.map((s) => (
-                <div key={s.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blurxl border border-white/20">
-                  <Sparkles className="h-4 w-4 text-teal-300" />
-                  <span className="text-sm text-white/60">{s.value}</span>
-                </div>
-              ))}
             </div>
           </div>
         </div>

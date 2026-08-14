@@ -9,6 +9,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Badge } from "../components/ui/badge";
 import { formatPrice } from "../lib/utils";
 
+const PLAN_ORDER: Record<string, number> = {
+  premium: 0,
+  "odonto-pro": 1,
+  gratuito: 2,
+};
+
+const PLAN_TITLE: Record<string, string> = {
+  premium: "Premium",
+  "odonto-pro": "Pro",
+  gratuito: "Gratuito",
+};
+
 export function Plans() {
   const { isAuthenticated } = useAuth();
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
@@ -16,7 +28,13 @@ export function Plans() {
 
   useEffect(() => {
     api<{ data: MembershipPlan[] }>("/api/plans")
-      .then((data) => setPlans(data.data.filter((p) => p.status === "ACTIVE")))
+      .then((data) =>
+        setPlans(
+          data.data
+            .filter((p) => p.status === "ACTIVE")
+            .sort((a, b) => (PLAN_ORDER[a.slug] ?? 99) - (PLAN_ORDER[b.slug] ?? 99))
+        )
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -55,7 +73,7 @@ export function Plans() {
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-xl">{plan.slug === "free" ? "Gratuito" : plan.slug === "premium" ? "Premium" : "Pro"}</CardTitle>
+                  <CardTitle className="text-xl">{PLAN_TITLE[plan.slug] ?? plan.name}</CardTitle>
                   {plan.description && (
                     <p className="text-sm text-slate-500">{plan.description}</p>
                   )}
@@ -89,13 +107,13 @@ export function Plans() {
                       </Link>
                     ) : plan.slug === "odonto-pro" ? (
                       <Link to={isAuthenticated ? `/checkout?plan=${plan.slug}` : `/cadastro?plan=${plan.slug}`}>
-                        <Button variant="outline" size="lg" className="w-full">
+                        <Button variant="premium" size="lg" className="w-full">
                           Assinar Pro
                         </Button>
                       </Link>
                     ) : (
                       <Link to={isAuthenticated ? "/dashboard" : "/cadastro"}>
-                        <Button variant="outline" size="lg" className="w-full">
+                        <Button variant="premium" size="lg" className="w-full">
                           Criar conta gratuita
                         </Button>
                       </Link>
