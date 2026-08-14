@@ -73,17 +73,17 @@ export function Home() {
         <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl" />
 
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
-          <div className="relative">
+          <div className="relative text-justify">
             <Badge className="bg-white/15 text-white hover:bg-white/20">
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight text-justify sm:text-5xl lg:text-6xl">
-              Domine a <span className="inline-block">Odontologia</span> com aulas em vídeo, Imagens e
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+              Domine a <span className="inline-block">Odontologia</span> com Aulas em Vídeo, Imagens e
               Estudos de Casos.
             </h1>
 
-            <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed text-justify">
+            <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed">
               Aprenda por especialidades, estudos de casos reais e evolua seus estudos com Quizz,
               Flashcards, Questionários que vão ajudar na sua formação e aprendizado.
             </p>
