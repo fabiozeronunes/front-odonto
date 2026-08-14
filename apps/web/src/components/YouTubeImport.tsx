@@ -74,8 +74,8 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-      <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+    <div className="rounded-xl border border-border bg-muted p-4">
+      <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
         <Youtube className="h-4 w-4 text-red-600" /> Importar do YouTube
       </p>
       <div className="flex gap-2">
@@ -98,8 +98,8 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
             <img src={info.thumbnailUrl} alt="" className="h-24 w-40 rounded-lg object-cover" />
           )}
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800">{info.title}</p>
-            <p className="text-xs text-slate-500">{info.author}</p>
+            <p className="text-sm font-medium text-foreground">{info.title}</p>
+            <p className="text-xs text-muted-foreground">{info.author}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <Button
                 type="button"

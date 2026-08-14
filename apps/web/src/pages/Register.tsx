@@ -60,14 +60,14 @@ export function Register() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="mb-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-700 text-white">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-700 text-primary-foreground">
           <GraduationCap className="h-6 w-6" />
         </span>
-        <p className="mt-2 text-lg font-bold text-slate-900">
+        <p className="mt-2 text-lg font-bold text-foreground">
           Front<span className="text-primary-700">Odontus</span>
         </p>
-        <h1 className="mt-1 text-2xl font-bold text-slate-900">Crie sua conta</h1>
-        <p className="mt-1 text-sm text-slate-500">Escolha seu plano e comece a estudar</p>
+        <h1 className="mt-1 font-display text-2xl font-bold text-foreground">Crie sua conta</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Escolha seu plano e comece a estudar</p>
       </div>
 
       <Card>
@@ -78,7 +78,7 @@ export function Register() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 {error}
               </div>
@@ -88,7 +88,7 @@ export function Register() {
               <Label>Plano de uso</Label>
               <div className="grid gap-2">
                 {plans.length === 0 ? (
-                  <div className="h-16 animate-pulse rounded-lg bg-slate-200" />
+                  <div className="h-16 animate-pulse rounded-lg bg-muted" />
                 ) : (
                   plans.map((p) => {
                     const isSelected = planSlug === p.slug;
@@ -100,19 +100,19 @@ export function Register() {
                         className={cn(
                           "flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors",
                           isSelected
-                            ? "border-primary-600 bg-primary-50"
-                            : "border-slate-200 hover:border-slate-300"
+                            ? "border-primary-600 bg-primary-50 dark:border-primary-400 dark:bg-primary-950/40"
+                            : "border-border hover:border-foreground/40"
                         )}
                       >
                         <div>
-                          <p className="text-sm font-bold text-slate-900">
+                          <p className="text-sm font-bold text-foreground">
                             {p.name === "Odonto PREMIUM"
                               ? "Premium"
                               : p.name === "Odonto Pro"
                                 ? "Pro"
                                 : p.name}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             {p.slug === "gratuito"
                               ? "Acesso a conteúdos gratuitos"
                               : p.billing === "YEARLY"
@@ -121,7 +121,7 @@ export function Register() {
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-slate-800">
+                          <span className="text-sm font-bold text-foreground">
                             {p.slug === "gratuito"
                               ? "Grátis"
                               : formatPrice(p.price)}
@@ -129,7 +129,7 @@ export function Register() {
                           <span
                             className={cn(
                               "flex h-5 w-5 items-center justify-center rounded-full border",
-                              isSelected ? "border-primary-600 bg-primary-600 text-white" : "border-slate-300"
+                              isSelected ? "border-primary-600 bg-primary-600 text-white" : "border-border"
                             )}
                           >
                             {isSelected && <Check className="h-3 w-3" />}
@@ -178,7 +178,7 @@ export function Register() {
             </div>
 
             {selectedPlan && selectedPlan.slug !== "gratuito" && (
-              <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950 dark:text-amber-300">
                 Você selecionou o plano{" "}
                 <strong>{selectedPlan.name === "Odonto PREMIUM" ? "Premium" : "Pro"}</strong>. Após criar
                 a conta, você confirma o pagamento no checkout para liberar o acesso.
@@ -190,7 +190,7 @@ export function Register() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-sm text-muted-foreground">
             Já tem conta?{" "}
             <Link to="/login" className="font-medium text-primary-700 hover:text-primary-800">
               Entrar

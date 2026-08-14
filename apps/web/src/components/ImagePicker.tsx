@@ -90,7 +90,7 @@ export function ImagePicker({ value, onChange, label = "Imagens" }: ImagePickerP
       <Label>{label}</Label>
       <div className="flex flex-wrap gap-3">
         {value.map((u) => (
-          <div key={u} className="group relative h-20 w-20 overflow-hidden rounded-lg border border-slate-200">
+          <div key={u} className="group relative h-20 w-20 overflow-hidden rounded-lg border border-border">
             <img src={resolveImageUrl(u)} alt="" className="h-full w-full object-cover" />
             <button
               type="button"
@@ -102,7 +102,7 @@ export function ImagePicker({ value, onChange, label = "Imagens" }: ImagePickerP
             </button>
           </div>
         ))}
-        <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 text-slate-400 transition-colors hover:border-primary-400 hover:text-primary-600">
+        <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border text-muted-foreground transition-colors hover:border-primary-400 hover:text-primary-600">
           {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" />}
           <span className="mt-1 text-[10px]">{uploading ? "Enviando..." : "Upload"}</span>
           <input
@@ -134,7 +134,7 @@ export function ImagePicker({ value, onChange, label = "Imagens" }: ImagePickerP
         {showMine && (
           <div className="mt-2">
             {mine && mine.length === 0 ? (
-              <p className="text-sm text-slate-400">Você ainda não enviou imagens.</p>
+              <p className="text-sm text-muted-foreground">Você ainda não enviou imagens.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {mine?.map((img) => {
@@ -147,7 +147,7 @@ export function ImagePicker({ value, onChange, label = "Imagens" }: ImagePickerP
                       title={selected ? "Remover seleção" : "Selecionar"}
                       className={cn(
                         "relative h-16 w-16 overflow-hidden rounded-lg border-2 transition-all",
-                        selected ? "border-primary-600 ring-2 ring-primary-200" : "border-transparent hover:border-slate-300"
+                        selected ? "border-primary-600 ring-2 ring-primary-200" : "border-transparent hover:border-border"
                       )}
                     >
                       <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />

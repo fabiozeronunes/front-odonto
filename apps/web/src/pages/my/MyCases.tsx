@@ -357,7 +357,7 @@ export function MyCases() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900">Meus estudos de caso</h2>
+        <h2 className="text-xl font-bold text-foreground">Meus estudos de caso</h2>
         <Button onClick={startCreate}>
           <Plus className="h-4 w-4" /> Novo caso
         </Button>
@@ -409,7 +409,7 @@ export function MyCases() {
 
             <div className="space-y-2">
               <Label>Vídeos do caso</Label>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Importe um vídeo do YouTube ou selecione um ou mais vídeos seus para vincular a este
                 estudo de caso.
               </p>
@@ -423,13 +423,13 @@ export function MyCases() {
                       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                         selected
                           ? "bg-primary-700 text-white"
-                          : "bg-slate-100 text-slate-600"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => toggleVideo(v.id)}
-                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
                         title={selected ? "Remover vídeo do caso" : "Adicionar vídeo ao caso"}
                       >
                         {v.title}
@@ -438,7 +438,7 @@ export function MyCases() {
                   );
                 })}
                 {myVideos.length === 0 && (
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     Nenhum vídeo seu ainda. Use a importação do YouTube acima para criar o primeiro.
                   </p>
                 )}
@@ -459,7 +459,7 @@ export function MyCases() {
 
             {editing.audioUrl && (
               <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 p-4">
-                <p className="text-sm font-semibold text-slate-800">Detalhes do áudio</p>
+                <p className="text-sm font-semibold text-foreground">Detalhes do áudio</p>
                 <div className="space-y-2">
                   <Label>Título do áudio</Label>
                   <Input
@@ -470,7 +470,7 @@ export function MyCases() {
                 </div>
                 <div className="space-y-2">
                   <Label>Tags do áudio</Label>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Tags específicas para o áudio, independentes das tags do caso.
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -482,13 +482,13 @@ export function MyCases() {
                           className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                             selected
                               ? "bg-accent-600 text-white"
-                              : "bg-slate-100 text-slate-600"
+                              : "bg-muted text-muted-foreground"
                           }`}
                         >
                           <button
                             type="button"
                             onClick={() => toggleAudioTag(tag.id)}
-                            className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                            className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
                             title={selected ? "Remover tag do áudio" : "Adicionar tag ao áudio"}
                           >
                             #{tag.name}
@@ -546,7 +546,7 @@ export function MyCases() {
             {editing.images.length > 0 && (
               <div className="space-y-3">
                 <Label>Tags de cada imagem</Label>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Tags específicas para cada imagem, independentes das tags do caso. Máximo de 5
                   imagens.
                 </p>
@@ -555,10 +555,10 @@ export function MyCases() {
                   return (
                     <div
                       key={img.id}
-                      className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-start"
+                      className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
                     >
                       <div className="flex shrink-0 flex-col items-center gap-1.5">
-                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-slate-200">
+                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
                           <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
                         </div>
                         <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
@@ -566,7 +566,7 @@ export function MyCases() {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="mb-2 text-sm font-semibold text-slate-700">
+                        <p className="mb-2 text-sm font-semibold text-foreground">
                           Tags da imagem {index + 1}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -588,7 +588,7 @@ export function MyCases() {
                             </span>
                           ))}
                           {imageTags.length === 0 && (
-                            <p className="text-sm text-slate-400">Nenhuma tag nesta imagem ainda.</p>
+                            <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
                           )}
                         </div>
                         <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
@@ -621,13 +621,13 @@ export function MyCases() {
                       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                         selected
                           ? "bg-primary-700 text-white"
-                          : "bg-slate-100 text-slate-600"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => toggleTag(tag.id)}
-                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
                         title={selected ? "Remover tag do caso" : "Adicionar tag ao caso"}
                       >
                         #{tag.name}
@@ -638,7 +638,7 @@ export function MyCases() {
                         className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
                           selected
                             ? "bg-white/25 text-white hover:bg-white/40"
-                            : "text-slate-400 hover:bg-slate-200 hover:text-red-600"
+                            : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
                         }`}
                         title="Excluir tag"
                         aria-label={`Excluir tag ${tag.name}`}
@@ -652,7 +652,7 @@ export function MyCases() {
               <TagCreator onCreate={createTag} />
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+            <div className="flex justify-end gap-2 border-t border-border pt-4">
               <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
               <Button onClick={save} disabled={saving || !editing.title}>
                 {saving ? "Salvando..." : "Salvar"}
@@ -666,7 +666,7 @@ export function MyCases() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Título</th>
                   <th className="px-5 py-3">Especialidade</th>
@@ -677,17 +677,17 @@ export function MyCases() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Carregando...</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
                 ) : cases.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Nenhum estudo de caso cadastrado ainda.</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum estudo de caso cadastrado ainda.</td></tr>
                 ) : (
                   cases.map((c) => (
-                    <tr key={c.id} className="hover:bg-slate-50">
+                    <tr key={c.id} className="hover:bg-muted">
                       <td className="max-w-[280px] px-5 py-3">
-                        <p className="truncate font-medium text-slate-800">{c.title}</p>
-                        <p className="text-xs text-slate-400">{c.author ?? "—"} {c.observations ? "• com observações" : ""}</p>
+                        <p className="truncate font-medium text-foreground">{c.title}</p>
+                        <p className="text-xs text-muted-foreground">{c.author ?? "—"} {c.observations ? "• com observações" : ""}</p>
                       </td>
-                      <td className="px-5 py-3 text-slate-500">{c.specialty?.name ?? "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{c.specialty?.name ?? "—"}</td>
                       <td className="px-5 py-3">
                         <Badge variant={c.isFree ? "free" : "premium"}>{c.isFree ? "FREE" : "Pago"}</Badge>
                       </td>

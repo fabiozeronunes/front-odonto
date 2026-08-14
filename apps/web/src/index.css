@@ -1,16 +1,44 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --border: 220 13% 90%;
+    --ring: 176 84% 32%;
+    --color-primary: 175 77% 26%;
+    --color-primary-foreground: 0 0% 100%;
+    --color-accent: 38 92% 50%;
+    --color-accent-foreground: 38 92% 14%;
+  }
+
+  .dark {
+    --background: 180 25% 7%;
+    --foreground: 165 25% 94%;
+    --surface: 176 24% 12%;
+    --muted: 178 22% 16%;
+    --muted-foreground: 172 12% 66%;
+    --border: 177 18% 20%;
+    --ring: 172 66% 50%;
+    --color-primary: 172 66% 50%;
+    --color-primary-foreground: 179 84% 10%;
+    --color-accent: 38 92% 55%;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-slate-50 text-slate-900 font-sans;
+    @apply bg-background text-foreground font-sans;
+    transition: background-color 0.25s, color 0.25s;
   }
 }
 

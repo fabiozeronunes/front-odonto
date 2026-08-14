@@ -111,9 +111,9 @@ export function Profile() {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-10 w-64 rounded-lg bg-slate-200" />
-          <div className="h-40 rounded-2xl bg-slate-200" />
-          <div className="h-40 rounded-2xl bg-slate-200" />
+          <div className="h-10 w-64 rounded-lg bg-muted" />
+          <div className="h-40 rounded-2xl bg-muted" />
+          <div className="h-40 rounded-2xl bg-muted" />
         </div>
       </div>
     );
@@ -129,10 +129,10 @@ export function Profile() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
         <UserIcon className="h-7 w-7 text-primary-700" /> Meu perfil
       </h1>
-      <p className="mt-1 text-slate-500">Gerencie seus dados, senha e acompanhe sua atividade.</p>
+      <p className="mt-1 text-muted-foreground">Gerencie seus dados, senha e acompanhe sua atividade.</p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-6">
@@ -248,38 +248,38 @@ export function Profile() {
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-700 text-2xl font-bold text-white">
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <h2 className="mt-4 text-xl font-bold text-slate-900">{user.name}</h2>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+              <h2 className="mt-4 text-xl font-bold text-foreground">{user.name}</h2>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" /> {user.email}
               </p>
               <dl className="mt-5 space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="flex items-center gap-1.5 text-slate-500">
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <ShieldCheck className="h-4 w-4" /> Perfil
                   </dt>
-                  <dd className="font-medium text-slate-900">
+                  <dd className="font-medium text-foreground">
                     {user.role === "ADMIN" ? "Administrador" : "Membro"}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="flex items-center gap-1.5 text-slate-500">
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <Hash className="h-4 w-4" /> Nº de matrícula
                   </dt>
-                  <dd className="font-medium text-slate-900">{user.registrationNumber ?? "—"}</dd>
+                  <dd className="font-medium text-foreground">{user.registrationNumber ?? "—"}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="flex items-center gap-1.5 text-slate-500">
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <Crown className="h-4 w-4" /> Plano
                   </dt>
-                  <dd className="font-medium capitalize text-slate-900">
+                  <dd className="font-medium capitalize text-foreground">
                     {user.plan?.name ?? "Gratuito"}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt className="flex items-center gap-1.5 text-slate-500">
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <CalendarDays className="h-4 w-4" /> Membro desde
                   </dt>
-                  <dd className="font-medium text-slate-900">
+                  <dd className="font-medium text-foreground">
                     {user.createdAt ? formatDate(user.createdAt) : "—"}
                   </dd>
                 </div>
@@ -298,10 +298,10 @@ export function Profile() {
                 <Link
                   key={label}
                   to={to}
-                  className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3 transition-colors hover:bg-slate-50"
+                  className="flex items-center justify-between rounded-xl border border-border px-4 py-3 transition-colors hover:bg-muted"
                 >
-                  <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <Icon className="h-4 w-4 text-slate-400" /> {label}
+                  <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                    <Icon className="h-4 w-4 text-muted-foreground" /> {label}
                   </span>
                   <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-sm font-bold text-primary-800">
                     {value}

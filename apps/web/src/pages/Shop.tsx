@@ -80,16 +80,16 @@ export function Shop() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">
-            <ShoppingBag className="h-7 w-7 text-primary-700" /> Shop Odontus
+          <h1 className="flex items-center gap-2 font-display text-3xl font-bold text-foreground">
+            <ShoppingBag className="h-7 w-7 text-primary-700 dark:text-primary-400" /> Shop Odontus
           </h1>
-          <p className="mt-1 text-slate-500">
+          <p className="mt-1 text-muted-foreground">
             Kits, uniformes, instrumentais e materiais odontológicos com desconto para assinantes.
           </p>
         </div>
         <div className="w-full sm:w-64">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => applyFilter("search", e.target.value)}
@@ -106,7 +106,7 @@ export function Shop() {
           onClick={() => applyFilter("category", "")}
           className={cn(
             "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-            category === "" ? "bg-primary-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            category === "" ? "bg-primary-700 text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
           )}
         >
           Todos
@@ -118,7 +118,7 @@ export function Shop() {
             onClick={() => applyFilter("category", c.id)}
             className={cn(
               "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-              category === c.id ? "bg-primary-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              category === c.id ? "bg-primary-700 text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
             )}
           >
             {c.name}
@@ -129,7 +129,7 @@ export function Shop() {
           onClick={() => applyFilter("onSale", !onSale)}
           className={cn(
             "ml-auto inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
-            onSale ? "bg-red-600 text-white" : "bg-red-50 text-red-600 hover:bg-red-100"
+            onSale ? "bg-red-600 text-white" : "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
           )}
         >
           <Percent className="h-4 w-4" /> Somente ofertas
@@ -137,8 +137,8 @@ export function Shop() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-slate-500">Produtos por linha:</span>
-        <div className="inline-flex overflow-hidden rounded-lg border border-slate-200">
+        <span className="text-muted-foreground">Produtos por linha:</span>
+        <div className="inline-flex overflow-hidden rounded-lg border border-border">
           {(["1", "2"] as const).map((value) => (
             <button
               key={value}
@@ -146,7 +146,7 @@ export function Shop() {
               onClick={() => changeRows(value)}
               className={cn(
                 "px-4 py-1.5 font-semibold transition-colors",
-                rows === value ? "bg-primary-700 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
+                rows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
               )}
             >
               {value} {Number(value) === 1 ? "produto" : "produtos"}
@@ -158,13 +158,13 @@ export function Shop() {
       {loading ? (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-slate-200" />
+            <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-16 text-center">
-          <Package className="mx-auto h-10 w-10 text-slate-300" />
-          <p className="mt-3 text-slate-500">Nenhum produto encontrado.</p>
+        <div className="mt-8 rounded-2xl border border-dashed border-border bg-surface p-16 text-center">
+          <Package className="mx-auto h-10 w-10 text-muted-foreground" />
+          <p className="mt-3 text-muted-foreground">Nenhum produto encontrado.</p>
         </div>
       ) : (
         <div
@@ -181,13 +181,13 @@ export function Shop() {
             return (
               <div
                 key={p.id}
-                className="group flex flex-col rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                className="group flex flex-col rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-slate-50">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-muted">
                   {img ? (
-                    <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                    <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
                   ) : (
-                    <span className="flex h-full w-full items-center justify-center text-slate-300">
+                    <span className="flex h-full w-full items-center justify-center text-muted-foreground">
                       <Package className="h-10 w-10" />
                     </span>
                   )}
@@ -203,16 +203,16 @@ export function Shop() {
                   )}
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
-                  <p className="truncate text-sm font-semibold text-slate-900">{p.name}</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-400">
+                  <p className="truncate text-sm font-semibold text-foreground">{p.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
                     {p.brand ?? "Odontus"}
                     {p.category ? ` • ${p.category.name}` : ""}
                   </p>
                   <div className="mt-2 flex items-baseline gap-2">
                     {discount > 0 && (
-                      <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                      <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
                     )}
-                    <span className="text-base font-bold text-slate-900 sm:text-lg">
+                    <span className="font-display text-base font-bold text-foreground sm:text-lg">
                       {formatPrice(p.promoPrice)}
                     </span>
                   </div>
@@ -242,7 +242,7 @@ export function Shop() {
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
             Anterior
           </Button>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-muted-foreground">
             Página {page} de {Math.max(totalPages, 1)}
           </span>
           <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>

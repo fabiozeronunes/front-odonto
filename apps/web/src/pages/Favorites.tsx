@@ -19,22 +19,22 @@ export function Favorites() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
         <Heart className="h-7 w-7 fill-red-500 text-red-500" /> Meus favoritos
       </h1>
-      <p className="mt-1 text-slate-500">Vídeos que você salvou para assistir depois.</p>
+      <p className="mt-1 text-muted-foreground">Vídeos que você salvou para assistir depois.</p>
 
       <div className="mt-8">
         {loading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
+              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-muted" />
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-16 text-center">
-            <Heart className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-slate-500">Nenhum favorito ainda.</p>
+          <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center">
+            <Heart className="mx-auto h-10 w-10 text-muted-foreground" />
+            <p className="mt-3 text-muted-foreground">Nenhum favorito ainda.</p>
             <Link to="/catalogo" className="mt-4 inline-block">
               <Button>Explorar catálogo</Button>
             </Link>

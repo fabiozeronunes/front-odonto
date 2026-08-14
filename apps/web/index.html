@@ -8,6 +8,16 @@
     <meta property="og:description" content="Aprenda Odontologia com vídeos e estudos de caso de especialistas." />
     <meta property="og:type" content="website" />
     <title>FrontOdontus — Plataforma de Estudos Odontológicos</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("odonto_theme");
+          if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

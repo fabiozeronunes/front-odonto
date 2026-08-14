@@ -1,9 +1,12 @@
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: {
+          DEFAULT: "hsl(var(--color-primary) / <alpha-value>)",
+          foreground: "hsl(var(--color-primary-foreground) / <alpha-value>)",
           50: "#f0fdfa",
           100: "#ccfbf1",
           200: "#99f6e4",
@@ -17,6 +20,8 @@ export default {
           950: "#042f2e",
         },
         accent: {
+          DEFAULT: "hsl(var(--color-accent) / <alpha-value>)",
+          foreground: "hsl(var(--color-accent-foreground) / <alpha-value>)",
           50: "#ecfdf5",
           100: "#d1fae5",
           200: "#a7f3d0",
@@ -28,10 +33,19 @@ export default {
           800: "#065f46",
           900: "#064e3b",
         },
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
+        surface: "hsl(var(--surface) / <alpha-value>)",
+        muted: {
+          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
+          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
+        },
+        border: "hsl(var(--border) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Inter", "system-ui", "sans-serif"],
+        display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
       },
       borderRadius: {
         xl: "0.875rem",
@@ -40,6 +54,7 @@ export default {
       boxShadow: {
         card: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08)",
         lift: "0 8px 24px -6px rgb(15 118 110 / 0.15)",
+        glow: "0 0 30px -6px hsl(var(--color-accent) / 0.4)",
       },
     },
   },

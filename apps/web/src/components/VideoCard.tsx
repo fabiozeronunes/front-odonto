@@ -8,8 +8,8 @@ import { formatDuration, resolveImageUrl } from "../lib/utils";
 export function VideoCard({ video }: { video: Video }) {
   return (
     <Link to={`/video/${video.slug}`} className="group block">
-      <Card className="overflow-hidden transition-shadow group-hover:shadow-lift">
-        <div className="relative aspect-video overflow-hidden bg-slate-200">
+      <Card className="overflow-hidden transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+        <div className="relative aspect-video overflow-hidden bg-muted">
           {video.thumbnailUrl ? (
             <img
               src={resolveImageUrl(video.thumbnailUrl)}
@@ -38,10 +38,10 @@ export function VideoCard({ video }: { video: Video }) {
           ) : null}
         </div>
         <CardContent className="p-4">
-          <h3 className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-800">
+          <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
             {video.title}
           </h3>
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
             <span>{video.specialty?.name ?? "Geral"}</span>
             <span className="capitalize">{video.difficulty.toLowerCase()}</span>
           </div>

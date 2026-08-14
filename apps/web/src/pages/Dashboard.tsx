@@ -36,7 +36,7 @@ export function Dashboard() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Olá, {user?.name.split(" ")[0]} 👋
           </h1>
           <div className="mt-2 flex items-center gap-2">
@@ -47,7 +47,7 @@ export function Dashboard() {
             ) : (
               <Badge variant="free">Plano Gratuito</Badge>
             )}
-            <span className="text-sm text-slate-500">{user?.email}</span>
+            <span className="text-sm text-muted-foreground">{user?.email}</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -90,7 +90,7 @@ export function Dashboard() {
             </p>
           </div>
           <Link to="/planos">
-            <Button variant="premium" className="bg-white text-amber-700 hover:bg-amber-50">
+            <Button variant="premium" className="bg-surface text-amber-700 hover:bg-amber-50">
               Assinar Premium
             </Button>
           </Link>
@@ -99,18 +99,18 @@ export function Dashboard() {
 
       <section className="mt-10">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
             <History className="h-5 w-5 text-primary-700" /> Continuar assistindo
           </h2>
         </div>        {loading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
+              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-muted" />
             ))}
           </div>
         ) : recent.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <p className="text-slate-500">Você ainda não assistiu a nenhum vídeo.</p>
+          <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
+            <p className="text-muted-foreground">Você ainda não assistiu a nenhum vídeo.</p>
             <Link to="/catalogo" className="mt-4 inline-block">
               <Button>Começar a estudar</Button>
             </Link>
@@ -126,7 +126,7 @@ export function Dashboard() {
 
       <section className="mt-10">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
             <ShoppingBag className="h-5 w-5 text-primary-700" /> Ofertas e descontos em produtos
           </h2>
           <Link to="/loja">
@@ -135,19 +135,19 @@ export function Dashboard() {
             </Button>
           </Link>
         </div>
-        <p className="mb-5 -mt-3 text-sm text-slate-500">
+        <p className="mb-5 -mt-3 text-sm text-muted-foreground">
           Descontos exclusivos em kits, uniformes e materiais odontológicos para assinantes.
         </p>
         {loadingSales ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-square animate-pulse rounded-2xl bg-slate-200" />
+              <div key={i} className="aspect-square animate-pulse rounded-2xl bg-muted" />
             ))}
           </div>
         ) : saleProducts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-            <Package className="mx-auto h-8 w-8 text-slate-300" />
-            <p className="mt-2 text-slate-500">Novas ofertas em breve.</p>
+          <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
+            <Package className="mx-auto h-8 w-8 text-muted-foreground" />
+            <p className="mt-2 text-muted-foreground">Novas ofertas em breve.</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -159,13 +159,13 @@ export function Dashboard() {
               return (
                 <div
                   key={p.id}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                  className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
-                  <div className="relative aspect-[4/3] bg-slate-50">
+                  <div className="relative aspect-[4/3] bg-muted">
                     {img ? (
                       <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
                     ) : (
-                      <span className="flex h-full w-full items-center justify-center text-slate-300">
+                      <span className="flex h-full w-full items-center justify-center text-muted-foreground">
                         <Package className="h-10 w-10" />
                       </span>
                     )}
@@ -176,14 +176,14 @@ export function Dashboard() {
                     )}
                   </div>
                   <div className="p-3">
-                    <p className="truncate text-sm font-semibold text-slate-900">{p.name}</p>
-                    <p className="truncate text-xs text-slate-400">
+                    <p className="truncate text-sm font-semibold text-foreground">{p.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
                       {p.brand ?? "—"}
                       {p.category ? ` • ${p.category.name}` : ""}
                     </p>
                     <div className="mt-2 flex items-baseline gap-2">
                       {discount > 0 && (
-                        <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                        <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
                       )}
                       <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
                     </div>

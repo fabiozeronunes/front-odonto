@@ -58,7 +58,7 @@ export function Checkout() {
   if (loadingPlan) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-14">
-        <div className="h-40 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-40 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
   }
@@ -66,8 +66,8 @@ export function Checkout() {
   if (!plan) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="text-2xl font-bold text-slate-900">Plano não encontrado</h1>
-        <p className="mt-2 text-slate-500">O plano selecionado não está disponível.</p>
+        <h1 className="font-display text-2xl font-bold text-foreground">Plano não encontrado</h1>
+        <p className="mt-2 text-muted-foreground">O plano selecionado não está disponível.</p>
         <Link to="/planos" className="mt-4 inline-block">
           <Button variant="outline">Ver planos</Button>
         </Link>
@@ -80,18 +80,18 @@ export function Checkout() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
       <div className="text-center">
-        <Badge className="bg-primary-100 text-primary-800">
+        <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200 dark:bg-primary-900 dark:text-primary-200">
           <Sparkles className="h-3 w-3" /> Finalizar assinatura
         </Badge>
-        <h1 className="mt-4 text-3xl font-bold text-slate-900">Checkout</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="mt-4 font-display text-3xl font-bold text-foreground">Checkout</h1>
+        <p className="mt-2 text-muted-foreground">
           Confirme sua assinatura do plano{" "}
           <strong>{plan.slug === "odontus-premium" ? "Premium" : plan.name}</strong>.
         </p>
       </div>
 
       {error && (
-        <div className="mt-6 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="mt-6 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>
@@ -107,34 +107,34 @@ export function Checkout() {
         <CardContent>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-lg font-bold text-slate-900">
+              <p className="text-lg font-bold text-foreground">
                 {plan.slug === "odontus-premium" ? "Plano Premium" : plan.name}
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 {plan.billing === "YEARLY" ? "Cobrança anual" : "Cobrança mensal"}
               </p>
               <ul className="mt-4 space-y-2">
                 {Array.isArray(plan.benefits) &&
                   plan.benefits.map((b, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
                       {String(b)}
                     </li>
                   ))}
               </ul>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-extrabold text-slate-900">{formatPrice(plan.price)}</p>
-              <p className="text-sm text-slate-500">
+              <p className="text-3xl font-extrabold text-foreground">{formatPrice(plan.price)}</p>
+              <p className="text-sm text-muted-foreground">
                 / {plan.billing === "YEARLY" ? "ano" : "mês"}
               </p>
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-semibold text-slate-700">Cliente</p>
-            <p className="mt-1 text-sm text-slate-600">{user?.name}</p>
-            <p className="text-sm text-slate-600">{user?.email}</p>
+          <div className="mt-6 rounded-xl border border-border bg-muted p-4">
+            <p className="text-sm font-semibold text-foreground">Cliente</p>
+            <p className="mt-1 text-sm text-muted-foreground">{user?.name}</p>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
           </div>
 
           <Button
@@ -147,11 +147,11 @@ export function Checkout() {
             {processing ? "Processando..." : `Confirmar assinatura ${formatPrice(plan.price)}`}
           </Button>
 
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <Lock className="h-3 w-3" /> Pagamento seguro · O acesso é liberado imediatamente após a
             confirmação.
           </p>
-          <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
+          <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <ShieldCheck className="h-3 w-3" /> Em breve você poderá pagar com Pix ou cartão de
             crédito.
           </p>

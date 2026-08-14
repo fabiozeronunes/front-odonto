@@ -138,7 +138,7 @@ export function AudioRecorder({
       <Label>{label}</Label>
 
       {value && (
-        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-muted p-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-700 text-white">
             <AudioLines className="h-5 w-5" />
           </span>
@@ -192,13 +192,13 @@ export function AudioRecorder({
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
-            recording ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-500"
+            recording ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"
           )}
         >
           {recording && <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />}
           {recording && !paused ? `Gravando ${format(elapsed)}` : paused ? `Pausado ${format(elapsed)}` : "Sem áudio"}
         </span>
-        {uploading && <span className="text-xs text-slate-500">Enviando...</span>}
+        {uploading && <span className="text-xs text-muted-foreground">Enviando...</span>}
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

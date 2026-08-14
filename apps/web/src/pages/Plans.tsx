@@ -41,13 +41,13 @@ export function Plans() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <Badge className="bg-primary-100 text-primary-800">
+        <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
           <Sparkles className="h-3 w-3" /> Planos de assinatura
         </Badge>
-        <h1 className="mt-4 text-3xl font-bold text-slate-900 sm:text-4xl">
+        <h1 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl">
           Escolha o plano ideal para seus estudos
         </h1>
-        <p className="mt-3 text-slate-500">
+        <p className="mt-3 text-muted-foreground">
           Comece grátis e evolua para o acesso completo quando quiser.
         </p>
       </div>
@@ -55,7 +55,7 @@ export function Plans() {
       {loading ? (
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-72 animate-pulse rounded-2xl bg-slate-200" />
+            <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : (
@@ -65,7 +65,11 @@ export function Plans() {
             return (
               <Card
                 key={plan.id}
-                className={`relative flex flex-col ${isPremium ? "border-primary-600 ring-2 ring-primary-600/20" : ""}`}
+                className={`relative flex flex-col transition-all hover:-translate-y-1 hover:shadow-lift ${
+                  isPremium
+                    ? "border-primary-600 ring-2 ring-primary-600/20 dark:border-primary-400"
+                    : ""
+                }`}
               >
                 {isPremium && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -75,24 +79,24 @@ export function Plans() {
                 <CardHeader>
                   <CardTitle className="text-xl">{PLAN_TITLE[plan.slug] ?? plan.name}</CardTitle>
                   {plan.description && (
-                    <p className="text-sm text-slate-500">{plan.description}</p>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
                   )}
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
                   {plan.billing === "YEARLY" ? (
                     <div>
-                      <p className="text-sm font-medium uppercase tracking-wide text-slate-400">
+                      <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                         Anual
                       </p>
                       <div className="mt-1 flex items-baseline gap-1">
-                        <span className="text-4xl font-extrabold text-slate-900">
+                        <span className="font-display text-4xl font-bold text-foreground">
                           {formatPrice(plan.price)}
                         </span>
-                        <span className="text-sm text-slate-500">/ ano</span>
+                        <span className="text-sm text-muted-foreground">/ ano</span>
                       </div>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         sai a{" "}
-                        <span className="font-semibold text-slate-700">
+                        <span className="font-semibold text-foreground">
                           {formatPrice(Number(plan.price) / 12)}
                         </span>{" "}
                         mensal
@@ -100,18 +104,18 @@ export function Plans() {
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-slate-900">
+                      <span className="font-display text-4xl font-bold text-foreground">
                         {formatPrice(plan.price)}
                       </span>
-                      <span className="text-sm text-slate-500">/ mês</span>
+                      <span className="text-sm text-muted-foreground">/ mês</span>
                     </div>
                   )}
 
                   <ul className="mt-6 flex-1 space-y-3">
                     {Array.isArray(plan.benefits) &&
                       plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
                           {benefit}
                         </li>
                       ))}
@@ -145,7 +149,7 @@ export function Plans() {
         </div>
       )}
 
-      <p className="mt-10 text-center text-sm text-slate-500">
+      <p className="mt-10 text-center text-sm text-muted-foreground">
         O acesso ao plano é liberado imediatamente após a confirmação do pagamento.
       </p>
     </div>

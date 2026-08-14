@@ -110,8 +110,8 @@ export function Catalog() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Catálogo de vídeos e imagens</h1>
-        <p className="mt-1 text-slate-500">
+        <h1 className="font-display text-3xl font-bold text-foreground">Catálogo de vídeos e imagens</h1>
+        <p className="mt-1 text-muted-foreground">
           {imageTag
             ? `${matchingImages.length} ${matchingImages.length === 1 ? "imagem" : "imagens"} com a tag ${selectedImageTag ? `#${selectedImageTag.name}` : ""}`
             : searchImages.length > 0
@@ -120,9 +120,9 @@ export function Catalog() {
         </p>
       </div>
 
-      <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-sm font-semibold text-slate-700">Conteúdo:</span>
+          <span className="mr-1 text-sm font-semibold text-foreground">Conteúdo:</span>
           <button
             type="button"
             onClick={() =>
@@ -130,12 +130,12 @@ export function Catalog() {
             }
             className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
               source === "FRONTODONTUS"
-                ? "bg-primary-700 text-white shadow-sm"
-                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                ? "bg-primary-700 text-primary-foreground shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
             }`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${source === "FRONTODONTUS" ? "bg-white" : "bg-primary-600"}`}
+              className={`h-2 w-2 rounded-full ${source === "FRONTODONTUS" ? "bg-surface" : "bg-primary-600"}`}
             />
             FrontOdontus
           </button>
@@ -145,25 +145,25 @@ export function Catalog() {
             className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
               source === "STUDENT"
                 ? "bg-sky-700 text-white shadow-sm"
-                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
             }`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${source === "STUDENT" ? "bg-white" : "bg-sky-500"}`}
+              className={`h-2 w-2 rounded-full ${source === "STUDENT" ? "bg-surface" : "bg-sky-500"}`}
             />
             Estudante
           </button>
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
-          <span className="mr-1 text-sm font-semibold text-slate-700">Ordenar:</span>
+        <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <span className="mr-1 text-sm font-semibold text-foreground">Ordenar:</span>
           <button
             type="button"
             onClick={() => updateParam("sort", "recent")}
             className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
               sort === "recent"
-                ? "bg-primary-700 text-white shadow-sm"
-                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                ? "bg-primary-700 text-primary-foreground shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
             }`}
           >
             <Clock className="h-4 w-4" />
@@ -175,7 +175,7 @@ export function Catalog() {
             className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
               sort === "popular"
                 ? "bg-accent-600 text-white shadow-sm"
-                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
             }`}
           >
             <Flame className="h-4 w-4" />
@@ -185,7 +185,7 @@ export function Catalog() {
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               defaultValue={search}
               placeholder="Buscar..."
@@ -214,7 +214,7 @@ export function Catalog() {
         </div>
 
         {showFilters && (
-          <div className="mt-4 grid gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-6">
             <Select value={specialty} onChange={(e) => updateParam("specialty", e.target.value)}>
               <option value="">Todas especialidades</option>
               {specialties.map((s) => (
@@ -261,7 +261,7 @@ export function Catalog() {
 
       {activeFilterCount > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="text-sm text-slate-500">Filtros ativos:</span>
+          <span className="text-sm text-muted-foreground">Filtros ativos:</span>
           <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>
             Limpar filtros
           </Button>
@@ -271,15 +271,15 @@ export function Catalog() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
+            <div key={i} className="aspect-video animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : imageTag ? (
         matchingImages.length === 0 ? (
           <div className="flex flex-col items-center py-20 text-center">
-            <ImageIcon className="h-10 w-10 text-slate-300" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">Nenhuma imagem encontrada</h3>
-            <p className="mt-1 text-sm text-slate-500">
+            <ImageIcon className="h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhuma imagem encontrada</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               Nenhum vídeo tem imagens com essa tag. Tente outra tag de imagem.
             </p>
           </div>
@@ -290,7 +290,7 @@ export function Catalog() {
                 <Link
                   key={`${video.id}-${img.id}`}
                   to={`/video/${video.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                  className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
                   <div className="overflow-hidden">
                     <img
@@ -300,7 +300,7 @@ export function Catalog() {
                     />
                   </div>
                   <div className="p-3">
-                    <p className="truncate text-sm font-medium text-slate-800">{video.title}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{video.title}</p>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       {(img.tags ?? []).map(({ tag }) => (
                         <span
@@ -340,9 +340,9 @@ export function Catalog() {
         )
       ) : videos.length === 0 && searchImages.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
-          <Search className="h-10 w-10 text-slate-300" />
-          <h3 className="mt-4 text-lg font-semibold text-slate-900">Nenhum conteúdo encontrado</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <Search className="h-10 w-10 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhum conteúdo encontrado</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Tente ajustar os filtros ou buscar por outro termo.
           </p>
         </div>
@@ -350,7 +350,7 @@ export function Catalog() {
         <>
           {searchImages.length > 0 && (
             <section className="mb-10">
-              <h2 className="mb-4 text-lg font-bold text-slate-900">
+              <h2 className="mb-4 text-lg font-bold text-foreground">
                 Imagens encontradas ({searchImages.length})
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -358,7 +358,7 @@ export function Catalog() {
                   <Link
                     key={img.id}
                     to={`/video/${img.video.slug}`}
-                    className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                    className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                   >
                     <div className="overflow-hidden">
                       <img
@@ -368,7 +368,7 @@ export function Catalog() {
                       />
                     </div>
                     <div className="p-3">
-                      <p className="truncate text-sm font-medium text-slate-800">{img.video.title}</p>
+                      <p className="truncate text-sm font-medium text-foreground">{img.video.title}</p>
                       <div className="mt-1.5 flex flex-wrap gap-1">
                         {img.tags.map(({ tag }) => (
                           <span

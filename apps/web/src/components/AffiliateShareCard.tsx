@@ -32,14 +32,14 @@ export function AffiliateShareCard() {
   return (
     <Card className="border-emerald-200 bg-emerald-50">
       <CardContent className="pt-5">
-        <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+        <h2 className="flex items-center gap-2 text-base font-bold text-foreground">
           <Link2 className="h-5 w-5 text-emerald-600" /> Programa de Afiliados
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           Compartilhe seu link de indicação e ganhe comissão quando o aluno assinar um plano pago.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex flex-1 items-center gap-2 rounded-lg border border-emerald-300 bg-white px-3 py-2">
+          <div className="flex flex-1 items-center gap-2 rounded-lg border border-emerald-300 bg-surface px-3 py-2">
             <Users className="h-4 w-4 shrink-0 text-emerald-600" />
             <span className="truncate font-mono text-sm text-emerald-800">{link}</span>
           </div>
@@ -55,7 +55,7 @@ export function AffiliateShareCard() {
             )}
           </Button>
         </div>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-muted-foreground">
           Seu código: <span className="font-mono font-semibold">{user.affiliateCode}</span> · As
           comissões ficam disponíveis no painel de afiliados.
         </p>

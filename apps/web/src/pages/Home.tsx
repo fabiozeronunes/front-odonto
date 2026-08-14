@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ShoppingBag, Package, Check } from "lucide-react";
+import { Sparkles, ShoppingBag, Package, Check, PlayCircle } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -45,16 +45,16 @@ function ShopPreview() {
   }
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 bg-surface">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <ShoppingBag className="h-5 w-5 text-primary-700" /> Shop Odontus
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <ShoppingBag className="h-5 w-5 text-primary-700 dark:text-primary-400" /> Shop Odontus
           </h2>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-slate-500">Por linha:</span>
-              <div className="inline-flex overflow-hidden rounded-lg border border-slate-200">
+              <span className="text-muted-foreground">Por linha:</span>
+              <div className="inline-flex overflow-hidden rounded-lg border border-border">
                 {(["1", "2"] as const).map((value) => (
                   <button
                     key={value}
@@ -62,7 +62,9 @@ function ShopPreview() {
                     onClick={() => changeRows(value)}
                     className={cn(
                       "px-3 py-1 font-semibold transition-colors",
-                      rows === value ? "bg-primary-700 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
+                      rows === value
+                        ? "bg-primary-700 text-primary-foreground"
+                        : "bg-surface text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {value}
@@ -71,7 +73,7 @@ function ShopPreview() {
               </div>
             </div>
             <Link to="/loja">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-primary-700 dark:text-primary-400">
                 Ver todos
               </Button>
             </Link>
@@ -81,11 +83,11 @@ function ShopPreview() {
         {loading ? (
           <div className="grid grid-cols-2 gap-4 sm:gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200" />
+              <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
             ))}
           </div>
         ) : products.length === 0 ? (
-          <p className="text-sm text-slate-500">Novos produtos em breve.</p>
+          <p className="text-sm text-muted-foreground">Novos produtos em breve.</p>
         ) : (
           <div
             className={cn(
@@ -101,19 +103,23 @@ function ShopPreview() {
               return (
                 <div
                   key={p.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
                   <Link to="/loja" className="block">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                       {img ? (
-                        <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                        <img
+                          src={resolveImageUrl(img)}
+                          alt={p.name}
+                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                        />
                       ) : (
-                        <span className="flex h-full w-full items-center justify-center text-slate-300">
+                        <span className="flex h-full w-full items-center justify-center text-muted-foreground">
                           <Package className="h-8 w-8" />
                         </span>
                       )}
                       {discount > 0 && (
-                        <span className="absolute left-1.5 top-1.5 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        <span className="absolute left-1.5 top-1.5 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
                           -{discount}%
                         </span>
                       )}
@@ -121,19 +127,21 @@ function ShopPreview() {
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col p-3">
                     <Link to="/loja">
-                      <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-800">
+                      <p className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
                         {p.name}
                       </p>
                     </Link>
-                    <p className="mt-0.5 truncate text-xs text-slate-400">
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
                       {p.brand ?? "Odontus"}
                       {p.category ? ` • ${p.category.name}` : ""}
                     </p>
                     <div className="mt-2 flex items-baseline gap-2">
                       {discount > 0 && (
-                        <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                        <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
                       )}
-                      <span className="text-base font-bold text-slate-900">{formatPrice(p.promoPrice)}</span>
+                      <span className="font-display text-base font-bold text-foreground">
+                        {formatPrice(p.promoPrice)}
+                      </span>
                     </div>
                     <Button size="sm" className="mt-3 w-full" onClick={() => handleAdd(p)}>
                       {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
@@ -154,61 +162,103 @@ export function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* ===== FIRST FOLD: HERO ===== */}
-      <section
-        className="relative overflow-hidden bg-gradient-to-br from-primary-950 via-primary-800 to-teal-700 text-white"
-      >
-        <div
-          className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl"
-        />
-        <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-950 via-primary-800 to-teal-700 text-white">
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl" />
+        <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
 
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
           <div className="relative">
-            <Badge className="bg-white/15 text-white hover:bg-white/20">
+            <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
-              Domine a <span className="inline-block">Odontologia</span> com Aulas em Vídeo, Imagens e
-              Estudos de Casos.
+            <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
+              Domine a{" "}
+              <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
+                Odontologia
+              </span>{" "}
+              com aulas em vídeo e casos reais.
             </h1>
 
-            <p className="mt-5 max-w-xl text-lg text-white/80 leading-relaxed text-justify">
-              Aprenda por especialidades, estudos de casos reais e evolua seus estudos com Quizz,
-              Flashcards, Questionários que vão ajudar na sua formação e aprendizado.
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
+              Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e
+              Questionários que vão ajudar na sua formação e aprendizado.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/planos">
-                <Button
-                  size="lg"
-                  variant="premium"
-                  className="h-12 px-8 font-medium transition-all duration-200 hover:bg-white/20"
-                >
-                  Conhecer Planos
-                </Button>
-              </Link>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row animate-fade-in-up anim-delay-200">
               <Link to="/cadastro">
                 <Button
                   size="lg"
-                  variant="outline"
-                  className="h-12 px-8 font-medium bg-white text-slate-900 border-2 border-white/20 hover:bg-white/90 hover:text-slate-900 transition-colors"
+                  variant="premium"
+                  className="h-12 w-full px-8 font-semibold shadow-glow sm:w-auto"
                 >
-                  Acesso Gratuito
+                  <PlayCircle className="h-5 w-5" /> Começar a estudar grátis
                 </Button>
               </Link>
+              <Link to="/planos">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 w-full border-2 border-white/25 bg-white/10 px-8 font-semibold text-white hover:bg-white/20 hover:text-white sm:w-auto"
+                >
+                  Ver planos
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
+              <div>
+                <p className="font-display text-2xl font-bold sm:text-3xl">+300</p>
+                <p className="text-sm text-teal-200">aulas em vídeo</p>
+              </div>
+              <div>
+                <p className="font-display text-2xl font-bold sm:text-3xl">+2.000</p>
+                <p className="text-sm text-teal-200">alunos ativos</p>
+              </div>
+              <div>
+                <p className="font-display text-2xl font-bold sm:text-3xl">4.9★</p>
+                <p className="text-sm text-teal-200">avaliação média</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mockup do player */}
+          <div className="relative hidden lg:block animate-fade-in-up anim-delay-200">
+            <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
+              <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
+                  <PlayCircle className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <div className="space-y-3 p-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex items-center gap-3 border-t border-teal-400/15 pt-3 first:border-t-0 first:pt-0">
+                    <div className="h-10 w-10 rounded-lg bg-primary-700" />
+                    <div className="flex-1">
+                      <div className="h-2 w-full rounded-full bg-teal-400/40" />
+                      <div className="mt-1.5 h-2 w-2/3 rounded-full bg-teal-400/25" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="absolute -right-4 top-8 animate-float rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" /> Plano Premium ativo
+            </div>
+            <div className="absolute -left-6 bottom-10 animate-float-slow rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
+              🛒 -20% em kits
             </div>
           </div>
         </div>
 
-        <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
+        <div className="pointer-events-none absolute -right-6 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
       </section>
 
       {/* ===== SHOP ODONTUS ===== */}
       <ShopPreview />
 
       {/* ===== PLANS SECTION ===== */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Plans />
         </div>

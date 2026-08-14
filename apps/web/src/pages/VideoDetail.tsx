@@ -40,8 +40,8 @@ export function VideoDetail() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-10">
-        <div className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
-        <div className="mt-6 h-8 w-2/3 animate-pulse rounded bg-slate-200" />
+        <div className="aspect-video animate-pulse rounded-2xl bg-muted" />
+        <div className="mt-6 h-8 w-2/3 animate-pulse rounded bg-muted" />
       </div>
     );
   }
@@ -49,8 +49,8 @@ export function VideoDetail() {
   if (error || !data) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
-        <h1 className="text-2xl font-bold text-slate-900">Erro</h1>
-        <p className="mt-2 text-slate-500">{error}</p>
+        <h1 className="text-2xl font-bold text-foreground">Erro</h1>
+        <p className="mt-2 text-muted-foreground">{error}</p>
         <Link to="/catalogo" className="mt-4 inline-block">
           <Button variant="outline">Voltar ao catálogo</Button>
         </Link>
@@ -80,10 +80,10 @@ export function VideoDetail() {
       </div>
 
       {isPremiumLocked ? (
-        <div className="flex flex-col items-center rounded-2xl border border-amber-200 bg-amber-50 px-6 py-20 text-center">
+        <div className="flex flex-col items-center rounded-2xl border border-amber-200 bg-amber-50 px-6 py-20 text-center dark:border-amber-900/60 dark:bg-amber-950/40">
           <Badge variant="premium" className="mb-4">CONTEÚDO PREMIUM</Badge>
-          <h1 className="text-2xl font-bold text-slate-900">{video.title}</h1>
-          <p className="mt-2 max-w-md text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">{video.title}</h1>
+          <p className="mt-2 max-w-md text-muted-foreground">
             {isAuthenticated
               ? "Você não tem permissão para assistir este conteúdo. Assine o plano Premium para desbloquear todos os vídeos exclusivos."
               : "Este vídeo é exclusivo para membros premium. Faça login ou assine o plano Premium para desbloquear."}
@@ -106,7 +106,7 @@ export function VideoDetail() {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
           <div className="aspect-video bg-black">
             <iframe
               src={video.videoUrl}
@@ -128,16 +128,16 @@ export function VideoDetail() {
               </Badge>
               {video.specialty && (
                 <Link to={`/catalogo?specialty=${video.specialty.slug}`}>
-                  <Badge variant="outline" className="hover:bg-slate-100">
+                  <Badge variant="outline" className="hover:bg-muted">
                     {video.specialty.name}
                   </Badge>
                 </Link>
               )}
             </div>
 
-            <h1 className="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">{video.title}</h1>
+            <h1 className="mt-3 font-display text-2xl font-bold text-foreground sm:text-3xl">{video.title}</h1>
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               {video.durationSeconds ? (
                 <span className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4" /> {formatDuration(video.durationSeconds)}
@@ -162,12 +162,12 @@ export function VideoDetail() {
             </div>
 
             {video.description && (
-              <p className="mt-5 whitespace-pre-line text-slate-600">{video.description}</p>
+              <p className="mt-5 whitespace-pre-line text-muted-foreground">{video.description}</p>
             )}
 
             {video.images && video.images.length > 0 && (
               <div className="mt-6">
-                <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+                <h2 className="flex items-center gap-2 text-base font-bold text-foreground">
                   <ImagesIcon className="h-5 w-5 text-primary-700" /> Imagens relacionadas ao assunto
                 </h2>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -176,7 +176,7 @@ export function VideoDetail() {
                       key={img.id}
                       type="button"
                       onClick={() => setLightbox(img.url)}
-                      className="group overflow-hidden rounded-xl border border-slate-200 text-left"
+                      className="group overflow-hidden rounded-xl border border-border text-left"
                       title="Ampliar imagem"
                     >
                       <img
@@ -189,7 +189,7 @@ export function VideoDetail() {
                           {img.tags.map(({ tag }) => (
                             <span
                               key={tag.id}
-                              className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                              className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700 dark:bg-accent-900 dark:text-accent-200"
                             >
                               #{tag.name}
                             </span>
@@ -204,10 +204,10 @@ export function VideoDetail() {
 
             {video.tags.length > 0 && (
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <TagIcon className="h-4 w-4 text-slate-400" />
+                <TagIcon className="h-4 w-4 text-muted-foreground" />
                 {video.tags.map(({ tag }) => (
                   <Link key={tag.id} to={`/catalogo?tag=${tag.slug}`}>
-                    <Badge variant="outline" className="hover:bg-slate-100">
+                    <Badge variant="outline" className="hover:bg-muted">
                       #{tag.name}
                     </Badge>
                   </Link>
@@ -215,7 +215,7 @@ export function VideoDetail() {
               </div>
             )}
 
-            <div className="mt-6 flex gap-3 border-t border-slate-100 pt-5">
+            <div className="mt-6 flex gap-3 border-t border-border pt-5">
               <Button variant="outline" onClick={toggleFavorite}>
                 <Heart className={favorited ? "fill-red-500 text-red-500" : ""} />
                 {favorited ? "Favoritado" : "Favoritar"}
@@ -253,7 +253,7 @@ export function VideoDetail() {
 
       {related.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-slate-900">Vídeos relacionados</h2>
+          <h2 className="mb-5 text-xl font-bold text-foreground">Vídeos relacionados</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
               <VideoCard key={item.id} video={item} />
@@ -264,14 +264,14 @@ export function VideoDetail() {
 
       {data.relatedImages && data.relatedImages.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-slate-900">Imagens relacionadas</h2>
+          <h2 className="mb-5 text-xl font-bold text-foreground">Imagens relacionadas</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {data.relatedImages.map((img) => (
               <button
                 key={img.id}
                 type="button"
                 onClick={() => setLightbox(img.url)}
-                className="group overflow-hidden rounded-xl border border-slate-200 text-left"
+                className="group overflow-hidden rounded-xl border border-border text-left"
                 title="Ampliar imagem"
               >
                 <img
@@ -283,7 +283,7 @@ export function VideoDetail() {
                   {img.tags.map(({ tag }) => (
                     <span
                       key={tag.id}
-                      className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                      className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700 dark:bg-accent-900 dark:text-accent-200"
                     >
                       #{tag.name}
                     </span>
@@ -297,17 +297,17 @@ export function VideoDetail() {
 
       {data.relatedCaseStudies && data.relatedCaseStudies.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-slate-900">Estudos de caso relacionados</h2>
+          <h2 className="mb-5 text-xl font-bold text-foreground">Estudos de caso relacionados</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {data.relatedCaseStudies.map((cs) => (
               <Link
                 key={cs.id}
                 to={`/casos/${cs.slug}`}
-                className="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-shadow hover:shadow-lift"
-              >
-                <div>
-                  <p className="font-medium text-slate-900 group-hover:text-primary-800">{cs.title}</p>
-                  <p className="text-xs capitalize text-slate-400">{cs.difficulty.toLowerCase()}</p>
+className="group flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+                >
+                  <div>
+                    <p className="font-medium text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">{cs.title}</p>
+                    <p className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</p>
                 </div>
                 <Badge variant={cs.isFree ? "free" : "premium"}>
                   {cs.isFree ? "GRATUITO" : "PREMIUM"}

@@ -16,8 +16,8 @@ export function Specialties() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Especialidades odontológicas</h1>
-        <p className="mt-1 text-slate-500">
+        <h1 className="text-3xl font-bold text-foreground">Especialidades odontológicas</h1>
+        <p className="mt-1 text-muted-foreground">
           Explore conteúdos organizados por área de atuação.
         </p>
       </div>
@@ -25,7 +25,7 @@ export function Specialties() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-200" />
+            <div key={i} className="h-40 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : (

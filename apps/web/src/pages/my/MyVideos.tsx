@@ -312,7 +312,7 @@ export function MyVideos() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900">Meus vídeos</h2>
+        <h2 className="text-xl font-bold text-foreground">Meus vídeos</h2>
         <Button onClick={startCreate}>
           <Plus className="h-4 w-4" /> Novo vídeo
         </Button>
@@ -422,7 +422,7 @@ export function MyVideos() {
             {editing.images.length > 0 && (
               <div className="space-y-3">
                 <Label>Tags de cada imagem</Label>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Tags específicas para cada imagem, independentes das tags do vídeo. Máximo de 5
                   imagens.
                 </p>
@@ -431,10 +431,10 @@ export function MyVideos() {
                   return (
                     <div
                       key={img.id}
-                      className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-start"
+                      className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
                     >
                       <div className="flex shrink-0 flex-col items-center gap-1.5">
-                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-slate-200">
+                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
                           <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
                         </div>
                         <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
@@ -442,7 +442,7 @@ export function MyVideos() {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <p className="mb-2 text-sm font-semibold text-slate-700">
+                        <p className="mb-2 text-sm font-semibold text-foreground">
                           Tags da imagem {index + 1}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -464,7 +464,7 @@ export function MyVideos() {
                             </span>
                           ))}
                           {imageTags.length === 0 && (
-                            <p className="text-sm text-slate-400">Nenhuma tag nesta imagem ainda.</p>
+                            <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
                           )}
                         </div>
                         <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
@@ -497,7 +497,7 @@ export function MyVideos() {
                 <option value="STUDENT">Estudante</option>
                 <option value="FRONTODONTUS">FrontOdontus</option>
               </Select>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Marque como "Estudante" para separar dos vídeos do administrador.
               </p>
             </div>
@@ -513,13 +513,13 @@ export function MyVideos() {
                       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                         selected
                           ? "bg-primary-700 text-white"
-                          : "bg-slate-100 text-slate-600"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => toggleTag(tag.id)}
-                        className={selected ? "text-white" : "text-slate-600 hover:text-slate-900"}
+                        className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
                         title={selected ? "Remover tag do vídeo" : "Adicionar tag ao vídeo"}
                       >
                         #{tag.name}
@@ -530,7 +530,7 @@ export function MyVideos() {
                         className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
                           selected
                             ? "bg-white/25 text-white hover:bg-white/40"
-                            : "text-slate-400 hover:bg-slate-200 hover:text-red-600"
+                            : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
                         }`}
                         title="Excluir tag"
                         aria-label={`Excluir tag ${tag.name}`}
@@ -544,7 +544,7 @@ export function MyVideos() {
               <TagCreator onCreate={createTag} />
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+            <div className="flex justify-end gap-2 border-t border-border pt-4">
               <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
               <Button onClick={save} disabled={saving || !editing.title || !editing.videoUrl}>
                 {saving ? "Salvando..." : "Salvar"}
@@ -558,7 +558,7 @@ export function MyVideos() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Título</th>
                   <th className="px-5 py-3">Especialidade</th>
@@ -568,18 +568,18 @@ export function MyVideos() {
                 </tr>              </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Carregando...</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
                 ) : videos.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">Nenhum vídeo cadastrado ainda.</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum vídeo cadastrado ainda.</td></tr>
                 ) : (
                   videos.map((v) => (
                     <>
-                      <tr key={v.id} className="hover:bg-slate-50">
+                      <tr key={v.id} className="hover:bg-muted">
                         <td className="max-w-[280px] px-5 py-3">
-                          <p className="truncate font-medium text-slate-800">{v.title}</p>
-                          <p className="text-xs text-slate-400">{v.author ?? "—"} {v.observations ? "• com observações" : ""}</p>
+                          <p className="truncate font-medium text-foreground">{v.title}</p>
+                          <p className="text-xs text-muted-foreground">{v.author ?? "—"} {v.observations ? "• com observações" : ""}</p>
                         </td>
-                        <td className="px-5 py-3 text-slate-500">{v.specialty?.name ?? "—"}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{v.specialty?.name ?? "—"}</td>
                         <td className="px-5 py-3">
                           <Badge variant={v.isFree ? "free" : "premium"}>{v.isFree ? "FREE" : "Pago"}</Badge>
                         </td>
@@ -605,15 +605,15 @@ export function MyVideos() {
                       </tr>
                       {expandedVideo === v.id && (
                         <tr key={`${v.id}-related`}>
-                          <td colSpan={5} className="bg-slate-50 px-5 py-4">
+                          <td colSpan={5} className="bg-muted px-5 py-4">
                             {loadingRelated === v.id ? (
-                              <p className="py-4 text-center text-sm text-slate-400">Carregando relacionados...</p>
+                              <p className="py-4 text-center text-sm text-muted-foreground">Carregando relacionados...</p>
                             ) : (
                               (() => {
                                 const rel = relatedMap[v.id];
                                 if (!rel || (rel.videos.length === 0 && rel.images.length === 0)) {
                                   return (
-                                    <p className="py-4 text-center text-sm text-slate-400">
+                                    <p className="py-4 text-center text-sm text-muted-foreground">
                                       Nenhum vídeo ou imagem relacionada. Vincule este vídeo a um estudo de caso
                                       para ver relacionados.
                                     </p>
@@ -623,7 +623,7 @@ export function MyVideos() {
                                   <div className="space-y-5">
                                     {rel.videos.length > 0 && (
                                       <div>
-                                        <h4 className="mb-3 text-sm font-bold text-slate-700">Vídeos relacionados</h4>
+                                        <h4 className="mb-3 text-sm font-bold text-foreground">Vídeos relacionados</h4>
                                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                           {rel.videos.map((rv) => (
                                             <VideoCard key={rv.id} video={rv} />
@@ -633,12 +633,12 @@ export function MyVideos() {
                                     )}
                                     {rel.images.length > 0 && (
                                       <div>
-                                        <h4 className="mb-3 text-sm font-bold text-slate-700">Imagens relacionadas</h4>
+                                        <h4 className="mb-3 text-sm font-bold text-foreground">Imagens relacionadas</h4>
                                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                                           {rel.images.map((img) => (
                                             <div
                                               key={img.id}
-                                              className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+                                              className="overflow-hidden rounded-xl border border-border bg-surface"
                                             >
                                               <img
                                                 src={resolveImageUrl(img.url)}
@@ -646,7 +646,7 @@ export function MyVideos() {
                                                 className="aspect-video w-full object-cover"
                                               />
                                               <div className="space-y-1 p-2">
-                                                <p className="truncate text-xs font-medium text-slate-700">
+                                                <p className="truncate text-xs font-medium text-foreground">
                                                   {img.caseStudy.title}
                                                 </p>
                                                 <div className="flex flex-wrap gap-1">

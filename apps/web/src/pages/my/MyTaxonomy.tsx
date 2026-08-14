@@ -98,7 +98,7 @@ export function MyTaxonomy() {
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-900">Minhas especialidades</h2>
+            <h2 className="text-xl font-bold text-foreground">Minhas especialidades</h2>
             <Button onClick={() => setSpecForm({ name: "", description: "" })}>
               <Plus className="h-4 w-4" /> Nova
             </Button>
@@ -125,17 +125,17 @@ export function MyTaxonomy() {
             </Card>
           )}
 
-          <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+          <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-border bg-surface">
             {loading ? (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">Carregando...</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">Carregando...</li>
             ) : specialties.length === 0 ? (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">Nenhuma especialidade criada por você.</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nenhuma especialidade criada por você.</li>
             ) : (
               specialties.map((s) => (
                 <li key={s.id} className="flex items-center justify-between gap-2 px-4 py-3">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-slate-800">{s.name}</p>
-                    <p className="truncate text-xs text-slate-400">{s.description ?? "—"}</p>
+                    <p className="truncate font-medium text-foreground">{s.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{s.description ?? "—"}</p>
                   </div>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => setSpecForm({ id: s.id, name: s.name, description: s.description ?? "" })}>
@@ -153,7 +153,7 @@ export function MyTaxonomy() {
 
         <div>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-900">Minhas tags</h2>
+            <h2 className="text-xl font-bold text-foreground">Minhas tags</h2>
             <Button onClick={() => setTagForm({ name: "" })}>
               <Plus className="h-4 w-4" /> Nova
             </Button>
@@ -176,15 +176,15 @@ export function MyTaxonomy() {
             </Card>
           )}
 
-          <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+          <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-border bg-surface">
             {loading ? (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">Carregando...</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">Carregando...</li>
             ) : tags.length === 0 ? (
-              <li className="px-4 py-6 text-center text-sm text-slate-400">Nenhuma tag criada por você.</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nenhuma tag criada por você.</li>
             ) : (
               tags.map((t) => (
                 <li key={t.id} className="flex items-center justify-between gap-2 px-4 py-3">
-                  <p className="font-medium text-slate-800">#{t.name}</p>
+                  <p className="font-medium text-foreground">#{t.name}</p>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => setTagForm({ id: t.id, name: t.name })}>
                       <Pencil className="h-4 w-4" />
