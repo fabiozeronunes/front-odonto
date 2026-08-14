@@ -24,18 +24,18 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-24 lg:h-28">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-4 py-2 sm:px-6 md:min-h-24 lg:min-h-28">
         <Link to="/" className="flex items-center">
           {logoUrl ? (
             <img
               src={logoUrl}
               alt="OdontoStudy"
-              className="h-auto w-[50vw] max-w-full object-contain md:max-w-[380px] lg:max-w-[320px] xl:max-w-[460px]"
+              className="h-auto w-[70vw] max-w-full object-contain md:max-w-[342px] lg:max-w-[288px] xl:max-w-[414px]"
             />
           ) : (
             <span
               aria-hidden
-              className="block h-11 w-[50vw] max-w-full md:h-20 md:max-w-[380px] lg:max-w-[320px] xl:h-28 xl:max-w-[460px]"
+              className="block h-[16vw] w-[70vw] max-w-full md:h-20 md:max-w-[342px] lg:max-w-[288px] xl:h-[104px] xl:max-w-[414px]"
             />
           )}
         </Link>
