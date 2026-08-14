@@ -141,9 +141,9 @@ export function Shop() {
             return (
               <div
                 key={p.id}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                className="group flex flex-col rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
               >
-                <div className="relative aspect-[4/3] bg-slate-50">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-slate-50">
                   {img ? (
                     <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
                   ) : (
@@ -162,31 +162,31 @@ export function Shop() {
                     </span>
                   )}
                 </div>
-                <div className="p-4">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-slate-900">{p.name}</p>
-                    <p className="mt-0.5 truncate text-xs text-slate-400">
-                      {p.brand ?? "Odontus"}
-                      {p.category ? ` • ${p.category.name}` : ""}
-                    </p>
-                  </div>
-                  <div className="mt-3 flex items-baseline gap-2">
+                <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
+                  <p className="truncate text-sm font-semibold text-slate-900">{p.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-slate-400">
+                    {p.brand ?? "Odontus"}
+                    {p.category ? ` • ${p.category.name}` : ""}
+                  </p>
+                  <div className="mt-2 flex items-baseline gap-2">
                     {discount > 0 && (
-                      <span className="text-sm text-slate-400 line-through">{formatPrice(p.price)}</span>
+                      <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
                     )}
-                    <span className="text-lg font-bold text-slate-900">{formatPrice(p.promoPrice)}</span>
+                    <span className="text-base font-bold text-slate-900 sm:text-lg">
+                      {formatPrice(p.promoPrice)}
+                    </span>
                   </div>
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:pt-1">
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="w-full sm:flex-1"
                       disabled={p.stock <= 0}
                       onClick={() => handleAdd(p)}
                     >
                       {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
                       {added[p.id] ? "Adicionado" : "Carrinho"}
                     </Button>
-                    <Button className="flex-1" disabled={p.stock <= 0} onClick={() => handleBuy(p)}>
+                    <Button className="w-full sm:flex-1" disabled={p.stock <= 0} onClick={() => handleBuy(p)}>
                       Comprar
                     </Button>
                   </div>

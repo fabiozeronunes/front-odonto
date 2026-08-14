@@ -31,8 +31,8 @@ export function Cart() {
         </Button>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-4">
           {items.map((item) => {
             const promo = item.promoPrice && item.promoPrice < item.price ? item.promoPrice : item.price;
             return (
@@ -64,7 +64,7 @@ export function Cart() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="mt-auto flex items-center justify-between gap-3 pt-3">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-3">
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"

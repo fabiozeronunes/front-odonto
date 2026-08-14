@@ -83,8 +83,8 @@ export function StoreCheckout() {
         </div>
       )}
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-        <Card>
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <Card className="min-w-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Itens do pedido</CardTitle>
           </CardHeader>
@@ -138,7 +138,7 @@ export function StoreCheckout() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Cliente</CardTitle>

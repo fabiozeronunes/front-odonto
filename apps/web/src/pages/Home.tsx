@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ShoppingBag, Package } from "lucide-react";
+import { Sparkles, ShoppingBag, Package, Check } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { api } from "../lib/api";
+import { useCart } from "../lib/cart";
 import { formatPrice, resolveImageUrl } from "../lib/utils";
 import type { Product } from "../types";
 
 function ShopPreview() {
+  const { addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [added, setAdded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     api<{ data: Product[] }>("/api/products?perPage=4")
@@ -18,6 +21,12 @@ function ShopPreview() {
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);
+
+  function handleAdd(p: Product) {
+    addItem(p, 1);
+    setAdded((prev) => ({ ...prev, [p.id]: true }));
+    setTimeout(() => setAdded((prev) => ({ ...prev, [p.id]: false })), 1500);
+  }
 
   return (
     <section className="py-12 bg-white">
@@ -49,29 +58,32 @@ function ShopPreview() {
               const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
               const img = p.images?.[0]?.url;
               return (
-                <Link
+                <div
                   key={p.id}
-                  to="/loja"
-                  className="group flex gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-card transition-shadow hover:shadow-lift"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
                 >
-                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-50 sm:h-28 sm:w-28">
-                    {img ? (
-                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="flex h-full w-full items-center justify-center text-slate-300">
-                        <Package className="h-8 w-8" />
-                      </span>
-                    )}
-                    {discount > 0 && (
-                      <span className="absolute left-1 top-1 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                        -{discount}%
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col justify-center">
-                    <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-800">
-                      {p.name}
-                    </p>
+                  <Link to="/loja" className="block">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
+                      {img ? (
+                        <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-slate-300">
+                          <Package className="h-8 w-8" />
+                        </span>
+                      )}
+                      {discount > 0 && (
+                        <span className="absolute left-1.5 top-1.5 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                          -{discount}%
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                  <div className="flex min-w-0 flex-1 flex-col p-3">
+                    <Link to="/loja">
+                      <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-800">
+                        {p.name}
+                      </p>
+                    </Link>
                     <p className="mt-0.5 truncate text-xs text-slate-400">
                       {p.brand ?? "Odontus"}
                       {p.category ? ` • ${p.category.name}` : ""}
@@ -82,8 +94,12 @@ function ShopPreview() {
                       )}
                       <span className="text-base font-bold text-slate-900">{formatPrice(p.promoPrice)}</span>
                     </div>
+                    <Button size="sm" className="mt-3 w-full" onClick={() => handleAdd(p)}>
+                      {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                      {added[p.id] ? "Adicionado" : "Carrinho"}
+                    </Button>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
