@@ -9,6 +9,7 @@ import { Specialties } from "./pages/Specialties";
 import { CaseStudies } from "./pages/CaseStudies";
 import { CaseStudyDetail } from "./pages/CaseStudyDetail";
 import { Plans } from "./pages/Plans";
+import { Shop } from "./pages/Shop";
 import { Checkout } from "./pages/Checkout";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/casos" element={<CaseStudies />} />
           <Route path="/casos/:slug" element={<CaseStudyDetail />} />
           <Route path="/planos" element={<Plans />} />
+          <Route path="/loja" element={<Shop />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Register />} />
           <Route path="/recuperar-senha" element={<ForgotPassword />} />

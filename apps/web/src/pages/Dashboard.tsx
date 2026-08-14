@@ -116,7 +116,7 @@ export function Dashboard() {
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <ShoppingBag className="h-5 w-5 text-primary-700" /> Ofertas e descontos em produtos
           </h2>
-          <Link to="/catalogo">
+          <Link to="/loja">
             <Button variant="outline" size="sm">
               <Percent className="h-4 w-4" /> Ver todas as ofertas
             </Button>

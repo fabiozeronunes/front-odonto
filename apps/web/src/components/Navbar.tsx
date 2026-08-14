@@ -11,6 +11,7 @@ const navItems = [
   { to: "/catalogo", label: "Catálogo" },
   { to: "/especialidades", label: "Especialidades" },
   { to: "/casos", label: "Estudos de Caso" },
+  { to: "/loja", label: "Shop Odontus" },
   { to: "/planos", label: "Planos" },
 ];
 
