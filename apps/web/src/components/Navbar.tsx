@@ -24,23 +24,23 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-24 lg:h-28">
         <Link to="/" className="flex items-center">
           {logoUrl ? (
             <img
               src={logoUrl}
               alt="OdontoStudy"
-              className="h-auto w-44 object-contain sm:w-52 md:w-60 lg:w-72"
+              className="h-auto w-[50vw] max-w-full object-contain md:max-w-[380px] lg:max-w-[320px] xl:max-w-[460px]"
             />
           ) : (
             <span
               aria-hidden
-              className="block h-11 w-44 sm:h-12 sm:w-52 md:h-14 md:w-60 lg:h-16 lg:w-72"
+              className="block h-11 w-[50vw] max-w-full md:h-20 md:max-w-[380px] lg:max-w-[320px] xl:h-28 xl:max-w-[460px]"
             />
           )}
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -59,7 +59,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <Link to="/catalogo">
             <Button variant="ghost" size="icon" aria-label="Buscar" className={darkGhost}>
               <Search className="h-5 w-5" />
@@ -102,7 +102,7 @@ export function Navbar() {
         </div>
 
         <button
-          className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 md:hidden"
+          className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Abrir menu"
         >
@@ -111,7 +111,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <nav className="border-t border-slate-800 bg-slate-950 px-4 py-3 md:hidden">
+        <nav className="border-t border-slate-800 bg-slate-950 px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
             {navItems.map((item) => (
               <NavLink
