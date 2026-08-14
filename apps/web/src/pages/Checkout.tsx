@@ -75,7 +75,7 @@ export function Checkout() {
     );
   }
 
-  const isPremium = plan.slug === "premium";
+  const isPremium = plan.slug === "odontus-premium";
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
@@ -86,7 +86,7 @@ export function Checkout() {
         <h1 className="mt-4 text-3xl font-bold text-slate-900">Checkout</h1>
         <p className="mt-2 text-slate-500">
           Confirme sua assinatura do plano{" "}
-          <strong>{plan.name === "Odonto PREMIUM" ? "Premium" : plan.name}</strong>.
+          <strong>{plan.slug === "odontus-premium" ? "Premium" : plan.name}</strong>.
         </p>
       </div>
 
@@ -108,7 +108,7 @@ export function Checkout() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-lg font-bold text-slate-900">
-                {plan.name === "Odonto PREMIUM" ? "Plano Premium" : plan.name}
+                {plan.slug === "odontus-premium" ? "Plano Premium" : plan.name}
               </p>
               <p className="text-sm text-slate-500">
                 {plan.billing === "YEARLY" ? "Cobrança anual" : "Cobrança mensal"}

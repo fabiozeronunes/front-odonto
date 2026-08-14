@@ -10,7 +10,7 @@ import { Badge } from "../components/ui/badge";
 import { formatDate, formatDuration, resolveImageUrl } from "../lib/utils";
 
 function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
-  return user?.role === "ADMIN" || user?.plan?.slug === "premium";
+  return user?.role === "ADMIN" || (!!user?.plan && user.plan.slug !== "gratuito");
 }
 
 export function VideoDetail() {

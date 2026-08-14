@@ -22,7 +22,7 @@ export async function getDashboard() {
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { plan: { slug: "gratuito" } } }),
-    prisma.user.count({ where: { plan: { slug: "premium" } } }),
+    prisma.user.count({ where: { plan: { slug: { not: "gratuito" } } } }),
     prisma.subscription.count({ where: { status: "ACTIVE" } }),
     prisma.video.count(),
     prisma.video.count({ where: { status: "PUBLISHED" } }),
@@ -136,7 +136,7 @@ const userBillingSelect = {
 function classifyUser(u: UserBillingRow) {
   const sub = u.subscriptions[0];
   const order = u.orders[0];
-  const isPremiumPlan = u.plan?.slug === "premium";
+  const isPremiumPlan = u.plan?.slug != null && u.plan.slug !== "gratuito";
   const now = new Date();
 
   let paymentStatus: "PAGO" | "EM_ATRASO" | "GRATUITO" = "GRATUITO";

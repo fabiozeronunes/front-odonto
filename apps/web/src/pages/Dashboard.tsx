@@ -13,7 +13,7 @@ export function Dashboard() {
   const { user } = useAuth();
   const [recent, setRecent] = useState<{ watchedAt: string; video: Video }[]>([]);
   const [loading, setLoading] = useState(true);
-  const isPremium = user?.plan?.slug === "premium";
+  const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
 
   useEffect(() => {
     api<Paginated<{ watchedAt: string; video: Video }>>("/api/videos/me/history?perPage=6")

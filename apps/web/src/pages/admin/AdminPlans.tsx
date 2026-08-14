@@ -40,10 +40,15 @@ export function AdminPlans() {
   async function save() {
     if (!editing) return;
     setSaving(true);
+    const basePrice = Number(editing.price) || 0;
+    const price =
+      editing.billing === "YEARLY"
+        ? Math.round(basePrice * 12 * 100) / 100
+        : basePrice;
     const body = {
       name: editing.name,
       description: editing.description || undefined,
-      price: Number(editing.price) || 0,
+      price,
       billing: editing.billing,
       status: editing.status,
       benefits: editing.benefitsText
@@ -71,11 +76,14 @@ export function AdminPlans() {
   }
 
   function startEdit(plan: MembershipPlan) {
+    const stored = Number(plan.price) || 0;
+    const basePrice =
+      plan.billing === "YEARLY" ? Math.round((stored / 12) * 100) / 100 : stored;
     setEditing({
       id: plan.id,
       name: plan.name,
       description: plan.description ?? "",
-      price: String(Number(plan.price) || 0),
+      price: String(basePrice),
       billing: plan.billing,
       benefitsText: Array.isArray(plan.benefits) ? plan.benefits.join("\n") : "",
       status: plan.status,
@@ -104,13 +112,19 @@ export function AdminPlans() {
                 <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Preço</label>
+                <label className="text-sm font-medium text-slate-700">Preço mensal</label>
                 <Input
                   type="number"
                   step="0.01"
                   value={editing.price}
                   onChange={(e) => setEditing({ ...editing, price: e.target.value })}
                 />
+                {editing.billing === "YEARLY" && (
+                  <p className="text-xs text-slate-500">
+                    Cobrança anual: <strong>{formatPrice((Number(editing.price) || 0) * 12)}/ano</strong>{" "}
+                    (12x o valor mensal)
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Periodicidade</label>

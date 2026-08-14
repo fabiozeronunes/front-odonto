@@ -10,14 +10,14 @@ import { Badge } from "../components/ui/badge";
 import { formatPrice } from "../lib/utils";
 
 const PLAN_ORDER: Record<string, number> = {
-  premium: 0,
-  "odonto-pro": 1,
+  "odontus-premium": 0,
+  "odontus-vip": 1,
   gratuito: 2,
 };
 
 const PLAN_TITLE: Record<string, string> = {
-  premium: "Premium",
-  "odonto-pro": "Pro",
+  "odontus-premium": "Odontus PREMIUM",
+  "odontus-vip": "Odontus VIP",
   gratuito: "Gratuito",
 };
 
@@ -61,7 +61,7 @@ export function Plans() {
       ) : (
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
-            const isPremium = plan.slug === "premium";
+            const isPremium = plan.slug === "odontus-premium";
             return (
               <Card
                 key={plan.id}
@@ -105,10 +105,10 @@ export function Plans() {
                           Assinar Premium
                         </Button>
                       </Link>
-                    ) : plan.slug === "odonto-pro" ? (
+                    ) : plan.slug === "odontus-vip" ? (
                       <Link to={isAuthenticated ? `/checkout?plan=${plan.slug}` : `/cadastro?plan=${plan.slug}`}>
                         <Button variant="premium" size="lg" className="w-full">
-                          Assinar Pro
+                          Assinar VIP
                         </Button>
                       </Link>
                     ) : (
