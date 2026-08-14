@@ -20,6 +20,22 @@ export function Shop() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [added, setAdded] = useState<Record<string, boolean>>({});
+  const [rows, setRows] = useState<"1" | "2">(() => {
+    try {
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
+    } catch {
+      return "2";
+    }
+  });
+
+  function changeRows(value: "1" | "2") {
+    setRows(value);
+    try {
+      localStorage.setItem("odonto_shop_rows", value);
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     api<{ data: ProductCategory[] }>("/api/products/categories")
@@ -29,7 +45,7 @@ export function Shop() {
 
   useEffect(() => {
     setLoading(true);
-    const params = new URLSearchParams({ perPage: "12", page: String(page) });
+    const params = new URLSearchParams({ perPage: "4", page: String(page) });
     if (search) params.set("search", search);
     if (category) params.set("category", category);
     if (onSale) params.set("onSale", "true");
@@ -120,6 +136,25 @@ export function Shop() {
         </button>
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-slate-500">Produtos por linha:</span>
+        <div className="inline-flex overflow-hidden rounded-lg border border-slate-200">
+          {(["1", "2"] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => changeRows(value)}
+              className={cn(
+                "px-4 py-1.5 font-semibold transition-colors",
+                rows === value ? "bg-primary-700 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
+              )}
+            >
+              {value} {Number(value) === 1 ? "produto" : "produtos"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {loading ? (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -132,7 +167,12 @@ export function Shop() {
           <p className="mt-3 text-slate-500">Nenhum produto encontrado.</p>
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6">
+        <div
+          className={cn(
+            "mt-8 grid gap-4 sm:gap-6",
+            rows === "2" ? "grid-cols-2" : "mx-auto max-w-2xl grid-cols-1"
+          )}
+        >
           {products.map((p) => {
             const price = Number(p.price);
             const promo = Number(p.promoPrice);

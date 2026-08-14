@@ -6,7 +6,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
-import { formatPrice, resolveImageUrl } from "../lib/utils";
+import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 import type { Product } from "../types";
 
 function ShopPreview() {
@@ -14,6 +14,22 @@ function ShopPreview() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState<Record<string, boolean>>({});
+  const [rows, setRows] = useState<"1" | "2">(() => {
+    try {
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
+    } catch {
+      return "2";
+    }
+  });
+
+  function changeRows(value: "1" | "2") {
+    setRows(value);
+    try {
+      localStorage.setItem("odonto_shop_rows", value);
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     api<{ data: Product[] }>("/api/products?perPage=4")
@@ -31,15 +47,35 @@ function ShopPreview() {
   return (
     <section className="py-12 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <ShoppingBag className="h-5 w-5 text-primary-700" /> Shop Odontus
           </h2>
-          <Link to="/loja">
-            <Button variant="ghost" size="sm">
-              Ver todos
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-slate-500">Por linha:</span>
+              <div className="inline-flex overflow-hidden rounded-lg border border-slate-200">
+                {(["1", "2"] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => changeRows(value)}
+                    className={cn(
+                      "px-3 py-1 font-semibold transition-colors",
+                      rows === value ? "bg-primary-700 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
+                    )}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Link to="/loja">
+              <Button variant="ghost" size="sm">
+                Ver todos
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {loading ? (
@@ -51,7 +87,12 @@ function ShopPreview() {
         ) : products.length === 0 ? (
           <p className="text-sm text-slate-500">Novos produtos em breve.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+          <div
+            className={cn(
+              "grid gap-4 sm:gap-6",
+              rows === "2" ? "grid-cols-2" : "mx-auto max-w-2xl grid-cols-1"
+            )}
+          >
             {products.map((p) => {
               const price = Number(p.price);
               const promo = Number(p.promoPrice);

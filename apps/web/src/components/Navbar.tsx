@@ -20,7 +20,7 @@ const darkOutline = "border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate
 const darkGhost = "text-slate-300 hover:bg-slate-800 hover:text-white";
 
 export function Navbar() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { count } = useCart();
   const logoUrl = useSiteLogo();
   const [open, setOpen] = useState(false);
@@ -86,19 +86,6 @@ export function Navbar() {
                   {user.name.split(" ")[0]}
                 </Button>
               </Link>
-              <Link to="/meus-conteudos">
-                <Button variant="ghost" size="sm" className={darkGhost}>
-                  Meu espaço
-                </Button>
-              </Link>
-              <Link to="/perfil">
-                <Button variant="ghost" size="sm" className={darkGhost}>
-                  Perfil
-                </Button>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={logout} className={darkGhost}>
-                Sair
-              </Button>
             </>
           ) : (
             <>
@@ -159,26 +146,6 @@ export function Navbar() {
                       {isAdmin ? "Painel Admin" : "Minha Área"}
                     </Button>
                   </Link>
-                  <Link to="/meus-conteudos" onClick={() => setOpen(false)}>
-                    <Button variant="outline" className={`w-full ${darkOutline}`}>
-                      Meu espaço
-                    </Button>
-                  </Link>
-                  <Link to="/perfil" onClick={() => setOpen(false)}>
-                    <Button variant="outline" className={`w-full ${darkOutline}`}>
-                      Meu perfil
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      logout();
-                      setOpen(false);
-                    }}
-                    className={darkGhost}
-                  >
-                    Sair
-                  </Button>
                 </>
               ) : (
                 <>

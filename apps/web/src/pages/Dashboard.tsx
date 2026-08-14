@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
@@ -11,7 +11,7 @@ import { Badge } from "../components/ui/badge";
 import { formatPrice, resolveImageUrl } from "../lib/utils";
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [recent, setRecent] = useState<{ watchedAt: string; video: Video }[]>([]);
   const [loading, setLoading] = useState(true);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
@@ -50,7 +50,7 @@ export function Dashboard() {
             <span className="text-sm text-slate-500">{user?.email}</span>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link to="/favoritos">
             <Button variant="outline">
               <Heart className="h-4 w-4" /> Favoritos
@@ -59,6 +59,19 @@ export function Dashboard() {
           <Link to="/catalogo">
             <Button>Explorar vídeos</Button>
           </Link>
+          <Link to="/meus-conteudos">
+            <Button variant="outline">
+              <LayoutGrid className="h-4 w-4" /> Meu espaço
+            </Button>
+          </Link>
+          <Link to="/perfil">
+            <Button variant="outline">
+              <User className="h-4 w-4" /> Perfil
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={logout} className="text-red-600 hover:text-red-700">
+            <LogOut className="h-4 w-4" /> Sair
+          </Button>
         </div>
       </div>
 
