@@ -5,6 +5,7 @@ export type VideoType = "EMBED" | "EXTERNAL" | "UPLOAD";
 export type VideoSource = "FRONTODONTUS" | "STUDENT";
 export type PlanStatus = "ACTIVE" | "INACTIVE";
 export type BillingPeriod = "MONTHLY" | "YEARLY";
+export type AccessLevelType = "PUBLIC" | "MEMBER" | "PREMIUM";
 
 export interface Pagination {
   page: number;
@@ -109,6 +110,33 @@ export interface MembershipPlan {
   status: PlanStatus;
   sortOrder: number;
   _count?: { users: number };
+}
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  _count?: { products: number };
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  price: string | number;
+  promoPrice?: string | number | null;
+  sku?: string | null;
+  stock: number;
+  status: ContentStatus;
+  isFeatured: boolean;
+  brand?: string | null;
+  accessLevel: AccessLevelType;
+  category?: ProductCategory | null;
+  tags: { tag: Tag }[];
+  images?: Media[];
+  createdAt?: string;
 }
 
 export interface User {

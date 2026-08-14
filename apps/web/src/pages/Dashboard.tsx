@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import type { Paginated, Video } from "../types";
+import type { Paginated, Product, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { formatPrice, resolveImageUrl } from "../lib/utils";
 
 export function Dashboard() {
   const { user } = useAuth();
   const [recent, setRecent] = useState<{ watchedAt: string; video: Video }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saleProducts, setSaleProducts] = useState<Product[]>([]);
+  const [loadingSales, setLoadingSales] = useState(true);
   const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
 
   useEffect(() => {
@@ -20,6 +23,13 @@ export function Dashboard() {
       .then((data) => setRecent(data.data))
       .catch(() => setRecent([]))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    api<Paginated<Product>>("/api/products?perPage=8&onSale=true")
+      .then((data) => setSaleProducts(data.data))
+      .catch(() => setSaleProducts([]))
+      .finally(() => setLoadingSales(false));
   }, []);
 
   return (
@@ -79,8 +89,7 @@ export function Dashboard() {
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <History className="h-5 w-5 text-primary-700" /> Continuar assistindo
           </h2>
-        </div>
-        {loading ? (
+        </div>        {loading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
@@ -98,6 +107,77 @@ export function Dashboard() {
             {recent.map(({ video }) => (
               <VideoCard key={video.id} video={video} />
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
+            <ShoppingBag className="h-5 w-5 text-primary-700" /> Ofertas e descontos em produtos
+          </h2>
+          <Link to="/catalogo">
+            <Button variant="outline" size="sm">
+              <Percent className="h-4 w-4" /> Ver todas as ofertas
+            </Button>
+          </Link>
+        </div>
+        <p className="mb-5 -mt-3 text-sm text-slate-500">
+          Descontos exclusivos em kits, uniformes e materiais odontológicos para assinantes.
+        </p>
+        {loadingSales ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="aspect-square animate-pulse rounded-2xl bg-slate-200" />
+            ))}
+          </div>
+        ) : saleProducts.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <Package className="mx-auto h-8 w-8 text-slate-300" />
+            <p className="mt-2 text-slate-500">Novas ofertas em breve.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {saleProducts.map((p) => {
+              const price = Number(p.price);
+              const promo = Number(p.promoPrice);
+              const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
+              const img = p.images?.[0]?.url;
+              return (
+                <div
+                  key={p.id}
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-lift"
+                >
+                  <div className="relative aspect-[4/3] bg-slate-50">
+                    {img ? (
+                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-slate-300">
+                        <Package className="h-10 w-10" />
+                      </span>
+                    )}
+                    {discount > 0 && (
+                      <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                        -{discount}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-sm font-semibold text-slate-900">{p.name}</p>
+                    <p className="truncate text-xs text-slate-400">
+                      {p.brand ?? "—"}
+                      {p.category ? ` • ${p.category.name}` : ""}
+                    </p>
+                    <div className="mt-2 flex items-baseline gap-2">
+                      {discount > 0 && (
+                        <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                      )}
+                      <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </section>

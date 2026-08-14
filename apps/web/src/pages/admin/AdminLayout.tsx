@@ -8,6 +8,7 @@ import {
   ClipboardList,
   CreditCard,
   Link2,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -19,6 +20,7 @@ const items = [
   { to: "/admin/tags", label: "Tags", icon: TagsIcon },
   { to: "/admin/casos", label: "Estudos de caso", icon: ClipboardList },
   { to: "/admin/planos", label: "Planos", icon: CreditCard },
+  { to: "/admin/loja", label: "Shop Odontus", icon: ShoppingBag },
   { to: "/admin/afiliados", label: "Afiliados", icon: Link2 },
 ];
 

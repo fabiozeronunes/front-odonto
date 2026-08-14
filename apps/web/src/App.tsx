@@ -27,6 +27,7 @@ import { AdminTags } from "./pages/admin/AdminTags";
 import { AdminCaseStudies } from "./pages/admin/AdminCaseStudies";
 import { AdminPlans } from "./pages/admin/AdminPlans";
 import { AdminAffiliates } from "./pages/admin/AdminAffiliates";
+import { AdminShop } from "./pages/admin/AdminShop";
 
 export default function App() {
   return (
@@ -103,6 +104,7 @@ export default function App() {
             <Route path="tags" element={<AdminTags />} />
             <Route path="casos" element={<AdminCaseStudies />} />
             <Route path="planos" element={<AdminPlans />} />
+            <Route path="loja" element={<AdminShop />} />
             <Route path="afiliados" element={<AdminAffiliates />} />
           </Route>
 

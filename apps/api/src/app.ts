@@ -15,6 +15,7 @@ import { checkoutRouter } from "./modules/checkout/checkout.routes.js";
 import { uploadsRouter } from "./modules/uploads/uploads.routes.js";
 import { youtubeRouter } from "./modules/youtube/youtube.routes.js";
 import { settingsRouter } from "./modules/settings/settings.routes.js";
+import { productsRouter } from "./modules/products/products.routes.js";
 
 export function createApp() {
   const app = express();
@@ -68,6 +69,7 @@ export function createApp() {
   app.use("/api/uploads", uploadsRouter);
   app.use("/api/youtube", youtubeRouter);
   app.use("/api/settings", settingsRouter);
+  app.use("/api/products", productsRouter);
 
   app.use(notFound);
   app.use(errorHandler);
