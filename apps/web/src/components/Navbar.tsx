@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { GraduationCap, Search, User as UserIcon, Menu, X } from "lucide-react";
+import { Search, User as UserIcon, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
 import { useSiteLogo } from "../lib/useSiteLogo";
@@ -25,22 +25,18 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center">
           {logoUrl ? (
             <img
               src={logoUrl}
               alt="OdontoStudy"
-              className="h-11 w-auto max-w-[170px] object-contain sm:max-w-[220px] md:h-14 md:max-w-[260px] lg:h-16 lg:max-w-[320px]"
+              className="h-auto w-44 object-contain sm:w-52 md:w-60 lg:w-72"
             />
           ) : (
-            <>
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-400 text-slate-950 md:h-12 md:w-12">
-                <GraduationCap className="h-6 w-6 md:h-7 md:w-7" />
-              </span>
-              <span className="text-lg font-bold text-white md:text-2xl">
-                Odonto<span className="text-teal-400">Study</span>
-              </span>
-            </>
+            <span
+              aria-hidden
+              className="block h-11 w-44 sm:h-12 sm:w-52 md:h-14 md:w-60 lg:h-16 lg:w-72"
+            />
           )}
         </Link>
 

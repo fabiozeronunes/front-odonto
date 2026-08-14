@@ -13,12 +13,10 @@ export function Footer() {
               <img
                 src={logoUrl}
                 alt="OdontoStudy"
-                className="h-12 w-auto max-w-[220px] object-contain sm:max-w-[280px] md:h-16 md:max-w-[360px]"
+                className="h-auto w-48 object-contain sm:w-60 md:w-72"
               />
             ) : (
-              <p className="text-lg font-bold text-white md:text-2xl">
-                Odonto<span className="text-teal-400">Study</span>
-              </p>
+              <span aria-hidden className="block h-12 w-48 sm:h-14 sm:w-60 md:h-16 md:w-72" />
             )}
             <p className="mt-3 max-w-md text-sm">
               Plataforma de estudos odontológicos com vídeos, especialidades e estudos de caso
