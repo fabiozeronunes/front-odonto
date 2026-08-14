@@ -5,6 +5,7 @@ import { requireRole } from "../../middlewares/requireRole.js";
 import { validate } from "../../middlewares/validate.js";
 import * as ctrl from "./products.controller.js";
 import {
+  createOrderSchema,
   createProductCategorySchema,
   createProductSchema,
   productQuerySchema,
@@ -16,6 +17,10 @@ export const productsRouter = Router();
 productsRouter.get("/", validate(productQuerySchema, "query"), ctrl.list);
 productsRouter.get("/categories", ctrl.categories);
 productsRouter.get("/admin", authenticate, requireRole(Role.ADMIN), validate(productQuerySchema, "query"), ctrl.adminList);
+productsRouter.post("/orders", authenticate, validate(createOrderSchema), ctrl.createOrder);
+productsRouter.post("/orders/:id/confirm", authenticate, ctrl.confirmOrder);
+productsRouter.get("/orders/me", authenticate, ctrl.myOrders);
+productsRouter.get("/orders", authenticate, requireRole(Role.ADMIN), ctrl.allOrders);
 productsRouter.get("/:slugOrId", ctrl.getOne);
 
 productsRouter.use(authenticate, requireRole(Role.ADMIN));

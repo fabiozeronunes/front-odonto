@@ -1,58 +1,91 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, Flame, Clock } from "lucide-react";
+import { Sparkles, ShoppingBag, Package } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { VideoCard } from "../components/VideoCard";
 import { api } from "../lib/api";
-import type { Paginated, Video } from "../types";
+import { formatPrice, resolveImageUrl } from "../lib/utils";
+import type { Product } from "../types";
 
-function VideoSection({
-  title,
-  icon,
-  sort,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  sort: "recent" | "popular";
-}) {
-  const [videos, setVideos] = useState<Video[]>([]);
+function ShopPreview() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api<Paginated<Video>>(`/api/videos?sort=${sort}&perPage=6`)
-      .then((d) => setVideos(d.data))
+    api<{ data: Product[] }>("/api/products?perPage=4")
+      .then((d) => setProducts(d.data))
+      .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [sort]);
+  }, []);
 
   return (
-    <section className="py-10">
+    <section className="py-12 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            {icon}
-            {title}
+            <ShoppingBag className="h-5 w-5 text-primary-700" /> Shop Odontus
           </h2>
-          <Link to={`/catalogo?sort=${sort}`}>
+          <Link to="/loja">
             <Button variant="ghost" size="sm">
               Ver todos
             </Button>
           </Link>
         </div>
+
         {loading ? (
-          <div className="grid grid-cols-2 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-video animate-pulse rounded-2xl bg-slate-200" />
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200" />
             ))}
           </div>
-        ) : videos.length === 0 ? (
-          <p className="text-sm text-slate-500">Nenhum vídeo disponível ainda.</p>
+        ) : products.length === 0 ? (
+          <p className="text-sm text-slate-500">Novos produtos em breve.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-6">
-            {videos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+            {products.map((p) => {
+              const price = Number(p.price);
+              const promo = Number(p.promoPrice);
+              const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
+              const img = p.images?.[0]?.url;
+              return (
+                <Link
+                  key={p.id}
+                  to="/loja"
+                  className="group flex gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-card transition-shadow hover:shadow-lift"
+                >
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-50 sm:h-28 sm:w-28">
+                    {img ? (
+                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-slate-300">
+                        <Package className="h-8 w-8" />
+                      </span>
+                    )}
+                    {discount > 0 && (
+                      <span className="absolute left-1 top-1 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        -{discount}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col justify-center">
+                    <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-800">
+                      {p.name}
+                    </p>
+                    <p className="mt-0.5 truncate text-xs text-slate-400">
+                      {p.brand ?? "Odontus"}
+                      {p.category ? ` • ${p.category.name}` : ""}
+                    </p>
+                    <div className="mt-2 flex items-baseline gap-2">
+                      {discount > 0 && (
+                        <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                      )}
+                      <span className="text-base font-bold text-slate-900">{formatPrice(p.promoPrice)}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
@@ -114,17 +147,11 @@ export function Home() {
         <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
       </section>
 
-      {/* ===== VIDEOS SECTIONS ===== */}
-      <section className="py-12 bg-white">
-        <VideoSection title="Vídeos novos" icon={<Clock className="h-5 w-5 text-primary-600" />} sort="recent" />
-      </section>
-
-      <section className="py-12 bg-slate-50">
-        <VideoSection title="Mais assistidos" icon={<Flame className="h-5 w-5 text-accent-500" />} sort="popular" />
-      </section>
+      {/* ===== SHOP ODONTUS ===== */}
+      <ShopPreview />
 
       {/* ===== PLANS SECTION ===== */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Plans />
         </div>

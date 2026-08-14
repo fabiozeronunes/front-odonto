@@ -1,7 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
-import { Search, User as UserIcon, Menu, X } from "lucide-react";
+import { Search, User as UserIcon, Menu, X, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
+import { useCart } from "../lib/cart";
 import { useSiteLogo } from "../lib/useSiteLogo";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -20,6 +21,7 @@ const darkGhost = "text-slate-300 hover:bg-slate-800 hover:text-white";
 
 export function Navbar() {
   const { user, isAdmin, logout } = useAuth();
+  const { count } = useCart();
   const logoUrl = useSiteLogo();
   const [open, setOpen] = useState(false);
 
@@ -61,6 +63,16 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Link to="/carrinho" aria-label="Carrinho de compras">
+            <Button variant="ghost" size="icon" className={`relative ${darkGhost}`}>
+              <ShoppingCart className="h-5 w-5" />
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                  {count}
+                </span>
+              )}
+            </Button>
+          </Link>
           <Link to="/catalogo">
             <Button variant="ghost" size="icon" aria-label="Buscar" className={darkGhost}>
               <Search className="h-5 w-5" />
@@ -130,6 +142,16 @@ export function Navbar() {
               </NavLink>
             ))}
             <div className="mt-2 flex flex-col gap-2 border-t border-slate-800 pt-3">
+              <Link to="/carrinho" onClick={() => setOpen(false)}>
+                <Button variant="outline" className={`w-full ${darkOutline}`}>
+                  <ShoppingCart className="h-4 w-4" /> Meu carrinho
+                  {count > 0 && (
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">
+                      {count}
+                    </span>
+                  )}
+                </Button>
+              </Link>
               {user ? (
                 <>
                   <Link to={isAdmin ? "/admin" : "/dashboard"} onClick={() => setOpen(false)}>

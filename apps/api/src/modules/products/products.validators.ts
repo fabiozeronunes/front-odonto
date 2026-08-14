@@ -40,7 +40,20 @@ export const createProductCategorySchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+export const createOrderSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, "Produto obrigatório"),
+        quantity: z.coerce.number().int().min(1, "Quantidade inválida").max(99),
+      })
+    )
+    .min(1, "Carrinho vazio")
+    .max(50),
+});
+
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type CreateProductCategoryInput = z.infer<typeof createProductCategorySchema>;
+export type CreateOrderInput = z.infer<typeof createOrderSchema>;

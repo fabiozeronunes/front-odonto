@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { AuthenticatedRequest } from "../../types/auth.js";
 import * as service from "./products.service.js";
 import type { ProductQueryInput } from "./products.validators.js";
 
@@ -16,6 +17,23 @@ export const adminList = asyncHandler(async (req: Request, res: Response) => {
 export const getOne = asyncHandler(async (req: Request, res: Response) => {
   const product = await service.getProduct(req.params.slugOrId);
   res.json(product);
+});
+
+export const createOrder = asyncHandler(async (req: Request, res: Response) => {
+  const order = await service.createOrder((req as AuthenticatedRequest).user.id, req.body);
+  res.status(201).json({ data: order });
+});
+
+export const confirmOrder = asyncHandler(async (req: Request, res: Response) => {
+  res.json(await service.confirmOrder((req as AuthenticatedRequest).user.id, req.params.id));
+});
+
+export const myOrders = asyncHandler(async (req: Request, res: Response) => {
+  res.json({ data: await service.listMyOrders((req as AuthenticatedRequest).user.id) });
+});
+
+export const allOrders = asyncHandler(async (_req: Request, res: Response) => {
+  res.json({ data: await service.listOrders() });
 });
 
 export const create = asyncHandler(async (req: Request, res: Response) => {

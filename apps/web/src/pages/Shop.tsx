@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { Search, ShoppingBag, Package, Percent } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, ShoppingBag, Package, Percent, Check } from "lucide-react";
 import { api } from "../lib/api";
+import { useCart } from "../lib/cart";
 import type { Paginated, Product, ProductCategory } from "../types";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 
 export function Shop() {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +19,7 @@ export function Shop() {
   const [onSale, setOnSale] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [added, setAdded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     api<{ data: ProductCategory[] }>("/api/products/categories")
@@ -43,6 +47,17 @@ export function Shop() {
     if (key === "category") setCategory(value as string);
     if (key === "onSale") setOnSale(value as boolean);
     if (key === "search") setSearch(value as string);
+  }
+
+  function handleAdd(p: Product) {
+    addItem(p, 1);
+    setAdded((prev) => ({ ...prev, [p.id]: true }));
+    setTimeout(() => setAdded((prev) => ({ ...prev, [p.id]: false })), 1500);
+  }
+
+  function handleBuy(p: Product) {
+    addItem(p, 1);
+    navigate("/checkout-loja");
   }
 
   return (
@@ -106,8 +121,8 @@ export function Shop() {
       </div>
 
       {loading ? (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-slate-200" />
           ))}
         </div>
@@ -117,7 +132,7 @@ export function Shop() {
           <p className="mt-3 text-slate-500">Nenhum produto encontrado.</p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6">
           {products.map((p) => {
             const price = Number(p.price);
             const promo = Number(p.promoPrice);
@@ -148,15 +163,12 @@ export function Shop() {
                   )}
                 </div>
                 <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-slate-900">{p.name}</p>
-                      <p className="mt-0.5 truncate text-xs text-slate-400">
-                        {p.brand ?? "Odontus"}
-                        {p.category ? ` • ${p.category.name}` : ""}
-                      </p>
-                    </div>
-                    {p.isFeatured && <Badge variant="premium">Destaque</Badge>}
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-slate-900">{p.name}</p>
+                    <p className="mt-0.5 truncate text-xs text-slate-400">
+                      {p.brand ?? "Odontus"}
+                      {p.category ? ` • ${p.category.name}` : ""}
+                    </p>
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
                     {discount > 0 && (
@@ -164,9 +176,20 @@ export function Shop() {
                     )}
                     <span className="text-lg font-bold text-slate-900">{formatPrice(p.promoPrice)}</span>
                   </div>
-                  {p.description && (
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-500">{p.description}</p>
-                  )}
+                  <div className="mt-4 flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      disabled={p.stock <= 0}
+                      onClick={() => handleAdd(p)}
+                    >
+                      {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                      {added[p.id] ? "Adicionado" : "Carrinho"}
+                    </Button>
+                    <Button className="flex-1" disabled={p.stock <= 0} onClick={() => handleBuy(p)}>
+                      Comprar
+                    </Button>
+                  </div>
                 </div>
               </div>
             );

@@ -5,6 +5,7 @@ import { slugify } from "../../utils/slugify.js";
 import { getPagination, paginated } from "../../utils/pagination.js";
 import type { Request } from "express";
 import type {
+  CreateOrderInput,
   CreateProductCategoryInput,
   CreateProductInput,
   ProductQueryInput,
@@ -223,4 +224,114 @@ export async function deleteCategory(id: string) {
   }
   await prisma.productCategory.delete({ where: { id } });
   return { ok: true };
+}
+
+const orderSelect = {
+  id: true,
+  status: true,
+  subtotal: true,
+  discount: true,
+  total: true,
+  createdAt: true,
+  items: {
+    select: {
+      id: true,
+      quantity: true,
+      unitPrice: true,
+      product: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          images: { select: { id: true, url: true, alt: true } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
+export async function createOrder(userId: string, input: CreateOrderInput) {
+  const productIds = input.items.map((i) => i.productId);
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds }, status: ContentStatus.PUBLISHED },
+    select: { id: true, price: true, promoPrice: true, stock: true },
+  });
+  const byId = new Map(products.map((p) => [p.id, p]));
+
+  let subtotal = 0;
+  let discount = 0;
+  const items: { productId: string; quantity: number; unitPrice: number }[] = [];
+
+  for (const item of input.items) {
+    const product = byId.get(item.productId);
+    if (!product) throw new NotFoundError("Produto não encontrado ou indisponível");
+    if (product.stock < item.quantity) {
+      throw new ConflictError("Estoque insuficiente para um dos produtos");
+    }
+    const price = Number(product.price);
+    const promo = Number(product.promoPrice);
+    const unitPrice = promo > 0 && promo < price ? promo : price;
+    subtotal += price * item.quantity;
+    discount += (price - unitPrice) * item.quantity;
+    items.push({ productId: product.id, quantity: item.quantity, unitPrice });
+  }
+
+  const total = Math.max(0, subtotal - discount);
+
+  return prisma.order.create({
+    data: {
+      userId,
+      status: "PENDING",
+      subtotal,
+      discount,
+      total,
+      items: { create: items },
+    },
+    select: orderSelect,
+  });
+}
+
+export async function confirmOrder(userId: string, orderId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId, status: "PENDING" },
+    include: { items: true },
+  });
+  if (!order) throw new NotFoundError("Pedido não encontrado");
+
+  await prisma.$transaction(async (tx) => {
+    for (const item of order.items) {
+      const product = await tx.product.findUnique({ where: { id: item.productId } });
+      if (!product) throw new NotFoundError("Produto não encontrado");
+      if (product.stock < item.quantity) {
+        throw new ConflictError("Estoque insuficiente para um dos produtos");
+      }
+    }
+    await tx.order.update({ where: { id: orderId }, data: { status: "PAID" } });
+    for (const item of order.items) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
+  });
+
+  return { ok: true, orderId };
+}
+
+export async function listMyOrders(userId: string) {
+  return prisma.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: orderSelect,
+  });
+}
+
+export async function listOrders() {
+  return prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    select: {
+      ...orderSelect,
+      user: { select: { id: true, name: true, email: true, registrationNumber: true } },
+    },
+  });
 }

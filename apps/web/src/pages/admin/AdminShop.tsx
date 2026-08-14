@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, ShoppingCart } from "lucide-react";
 import { api } from "../../lib/api";
-import type { Paginated, Product, ProductCategory, Tag } from "../../types";
+import type { Paginated, Product, ProductCategory, ShopOrder, Tag } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -10,7 +10,7 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
-import { formatPrice } from "../../lib/utils";
+import { cn, formatDate, formatPrice } from "../../lib/utils";
 
 interface ProductFormState {
   id?: string;
@@ -46,8 +46,10 @@ const emptyForm: ProductFormState = {
 };
 
 export function AdminShop() {
+  const [tab, setTab] = useState<"produtos" | "categorias" | "pedidos">("produtos");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [orders, setOrders] = useState<ShopOrder[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,6 +79,13 @@ export function AdminShop() {
   useEffect(() => {
     load();
   }, [page]);
+
+  useEffect(() => {
+    if (tab !== "pedidos") return;
+    api<{ data: ShopOrder[] }>("/api/products/orders")
+      .then((d) => setOrders(d.data))
+      .catch(() => setOrders([]));
+  }, [tab]);
 
   function startCreate() {
     setEditing({ ...emptyForm });
@@ -186,13 +195,42 @@ export function AdminShop() {
             Cadastre produtos de odontologia, kits, uniformes e materiais.
           </p>
         </div>
-        <Button onClick={startCreate}>
-          <Plus className="h-4 w-4" /> Novo produto
-        </Button>
+        {tab === "produtos" && (
+          <Button onClick={startCreate}>
+            <Plus className="h-4 w-4" /> Novo produto
+          </Button>
+        )}
+      </div>
+
+      <div className="mt-5 flex gap-2">
+        {(
+          [
+            ["produtos", "Produtos"],
+            ["categorias", "Categorias"],
+            ["pedidos", "Pedidos"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+              tab === key
+                ? "bg-primary-700 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            )}
+          >
+            {key === "pedidos" && <ShoppingCart className="mr-1.5 inline h-4 w-4" />}
+            {label}
+          </button>
+        ))}
       </div>
 
       {error && <div className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
+      {tab === "produtos" && (
+        <>
       {editing && (
         <Card className="mt-6 border-primary-200">
           <CardHeader>
@@ -417,50 +455,121 @@ export function AdminShop() {
           Próxima
         </Button>
       </div>
+        </>
+      )}
 
-      <Card className="mt-6">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Categorias</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <Input
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Ex.: Kits, Uniformes, Instrumentais"
-              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCategory())}
-            />
-            <Button onClick={addCategory} disabled={!newCategory.trim()}>
-              <Plus className="h-4 w-4" /> Adicionar
-            </Button>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <span
-                key={c.id}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700"
-              >
-                {c.name}
-                <span className="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">
-                  {c._count?.products ?? 0} produtos
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeCategory(c.id)}
-                  className="text-slate-400 transition-colors hover:text-red-600"
-                  title="Excluir categoria"
-                  aria-label={`Excluir categoria ${c.name}`}
+      {tab === "categorias" && (
+        <Card className="mt-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Categorias</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="Ex.: Kits, Uniformes, Instrumentais"
+                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCategory())}
+              />
+              <Button onClick={addCategory} disabled={!newCategory.trim()}>
+                <Plus className="h-4 w-4" /> Adicionar
+              </Button>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {categories.map((c) => (
+                <span
+                  key={c.id}
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </span>
-            ))}
-            {categories.length === 0 && (
-              <p className="text-sm text-slate-400">Nenhuma categoria criada ainda.</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+                  {c.name}
+                  <span className="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">
+                    {c._count?.products ?? 0} produtos
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeCategory(c.id)}
+                    className="text-slate-400 transition-colors hover:text-red-600"
+                    title="Excluir categoria"
+                    aria-label={`Excluir categoria ${c.name}`}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </span>
+              ))}
+              {categories.length === 0 && (
+                <p className="text-sm text-slate-400">Nenhuma categoria criada ainda.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {tab === "pedidos" && (
+        <Card className="mt-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Pedidos</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                  <tr>
+                    <th className="px-5 py-3">Pedido</th>
+                    <th className="px-5 py-3">Cliente</th>
+                    <th className="px-5 py-3">Itens</th>
+                    <th className="px-5 py-3">Total</th>
+                    <th className="px-5 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {orders.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                        Nenhum pedido realizado ainda.
+                      </td>
+                    </tr>
+                  ) : (
+                    orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-50">
+                        <td className="px-5 py-3">
+                          <p className="font-mono text-xs text-slate-700">#{o.id.slice(-8).toUpperCase()}</p>
+                          <p className="text-xs text-slate-400">{formatDate(o.createdAt)}</p>
+                        </td>
+                        <td className="px-5 py-3">
+                          <p className="font-medium text-slate-800">{o.user?.name ?? "—"}</p>
+                          <p className="text-xs text-slate-400">{o.user?.email ?? ""}</p>
+                        </td>
+                        <td className="max-w-[280px] px-5 py-3">
+                          <ul className="space-y-0.5 text-xs text-slate-600">
+                            {o.items.map((it) => (
+                              <li key={it.id}>
+                                {it.quantity}× {it.product.name}
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="px-5 py-3 font-medium text-slate-800">
+                          {formatPrice(o.total)}
+                          {Number(o.discount) > 0 && (
+                            <span className="block text-xs font-normal text-emerald-700">
+                              -{formatPrice(o.discount)} desconto
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3">
+                          <Badge variant={o.status === "PAID" ? "default" : o.status === "CANCELED" ? "outline" : "free"}>
+                            {o.status === "PAID" ? "Pago" : o.status === "CANCELED" ? "Cancelado" : o.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

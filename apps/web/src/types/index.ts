@@ -139,6 +139,24 @@ export interface Product {
   createdAt?: string;
 }
 
+export interface ShopOrderItem {
+  id: string;
+  quantity: number;
+  unitPrice: string | number;
+  product: { id: string; name: string; slug: string; images?: Media[] };
+}
+
+export interface ShopOrder {
+  id: string;
+  status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
+  subtotal: string | number;
+  discount: string | number;
+  total: string | number;
+  createdAt: string;
+  items: ShopOrderItem[];
+  user?: { id: string; name: string; email: string; registrationNumber?: string | null };
+}
+
 export interface User {
   id: string;
   name: string;
