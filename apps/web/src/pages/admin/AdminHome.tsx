@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
-import { Link2, Trash2, Video } from "lucide-react";
+import { Trash2, Video } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { YouTubeImport } from "../../components/YouTubeImport";
 import { InfoPopover } from "../../components/ui/info-popover";
 
 export function AdminHome() {
-  const [url, setUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
     try {
       const res = await api<{ data: string | null }>("/api/settings/hero-video", { skipAuth: true });
-      setUrl(res.data ?? "");
-      setSaved(res.data ?? null);
+      setPreviewUrl(res.data ?? null);
+      setSavedUrl(res.data ?? null);
     } catch {
-      setUrl("");
-      setSaved(null);
+      setPreviewUrl(null);
+      setSavedUrl(null);
     } finally {
       setLoading(false);
     }
@@ -32,20 +32,18 @@ export function AdminHome() {
   }, []);
 
   async function save() {
-    const link = url.trim();
-    if (!link) return;
+    if (!previewUrl) return;
     setSaving(true);
+    setNotice(null);
     try {
       const res = await api<{ data: string }>("/api/settings/hero-video", {
         method: "POST",
-        body: JSON.stringify({ url: link }),
+        body: JSON.stringify({ url: previewUrl }),
       });
-      setSaved(res.data);
+      setSavedUrl(res.data);
       setNotice("Vídeo da hero atualizado. A página inicial já exibe o novo vídeo.");
-    } catch (err) {
-      setNotice(null);
-      setSaved(url);
-      setUrl("");
+    } catch {
+      setNotice("Falha ao salvar o vídeo. Tente novamente.");
     } finally {
       setSaving(false);
     }
@@ -53,22 +51,21 @@ export function AdminHome() {
 
   async function remove() {
     setSaving(true);
+    setNotice(null);
     try {
       await api("/api/settings/hero-video", { method: "DELETE" });
-      setUrl("");
-      setSaved(null);
+      setPreviewUrl(null);
+      setSavedUrl(null);
       setNotice("Vídeo removido. A hero voltou a exibir o mockup padrão.");
     } catch {
-      setNotice(null);
+      setNotice("Falha ao remover o vídeo.");
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return (
-      <div className="h-48 animate-pulse rounded-2xl bg-slate-200" />
-    );
+    return <div className="h-48 animate-pulse rounded-2xl bg-slate-200" />;
   }
 
   return (
@@ -77,7 +74,7 @@ export function AdminHome() {
         Página inicial
         <InfoPopover
           title="Vídeo da hero"
-          text="Cole o link de um vídeo (YouTube) para que ele apareça no topo da página inicial, no lugar do mockup. O vídeo fica visível para todos os visitantes."
+          text="Cole o link de um vídeo do YouTube. Ao importar, o vídeo aparece abaixo para você conferir e depois salvar. O vídeo fica visível para todos os visitantes no topo da home."
         />
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -95,46 +92,39 @@ export function AdminHome() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative">
-            <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              className="pl-9"
-              placeholder="https://www.youtube.com/embed/..."
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-          </div>
-          <p className="text-xs text-slate-400">
-            Use o link de incorporação do YouTube (compartilhar → Incorporar → link da
-            iframe), ex.: <span className="font-mono">https://www.youtube.com/embed/VIDEO_ID</span>
-          </p>
+          <YouTubeImport
+            onInfo={({ videoUrl }) => {
+              setPreviewUrl(videoUrl);
+              setSavedUrl(null);
+            }}
+          />
 
-          {saved ? (
+          {previewUrl && (
             <div className="overflow-hidden rounded-xl border border-border">
               <iframe
-                src={saved}
+                src={previewUrl}
                 title="Vídeo da hero"
                 className="aspect-video w-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-          ) : (
-            <div className="flex aspect-video items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-400">
-              Nenhum vídeo configurado — a hero exibe o mockup padrão.
-            </div>
           )}
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={save} disabled={saving || !url.trim()}>
-              {saving ? "Salvando..." : saved ? "Atualizar vídeo" : "Salvar vídeo"}
+            <Button onClick={save} disabled={saving || !previewUrl}>
+              {saving ? "Salvando..." : "Salvar vídeo"}
             </Button>
-            {saved && (
+            {savedUrl && (
               <Button variant="outline" disabled={saving} onClick={remove}>
                 <Trash2 className="h-4 w-4" /> Remover vídeo
               </Button>
             )}
           </div>
+
+          <p className="text-xs text-slate-400">
+            Ao importar, o vídeo aparece acima para conferência antes de salvar.
+          </p>
         </CardContent>
       </Card>
     </div>
