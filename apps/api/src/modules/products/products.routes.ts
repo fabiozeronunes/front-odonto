@@ -21,6 +21,7 @@ productsRouter.post("/orders", authenticate, validate(createOrderSchema), ctrl.c
 productsRouter.post("/orders/:id/confirm", authenticate, ctrl.confirmOrder);
 productsRouter.get("/orders/me", authenticate, ctrl.myOrders);
 productsRouter.get("/orders", authenticate, requireRole(Role.ADMIN), ctrl.allOrders);
+productsRouter.delete("/orders/:id", authenticate, requireRole(Role.ADMIN), ctrl.removeOrder);
 productsRouter.get("/:slugOrId", ctrl.getOne);
 
 productsRouter.use(authenticate, requireRole(Role.ADMIN));

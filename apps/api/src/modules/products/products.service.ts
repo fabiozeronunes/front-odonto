@@ -335,3 +335,13 @@ export async function listOrders() {
     },
   });
 }
+
+export async function deleteOrder(orderId: string) {
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order) throw new NotFoundError("Pedido não encontrado");
+  await prisma.$transaction(async (tx) => {
+    await tx.orderItem.deleteMany({ where: { orderId } });
+    await tx.order.delete({ where: { id: orderId } });
+  });
+  return { ok: true, orderId };
+}

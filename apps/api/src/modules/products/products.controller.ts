@@ -36,6 +36,10 @@ export const allOrders = asyncHandler(async (_req: Request, res: Response) => {
   res.json({ data: await service.listOrders() });
 });
 
+export const removeOrder = asyncHandler(async (req: Request, res: Response) => {
+  res.json(await service.deleteOrder(req.params.id));
+});
+
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const product = await service.createProduct(req.body);
   res.status(201).json({ data: product });

@@ -184,7 +184,7 @@ export function Shop() {
                 className="group flex flex-col rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
               >
                 <Link to={`/loja/${p.slug}`} className="block">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-muted">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-white">
                     {img ? (
                       <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
                     ) : (

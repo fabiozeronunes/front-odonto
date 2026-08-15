@@ -87,6 +87,17 @@ export function AdminShop() {
       .catch(() => setOrders([]));
   }, [tab]);
 
+  async function handleDeleteOrder(orderId: string) {
+    if (!window.confirm("Excluir este pedido? Esta ação não pode ser desfeita.")) return;
+    try {
+      await api(`/api/products/orders/${orderId}`, { method: "DELETE" });
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível excluir o pedido.");
+    }
+  }
+
   function startCreate() {
     setEditing({ ...emptyForm });
     setError(null);
@@ -519,12 +530,13 @@ export function AdminShop() {
                     <th className="px-5 py-3">Itens</th>
                     <th className="px-5 py-3">Total</th>
                     <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                      <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
                         Nenhum pedido realizado ainda.
                       </td>
                     </tr>
@@ -560,6 +572,17 @@ export function AdminShop() {
                           <Badge variant={o.status === "PAID" ? "default" : o.status === "CANCELED" ? "outline" : "free"}>
                             {o.status === "PAID" ? "Pago" : o.status === "CANCELED" ? "Cancelado" : o.status}
                           </Badge>
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteOrder(o.id)}
+                            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            aria-label={`Excluir pedido ${o.id.slice(-8).toUpperCase()}`}
+                            title="Excluir pedido"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
                     ))
