@@ -125,7 +125,7 @@ export function ProductDetail() {
               <img
                 src={resolveImageUrl(imgUrl)}
                 alt={product.name}
-                className="aspect-square w-full object-cover"
+                className="aspect-square w-full object-contain"
               />
             ) : (
               <div className="flex aspect-square w-full items-center justify-center text-muted-foreground">
@@ -148,7 +148,7 @@ export function ProductDetail() {
                   <img
                     src={resolveImageUrl(img.url)}
                     alt={img.alt ?? product.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 </button>
               ))}

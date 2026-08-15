@@ -111,7 +111,7 @@ function ShopPreview() {
                         <img
                           src={resolveImageUrl(img)}
                           alt={p.name}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          className="h-full w-full object-contain transition-transform group-hover:scale-105"
                         />
                       ) : (
                         <span className="flex h-full w-full items-center justify-center text-muted-foreground">
