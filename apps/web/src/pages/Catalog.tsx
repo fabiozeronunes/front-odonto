@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame } from "lucide-react";
 import { api } from "../lib/api";
@@ -25,11 +25,12 @@ export function Catalog() {
   const [imageTags, setImageTags] = useState<Tag[]>([]);
   const [searchImages, setSearchImages] = useState<ImageSearchItem[]>([]);
   const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const isLoadMoreRef = useRef(false);
 
-  const page = Number(searchParams.get("page") ?? 1);
   const search = searchParams.get("search") ?? "";
   const specialty = searchParams.get("specialty") ?? "";
   const tag = searchParams.get("tag") ?? "";
@@ -38,6 +39,12 @@ export function Catalog() {
   const access = searchParams.get("access") ?? "";
   const source = searchParams.get("source") ?? "";
   const sort = searchParams.get("sort") ?? "recent";
+
+  const filterKey = [search, specialty, tag, imageTag, difficulty, access, source, sort].join("|");
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [filterKey]);
 
   useEffect(() => {
     (async () => {
@@ -65,10 +72,12 @@ export function Catalog() {
   }, [search]);
 
   useEffect(() => {
-    setLoading(true);
+    const isLoadMore = isLoadMoreRef.current;
+    isLoadMoreRef.current = false;
+    if (!isLoadMore) setLoading(true);
     const params = new URLSearchParams();
-    params.set("page", String(page));
-    params.set("perPage", "12");
+    params.set("page", "1");
+    params.set("perPage", String(visibleCount));
     params.set("sort", sort);
     if (search) params.set("search", search);
     if (specialty) params.set("specialty", specialty);
@@ -82,10 +91,12 @@ export function Catalog() {
       .then((data) => {
         setVideos(data.data);
         setTotal(data.pagination.total);
-        setTotalPages(data.pagination.totalPages);
       })
-      .finally(() => setLoading(false));
-  }, [page, search, specialty, tag, imageTag, difficulty, access, source, sort]);
+      .finally(() => {
+        setLoading(false);
+        setLoadingMore(false);
+      });
+  }, [filterKey, visibleCount]);
 
   function updateParam(key: string, value: string) {
     const next = new URLSearchParams(searchParams);
@@ -93,6 +104,13 @@ export function Catalog() {
     else next.delete(key);
     next.delete("page");
     setSearchParams(next);
+  }
+
+  function loadMore() {
+    if (loadingMore) return;
+    isLoadMoreRef.current = true;
+    setLoadingMore(true);
+    setVisibleCount((c) => c + 12);
   }
 
   const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length;
@@ -315,27 +333,13 @@ export function Catalog() {
                 </Link>
               ))}
             </div>
-            <div className="mt-10 flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => updateParam("page", String(page - 1))}
-              >
-                Anterior
-              </Button>
-              <Badge variant="outline">
-                Página {page} de {Math.max(totalPages, 1)}
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => updateParam("page", String(page + 1))}
-              >
-                Próxima
-              </Button>
-            </div>
+            {videos.length < total && (
+              <div className="mt-10 flex justify-center">
+                <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+                  {loadingMore ? "Carregando..." : "Carregar mais vídeos"}
+                </Button>
+              </div>
+            )}
           </>
         )
       ) : videos.length === 0 && searchImages.length === 0 ? (
@@ -392,27 +396,13 @@ export function Catalog() {
                   <VideoCard key={video.id} video={video} />
                 ))}
               </div>
-              <div className="mt-10 flex items-center justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page <= 1}
-                  onClick={() => updateParam("page", String(page - 1))}
-                >
-                  Anterior
-                </Button>
-                <Badge variant="outline">
-                  Página {page} de {Math.max(totalPages, 1)}
-                </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page >= totalPages}
-                  onClick={() => updateParam("page", String(page + 1))}
-                >
-                  Próxima
-                </Button>
-              </div>
+              {videos.length < total && (
+                <div className="mt-10 flex justify-center">
+                  <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+                    {loadingMore ? "Carregando..." : "Carregar mais vídeos"}
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </>
