@@ -16,6 +16,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import { Select } from "../../components/ui/select";
+import { InfoPopover } from "../../components/ui/info-popover";
 import { formatDate, formatPrice } from "../../lib/utils";
 
 interface Affiliate {
@@ -223,7 +224,16 @@ export function AdminAffiliates() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Afiliados</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+        Afiliados
+        <InfoPopover
+          title="Como funciona"
+          text="Cadastre um afiliado e ele recebe um link de indicação. Quando um aluno se cadastra pelo link e assina um plano ou compra produto no site, o sistema computa a comissão automaticamente. Aqui você define as taxas (aluno e produtos) e marca os valores como pagos quando repassar ao afiliado."
+        />
+      </h1>
+      <p className="mt-1 text-sm text-slate-500">
+        Professores e parceiros que indicam alunos e recebem comissão.
+      </p>
       <p className="mt-1 text-sm text-slate-500">
         Professores e parceiros que indicam alunos e recebem comissão.
       </p>

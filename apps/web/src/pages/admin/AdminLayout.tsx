@@ -11,17 +11,64 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 const items = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/usuarios", label: "Usuários", icon: Users },
-  { to: "/admin/videos", label: "Vídeos", icon: Video },
-  { to: "/admin/especialidades", label: "Especialidades", icon: Stethoscope },
-  { to: "/admin/tags", label: "Tags", icon: TagsIcon },
-  { to: "/admin/casos", label: "Estudos de caso", icon: ClipboardList },
-  { to: "/admin/planos", label: "Planos", icon: CreditCard },
-  { to: "/admin/loja", label: "Shop Odontus", icon: ShoppingBag },
-  { to: "/admin/afiliados", label: "Afiliados", icon: Link2 },
+  {
+    to: "/admin",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    end: true,
+    help: "Visão geral do admin: total de usuários, vídeos, planos ativos e vendas do site.",
+  },
+  {
+    to: "/admin/usuarios",
+    label: "Usuários",
+    icon: Users,
+    help: "Todos os usuários cadastrados. Permite buscar, ver o plano de cada um e alternar entre ativo/inativo.",
+  },
+  {
+    to: "/admin/videos",
+    label: "Vídeos",
+    icon: Video,
+    help: "Cadastro e gerenciamento dos vídeos do catálogo, com upload de arquivo ou link, categoria e tags.",
+  },
+  {
+    to: "/admin/especialidades",
+    label: "Especialidades",
+    icon: Stethoscope,
+    help: "As especialidades da odontologia usadas para organizar os vídeos e casos do site.",
+  },
+  {
+    to: "/admin/tags",
+    label: "Tags",
+    icon: TagsIcon,
+    help: "Palavras-chave que ajudam a encontrar vídeos e casos por assunto.",
+  },
+  {
+    to: "/admin/casos",
+    label: "Estudos de caso",
+    icon: ClipboardList,
+    help: "Cadastro de estudos de caso clínicos, com imagens e textos, exibidos na área pública do site.",
+  },
+  {
+    to: "/admin/planos",
+    label: "Planos",
+    icon: CreditCard,
+    help: "Planos de assinatura (mensal/anual) que liberam o acesso aos conteúdos pagos do site.",
+  },
+  {
+    to: "/admin/loja",
+    label: "Shop Odontus",
+    icon: ShoppingBag,
+    help: "Loja do site: cadastro de produtos, categorias e acompanhamento dos pedidos recebidos.",
+  },
+  {
+    to: "/admin/afiliados",
+    label: "Afiliados",
+    icon: Link2,
+    help: "Parceiros que indicam alunos. Aqui você cadastra o afiliado, define as comissões (aluno e produtos) e acompanha/repassa os valores.",
+  },
 ];
 
 export function AdminLayout() {
@@ -45,6 +92,9 @@ export function AdminLayout() {
             >
               <item.icon className="h-4 w-4" />
               {item.label}
+              <span className="ml-auto">
+                <InfoPopover text={item.help} />
+              </span>
             </NavLink>
           ))}
         </nav>

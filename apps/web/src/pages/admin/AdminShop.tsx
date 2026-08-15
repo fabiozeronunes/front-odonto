@@ -11,6 +11,7 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
 import { cn, formatDate, formatPrice } from "../../lib/utils";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 interface ProductFormState {
   id?: string;
@@ -201,6 +202,10 @@ export function AdminShop() {
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
             <Package className="h-6 w-6 text-primary-700" /> Shop Odontus
+            <InfoPopover
+              title="Como funciona"
+              text="A loja exibida em /loja. Em 'Produtos' você cadastra os itens vendidos. Em 'Categorias' organiza os produtos. Em 'Pedidos' acompanha as compras dos alunos; você pode excluir pedidos e ver o total faturado. Compras geram comissão automática para o afiliado que indicou o aluno."
+            />
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Cadastre produtos de odontologia, kits, uniformes e materiais.

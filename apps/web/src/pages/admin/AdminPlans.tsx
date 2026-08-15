@@ -9,6 +9,7 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { formatPrice } from "../../lib/utils";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 interface PlanForm {
   id?: string;
@@ -94,7 +95,13 @@ export function AdminPlans() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Planos</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+            Planos
+            <InfoPopover
+              title="Como funciona"
+              text="Estes são os planos de assinatura exibidos em /planos. O plano 'gratuito' é o padrão ao cadastrar. Ao assinar um plano pago, o aluno libera o acesso ao catálogo de vídeos e casos. A cobrança anual é 12x o valor mensal."
+            />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">Planos de assinatura de membros</p>
         </div>
         <Button onClick={() => setEditing({ name: "", description: "", price: "0", billing: "MONTHLY", benefitsText: "", status: "ACTIVE" })}>
