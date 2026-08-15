@@ -177,7 +177,7 @@ export function Home() {
               <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
                 Odontologia
               </span>{" "}
-              com aulas em vídeo e casos reais.
+              Estudando por Vídeo, Imagens e Estudos de Casos.
             </h1>
 
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
@@ -208,8 +208,8 @@ export function Home() {
 
             <div className="mt-10 flex flex-wrap gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
               <div>
-                <p className="font-display text-2xl font-bold sm:text-3xl">+300</p>
-                <p className="text-sm text-teal-200">aulas em vídeo</p>
+                <p className="font-display text-2xl font-bold sm:text-3xl">mais de 300</p>
+                <p className="text-sm text-teal-200">vídeos</p>
               </div>
               <div>
                 <p className="font-display text-2xl font-bold sm:text-3xl">+2.000</p>
