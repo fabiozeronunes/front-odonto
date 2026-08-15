@@ -6,6 +6,7 @@ import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
+import { CountdownTimer } from "../components/CountdownTimer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { formatPrice, resolveImageUrl, cn } from "../lib/utils";
@@ -234,6 +235,9 @@ export function Dashboard() {
                       )}
                       <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
                     </div>
+                    {p.saleEndsAt && (
+                      <CountdownTimer endsAt={p.saleEndsAt} className="mt-3" />
+                    )}
                   </div>
                 </Link>
               );

@@ -16,6 +16,7 @@ import { useCart } from "../lib/cart";
 import type { Product } from "../types";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { CountdownTimer } from "../components/CountdownTimer";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 
 export function ProductDetail() {
@@ -186,6 +187,7 @@ export function ProductDetail() {
               Economize {formatPrice(price - promo)} ({discount}% de desconto)
             </p>
           )}
+          {product.saleEndsAt && <CountdownTimer endsAt={product.saleEndsAt} className="mt-3" />}
 
           <div className="mt-6 space-y-4">
             {/* Quantidade + ações */}

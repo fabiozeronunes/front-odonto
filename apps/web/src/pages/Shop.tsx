@@ -6,6 +6,7 @@ import { useCart } from "../lib/cart";
 import type { Paginated, Product, ProductCategory } from "../types";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { CountdownTimer } from "../components/CountdownTimer";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 
 export function Shop() {
@@ -222,6 +223,7 @@ export function Shop() {
                       {formatPrice(p.promoPrice)}
                     </span>
                   </div>
+                  {p.saleEndsAt && <CountdownTimer endsAt={p.saleEndsAt} className="mt-3" />}
                   <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:pt-1">
                     <Button
                       variant="outline"

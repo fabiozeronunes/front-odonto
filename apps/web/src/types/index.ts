@@ -136,6 +136,7 @@ export interface Product {
   description?: string | null;
   price: string | number;
   promoPrice?: string | number | null;
+  saleEndsAt?: string | null;
   sku?: string | null;
   stock: number;
   status: ContentStatus;

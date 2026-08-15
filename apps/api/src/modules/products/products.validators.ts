@@ -22,6 +22,7 @@ export const createProductSchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   price: z.coerce.number().min(0, "Preço inválido"),
   promoPrice: z.coerce.number().min(0).optional().nullable(),
+  saleEndsAt: z.string().datetime().optional().nullable(),
   sku: z.string().max(60).optional().nullable(),
   stock: z.coerce.number().int().min(0).default(0),
   status: z.nativeEnum(ContentStatus).default(ContentStatus.DRAFT),

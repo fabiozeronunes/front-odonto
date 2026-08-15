@@ -20,6 +20,7 @@ interface ProductFormState {
   description: string;
   price: string;
   promoPrice: string;
+  saleEndsAt: string;
   sku: string;
   stock: string;
   status: string;
@@ -36,6 +37,7 @@ const emptyForm: ProductFormState = {
   description: "",
   price: "",
   promoPrice: "",
+  saleEndsAt: "",
   sku: "",
   stock: "0",
   status: "DRAFT",
@@ -112,6 +114,7 @@ export function AdminShop() {
       description: p.description ?? "",
       price: String(Number(p.price) || 0),
       promoPrice: p.promoPrice != null ? String(Number(p.promoPrice)) : "",
+      saleEndsAt: p.saleEndsAt ? new Date(p.saleEndsAt).toISOString().slice(0, 16) : "",
       sku: p.sku ?? "",
       stock: String(p.stock),
       status: p.status,
@@ -134,6 +137,7 @@ export function AdminShop() {
       description: editing.description || undefined,
       price: Number(editing.price) || 0,
       promoPrice: editing.promoPrice ? Number(editing.promoPrice) : null,
+      saleEndsAt: editing.saleEndsAt ? new Date(editing.saleEndsAt).toISOString() : null,
       sku: editing.sku || undefined,
       stock: Number(editing.stock) || 0,
       status: editing.status,
@@ -296,6 +300,17 @@ export function AdminShop() {
                   onChange={(e) => setEditing({ ...editing, promoPrice: e.target.value })}
                   placeholder="Deixe vazio se não houver desconto"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Fim da promoção (temporizador)</Label>
+                <Input
+                  type="datetime-local"
+                  value={editing.saleEndsAt}
+                  onChange={(e) => setEditing({ ...editing, saleEndsAt: e.target.value })}
+                />
+                <p className="text-xs text-slate-400">
+                  Data/hora em que a contagem regressiva termina. Deixe vazio para não exibir.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label>Estoque</Label>

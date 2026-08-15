@@ -335,6 +335,7 @@ model Product {
   description String?
   price       Decimal       @default(0)
   promoPrice  Decimal?
+  saleEndsAt  DateTime?
   sku         String?
   stock       Int           @default(0)
   status      ContentStatus @default(DRAFT)

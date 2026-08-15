@@ -26,6 +26,7 @@ const productSelect = {
   brand: true,
   accessLevel: true,
   createdAt: true,
+  saleEndsAt: true,
   category: { select: { id: true, name: true, slug: true } },
   tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
   images: { select: { id: true, url: true, alt: true } },
@@ -107,6 +108,7 @@ export async function createProduct(input: CreateProductInput) {
     description: input.description,
     price: input.price,
     promoPrice: input.promoPrice,
+    saleEndsAt: input.saleEndsAt ? new Date(input.saleEndsAt) : null,
     sku: input.sku,
     stock: input.stock,
     status: input.status,
@@ -153,6 +155,10 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     if (input[field] !== undefined) {
       data[field] = (input[field] === "" ? null : input[field]) as never;
     }
+  }
+
+  if (input.saleEndsAt !== undefined) {
+    data.saleEndsAt = input.saleEndsAt ? new Date(input.saleEndsAt) : null;
   }
 
   if (input.name) {
