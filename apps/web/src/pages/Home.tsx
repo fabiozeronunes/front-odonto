@@ -166,13 +166,13 @@ export function Home() {
         <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl" />
         <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
 
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
-          <div className="relative">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:py-24">
+          <div className="text-center">
             <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
-            <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
+            <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
               Domine a{" "}
               <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
                 Odontologia
@@ -180,12 +180,31 @@ export function Home() {
               Estudando por Vídeos, Imagens e Estudos de Casos.
             </h1>
 
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
               Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e
               Questionários que vão ajudar na sua formação e aprendizado.
             </p>
+          </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row animate-fade-in-up anim-delay-200">
+          {/* Mockup do player */}
+          <div className="relative mx-auto mt-10 max-w-3xl animate-fade-in-up anim-delay-200">
+            <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
+              <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
+                  <PlayCircle className="h-8 w-8 text-white" />
+                </div>
+              </div>
+            </div>
+            <div className="absolute -right-4 top-8 animate-float rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" /> Plano Premium ativo
+            </div>
+            <div className="absolute -left-6 bottom-10 animate-float-slow rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
+              🛒 -20% em kits
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center animate-fade-in-up anim-delay-200">
               <Link to="/cadastro">
                 <Button
                   size="lg"
@@ -206,7 +225,7 @@ export function Home() {
               </Link>
             </div>
 
-            <div className="mt-10 flex flex-wrap gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
+            <div className="mt-10 flex flex-wrap justify-center gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
               <div>
                 <p className="font-display text-2xl font-bold sm:text-3xl">mais de 300</p>
                 <p className="text-sm text-teal-200">vídeos</p>
@@ -219,34 +238,6 @@ export function Home() {
                 <p className="font-display text-2xl font-bold sm:text-3xl">4.9★</p>
                 <p className="text-sm text-teal-200">avaliação média</p>
               </div>
-            </div>
-          </div>
-
-          {/* Mockup do player */}
-          <div className="relative animate-fade-in-up anim-delay-200">
-            <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
-              <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
-                  <PlayCircle className="h-8 w-8 text-white" />
-                </div>
-              </div>
-              <div className="space-y-3 p-4">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="flex items-center gap-3 border-t border-teal-400/15 pt-3 first:border-t-0 first:pt-0">
-                    <div className="h-10 w-10 rounded-lg bg-primary-700" />
-                    <div className="flex-1">
-                      <div className="h-2 w-full rounded-full bg-teal-400/40" />
-                      <div className="mt-1.5 h-2 w-2/3 rounded-full bg-teal-400/25" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="absolute -right-4 top-8 animate-float rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" /> Plano Premium ativo
-            </div>
-            <div className="absolute -left-6 bottom-10 animate-float-slow rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
-              🛒 -20% em kits
             </div>
           </div>
         </div>
