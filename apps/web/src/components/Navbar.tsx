@@ -90,12 +90,21 @@ export function Navbar() {
             </Button>
           </Link>
           {user ? (
-            <Link to={isAdmin ? "/admin" : "/dashboard"}>
-              <Button variant="outline" size="sm" className={outlineClass}>
-                <UserIcon className="h-4 w-4" />
-                {user.name.split(" ")[0]}
-              </Button>
-            </Link>
+            <>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="outline" size="sm" className={outlineClass}>
+                    Painel Admin
+                  </Button>
+                </Link>
+              )}
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm" className={outlineClass}>
+                  <UserIcon className="h-4 w-4" />
+                  {user.name.split(" ")[0]}
+                </Button>
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login">
@@ -162,11 +171,20 @@ export function Navbar() {
                 </Button>
               </Link>
               {user ? (
-                <Link to={isAdmin ? "/admin" : "/dashboard"} onClick={() => setOpen(false)}>
-                  <Button variant="outline" className={`w-full ${outlineClass}`}>
-                    {isAdmin ? "Painel Admin" : "Minha Área"}
-                  </Button>
-                </Link>
+                <>
+                  <Link to="/dashboard" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className={`w-full ${outlineClass}`}>
+                      Minha Área
+                    </Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setOpen(false)}>
+                      <Button variant="outline" className={`w-full ${outlineClass}`}>
+                        Painel Admin
+                      </Button>
+                    </Link>
+                  )}
+                </>
               ) : (
                 <>
                   <Link to="/login" onClick={() => setOpen(false)}>
