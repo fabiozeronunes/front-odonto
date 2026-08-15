@@ -7,7 +7,7 @@ import type { VideoDetail } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { formatDate, formatDuration, resolveImageUrl } from "../lib/utils";
+import { formatDate, formatDuration, resolveImageUrl, cn } from "../lib/utils";
 
 function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
   return user?.role === "ADMIN" || (!!user?.plan && user.plan.slug !== "gratuito");
@@ -25,6 +25,22 @@ export function VideoDetail() {
   const [error, setError] = useState<string | null>(null);
   const [isPremiumLocked, setIsPremiumLocked] = useState(false);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [rows, setRows] = useState<"1" | "2">(() => {
+    try {
+      return localStorage.getItem("odonto_catalog_rows") === "1" ? "1" : "2";
+    } catch {
+      return "2";
+    }
+  });
+
+  function changeRows(value: "1" | "2") {
+    setRows(value);
+    try {
+      localStorage.setItem("odonto_catalog_rows", value);
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -264,8 +280,37 @@ export function VideoDetail() {
 
       {related.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-foreground">Vídeos relacionados</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-bold text-foreground">Vídeos relacionados</h2>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Vídeos por linha:</span>
+              <div className="inline-flex overflow-hidden rounded-lg border border-border">
+                {(["1", "2"] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => changeRows(value)}
+                    className={cn(
+                      "px-3 py-1 font-semibold transition-colors",
+                      rows === value
+                        ? "bg-primary-700 text-primary-foreground"
+                        : "bg-surface text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div
+            className={cn(
+              "grid gap-4 sm:gap-6",
+              rows === "2"
+                ? "grid-cols-2 md:grid-cols-4"
+                : "mx-auto max-w-3xl grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+            )}
+          >
             {related.map((item) => (
               <VideoCard key={item.id} video={item} />
             ))}
