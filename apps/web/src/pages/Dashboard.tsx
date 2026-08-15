@@ -17,16 +17,16 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
-  const [rows, setRows] = useState<"1" | "2">(() => {
+  const [rows, setRows] = useState<"2" | "3">(() => {
     try {
-      return localStorage.getItem("odonto_dashboard_sale_rows") === "2" ? "2" : "1";
+      return localStorage.getItem("odonto_dashboard_sale_rows") === "2" ? "2" : "3";
     } catch {
-      return "1";
+      return "3";
     }
   });
   const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
 
-  function changeRows(value: "1" | "2") {
+  function changeRows(value: "2" | "3") {
     setRows(value);
     try {
       localStorage.setItem("odonto_dashboard_sale_rows", value);
@@ -164,7 +164,7 @@ export function Dashboard() {
         <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted-foreground">Produtos por linha:</span>
           <div className="inline-flex overflow-hidden rounded-lg border border-border">
-            {(["1", "2"] as const).map((value) => (
+            {(["3", "2"] as const).map((value) => (
               <button
                 key={value}
                 type="button"
@@ -174,7 +174,7 @@ export function Dashboard() {
                   rows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
                 )}
               >
-                {value} produto{value === "2" ? "s" : ""}
+                {value} produtos
               </button>
             ))}
           </div>
@@ -195,7 +195,7 @@ export function Dashboard() {
           <div
             className={cn(
               "grid gap-4 sm:gap-6",
-              rows === "2" ? "grid-cols-2" : "mx-auto max-w-md grid-cols-1"
+              rows === "3" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
             )}
           >
             {saleProducts.map((p) => {
@@ -209,9 +209,9 @@ export function Dashboard() {
                   to={`/loja/${p.slug}`}
                   className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
-                  <div className="relative aspect-[4/3] bg-muted">
+                  <div className="relative aspect-[4/3] bg-white">
                     {img ? (
-                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover" />
+                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
                     ) : (
                       <span className="flex h-full w-full items-center justify-center text-muted-foreground">
                         <Package className="h-10 w-10" />
