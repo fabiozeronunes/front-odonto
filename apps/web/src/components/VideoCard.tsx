@@ -28,7 +28,11 @@ export function VideoCard({ video }: { video: Video }) {
             ) : (
               <Badge variant="premium">Pago</Badge>
             )}
-            {video.source === "STUDENT" && <Badge variant="info">Estudante</Badge>}
+            {video.source === "FRONTODONTUS" ? (
+              <Badge variant="default">Front Odontus</Badge>
+            ) : video.source === "STUDENT" ? (
+              <Badge variant="info">Estudante</Badge>
+            ) : null}
           </div>
           {video.durationSeconds ? (
             <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">

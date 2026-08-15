@@ -37,7 +37,7 @@ const caseStudySelect = {
       tags: { select: { tag: { select: { id: true, name: true, slug: true } } } },
     },
   },
-  createdBy: { select: { id: true, name: true, email: true } },
+  createdBy: { select: { id: true, name: true, email: true, role: true } },
   videoCases: {
     select: {
       video: {

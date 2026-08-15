@@ -80,11 +80,12 @@ export function CaseStudies() {
                   </Link>
                 )}
                 <div className="flex flex-1 flex-col p-5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={cs.isFree ? "free" : "premium"}>
                       {cs.isFree ? "GRATUITO" : "PREMIUM"}
                     </Badge>
-                    <span className="text-xs capitalize text-muted-foreground">
+                    {cs.createdBy?.role === "ADMIN" && <Badge variant="default">Front Odontus</Badge>}
+                    <span className="ml-auto text-xs capitalize text-muted-foreground">
                       {cs.difficulty.toLowerCase()}
                     </span>
                   </div>

@@ -70,7 +70,7 @@ export interface Video {
   tags: VideoTag[];
   images?: Media[];
   createdById?: string | null;
-  createdBy?: { id: string; name: string; email: string } | null;
+  createdBy?: { id: string; name: string; email: string; role?: string } | null;
 }
 
 export interface CaseStudy {
@@ -105,7 +105,7 @@ export interface CaseStudy {
   }[];
   tagIds?: string[];
   createdById?: string | null;
-  createdBy?: { id: string; name: string; email: string } | null;
+  createdBy?: { id: string; name: string; email: string; role?: string } | null;
 }
 
 export interface MembershipPlan {
