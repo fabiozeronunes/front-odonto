@@ -223,7 +223,7 @@ export function Home() {
           </div>
 
           {/* Mockup do player */}
-          <div className="relative hidden lg:block animate-fade-in-up anim-delay-200">
+          <div className="relative animate-fade-in-up anim-delay-200">
             <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
               <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
                 <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
