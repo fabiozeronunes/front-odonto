@@ -6,7 +6,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
-import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
+import { cn, cleanYoutubeEmbedUrl, formatPrice, resolveImageUrl } from "../lib/utils";
 import type { Product } from "../types";
 
 function ShopPreview() {
@@ -188,11 +188,11 @@ export function Home() {
             {heroVideo ? (
               <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
                 <iframe
-                  src={heroVideo}
+                  src={cleanYoutubeEmbedUrl(heroVideo) ?? heroVideo}
                   title="Vídeo da Front Odontus"
                   className="aspect-video w-full bg-black"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+                  allowFullScreen={false}
                 />
               </div>
             ) : (

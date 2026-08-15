@@ -39,3 +39,13 @@ export function formatPrice(value: number | string | null | undefined): string {
     currency: "BRL",
   });
 }
+
+const YOUTUBE_ID_REGEX =
+  /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/;
+
+export function cleanYoutubeEmbedUrl(url: string): string | null {
+  const match = url.match(YOUTUBE_ID_REGEX) ?? url.match(/^([\w-]{11})$/);
+  if (!match) return url.includes("youtube.com/embed") ? url : null;
+  const id = match[1];
+  return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&controls=0&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1`;
+}
