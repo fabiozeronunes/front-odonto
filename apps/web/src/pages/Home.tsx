@@ -177,7 +177,7 @@ export function Home() {
               <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
                 Odontologia
               </span>{" "}
-              Estudando por Vídeo, Imagens e Estudos de Casos.
+              Estudando por Vídeos, Imagens e Estudos de Casos.
             </h1>
 
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
