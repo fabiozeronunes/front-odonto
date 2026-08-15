@@ -93,7 +93,16 @@ export interface CaseStudy {
   tags: { tag: Tag }[];
   images?: Media[];
   videoIds?: string[];
-  videoCases?: { video: { id: string; title: string; slug: string; isFree: boolean } }[];
+  videoCases?: {
+    video: {
+      id: string;
+      title: string;
+      slug: string;
+      thumbnailUrl?: string | null;
+      durationSeconds?: number | null;
+      isFree: boolean;
+    };
+  }[];
   tagIds?: string[];
   createdById?: string | null;
   createdBy?: { id: string; name: string; email: string } | null;

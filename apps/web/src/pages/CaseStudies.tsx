@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { PlayCircle, Clock } from "lucide-react";
 import { api } from "../lib/api";
 import type { Paginated, CaseStudy } from "../types";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { formatDuration, resolveImageUrl } from "../lib/utils";
 
 export function CaseStudies() {
   const [items, setItems] = useState<CaseStudy[]>([]);
@@ -34,33 +36,73 @@ export function CaseStudies() {
         <p className="py-20 text-center text-muted-foreground">Nenhum estudo de caso publicado.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((cs) => (
-            <div
-              key={cs.id}
-              className="flex flex-col rounded-2xl border border-border bg-surface p-5 shadow-card"
-            >
-              <div className="flex items-center justify-between">
-                <Badge variant={cs.isFree ? "free" : "premium"}>
-                  {cs.isFree ? "GRATUITO" : "PREMIUM"}
-                </Badge>
-                <span className="text-xs capitalize text-muted-foreground">
-                  {cs.difficulty.toLowerCase()}
-                </span>
+          {items.map((cs) => {
+            const video = cs.videoCases?.[0]?.video;
+            return (
+              <div
+                key={cs.id}
+                className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card"
+              >
+                {video && (
+                  <Link
+                    to={`/video/${video.slug}`}
+                    className="group relative block aspect-video overflow-hidden bg-muted"
+                  >
+                    {video.thumbnailUrl ? (
+                      <img
+                        src={resolveImageUrl(video.thumbnailUrl)}
+                        alt={video.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-700 to-teal-600">
+                        <PlayCircle className="h-12 w-12 text-white/80" />
+                      </div>
+                    )}
+                    <div className="absolute left-2 top-2 flex gap-2">
+                      {video.isFree ? (
+                        <Badge variant="free">GRATUITO</Badge>
+                      ) : (
+                        <Badge variant="premium">Pago</Badge>
+                      )}
+                      <Badge variant="info">
+                        <PlayCircle className="mr-0.5 inline h-3 w-3" /> Vídeo
+                      </Badge>
+                    </div>
+                    {video.durationSeconds ? (
+                      <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">
+                        <Clock className="mr-1 inline h-3 w-3" />
+                        {formatDuration(video.durationSeconds)}
+                      </div>
+                    ) : null}
+                  </Link>
+                )}
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={cs.isFree ? "free" : "premium"}>
+                      {cs.isFree ? "GRATUITO" : "PREMIUM"}
+                    </Badge>
+                    <span className="text-xs capitalize text-muted-foreground">
+                      {cs.difficulty.toLowerCase()}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 font-semibold text-foreground">{cs.title}</h3>
+                  <p className="mt-1 line-clamp-2 flex-1 text-sm text-muted-foreground">{cs.description}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {cs.specialty?.name ?? "Geral"} · {cs.author ?? "Anônimo"}
+                    </span>
+                    <Link to={`/casos/${cs.slug}`}>
+                      <Button variant="outline" size="sm">
+                        Ver caso
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <h3 className="mt-3 font-semibold text-foreground">{cs.title}</h3>
-              <p className="mt-1 line-clamp-2 flex-1 text-sm text-muted-foreground">{cs.description}</p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  {cs.specialty?.name ?? "Geral"} · {cs.author ?? "Anônimo"}
-                </span>
-                <Link to={`/casos/${cs.slug}`}>
-                  <Button variant="outline" size="sm">
-                    Ver caso
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
