@@ -14,15 +14,15 @@ function ShopPreview() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<"1" | "2">(() => {
+  const [rows, setRows] = useState<"2" | "4">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
+      return localStorage.getItem("odonto_shop_rows") === "4" ? "4" : "2";
     } catch {
-      return "2";
+      return "4";
     }
   });
 
-  function changeRows(value: "1" | "2") {
+  function changeRows(value: "2" | "4") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -55,7 +55,7 @@ function ShopPreview() {
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Por linha:</span>
               <div className="inline-flex overflow-hidden rounded-lg border border-border">
-                {(["1", "2"] as const).map((value) => (
+                {(["2", "4"] as const).map((value) => (
                   <button
                     key={value}
                     type="button"
@@ -81,7 +81,7 @@ function ShopPreview() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
             ))}
@@ -92,7 +92,7 @@ function ShopPreview() {
           <div
             className={cn(
               "grid gap-4 sm:gap-6",
-              rows === "2" ? "grid-cols-2" : "mx-auto max-w-2xl grid-cols-1"
+              rows === "4" ? "grid-cols-2 lg:grid-cols-4" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
             )}
           >
             {products.map((p) => {

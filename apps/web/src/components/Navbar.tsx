@@ -34,7 +34,7 @@ export function Navbar() {
         <Link to="/" className="flex items-center">
           {logoUrl ? (
             <img
-              src={logoUrl}
+              src={theme === "dark" ? logoUrl : logoUrl.replace("logomarca.png", "logomarca-light.png")}
               alt="OdontoStudy"
               className="h-auto w-[70vw] max-w-full object-contain md:max-w-[240px] lg:max-w-[220px]"
             />
