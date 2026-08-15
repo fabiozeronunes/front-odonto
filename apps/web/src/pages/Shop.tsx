@@ -162,7 +162,7 @@ export function Shop() {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         <span className="text-muted-foreground">Produtos por linha:</span>
         <div className="inline-flex overflow-hidden rounded-lg border border-border">
-          {(["3", "2"] as const).map((value) => (
+          {(["2", "3"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -193,7 +193,7 @@ export function Shop() {
         <div
           className={cn(
             "mt-8 grid gap-4 sm:gap-6",
-            rows === "3" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
+            rows === "3" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
           )}
         >
           {products.map((p) => {
