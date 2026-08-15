@@ -204,12 +204,6 @@ export function Home() {
                 </div>
               </div>
             )}
-            <div className="absolute -right-4 top-8 animate-float rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
-              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" /> Plano Premium ativo
-            </div>
-            <div className="absolute -left-6 bottom-10 animate-float-slow rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
-              🛒 -20% em kits
-            </div>
           </div>
 
           <div className="mt-10 text-center">
