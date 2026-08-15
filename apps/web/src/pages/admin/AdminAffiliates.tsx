@@ -17,7 +17,7 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import { Select } from "../../components/ui/select";
 import { InfoPopover } from "../../components/ui/info-popover";
-import { formatDate, formatPrice } from "../../lib/utils";
+import { formatDate, formatPrice, cn } from "../../lib/utils";
 
 interface Affiliate {
   id: string;
@@ -78,11 +78,13 @@ export function AdminAffiliates() {
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [rateDrafts, setRateDrafts] = useState<Record<string, { referral: string; product: string }>>({});
+  const [tab, setTab] = useState<"active" | "suspended">("active");
 
   async function load() {
     setLoading(true);
     const params = new URLSearchParams({ perPage: "50" });
     if (search) params.set("search", search);
+    if (tab === "suspended") params.set("suspended", "true");
     const data = await api<Paginated<Affiliate>>(`/api/affiliates?${params.toString()}`);
     setAffiliates(data.data);
     setTotal(data.pagination.total);
@@ -91,7 +93,7 @@ export function AdminAffiliates() {
 
   useEffect(() => {
     load();
-  }, [search]);
+  }, [search, tab]);
 
   async function loadDetail(id: string) {
     const d = await api<{ data: AffiliateDetail }>(`/api/affiliates/${id}`);
@@ -108,13 +110,13 @@ export function AdminAffiliates() {
   async function toggleAffiliate(a: Affiliate) {
     setBusy(a.id);
     try {
-      if (a.affiliateCode) {
-        await api(`/api/affiliates/${a.id}/disable`, { method: "PUT" });
-      } else {
+      if (tab === "suspended") {
         await api(`/api/affiliates/${a.id}/enable`, {
           method: "PUT",
           body: JSON.stringify({}),
         });
+      } else {
+        await api(`/api/affiliates/${a.id}/disable`, { method: "PUT" });
       }
       await load();
       if (selected?.id === a.id) await loadDetail(a.id);
@@ -234,9 +236,29 @@ export function AdminAffiliates() {
       <p className="mt-1 text-sm text-slate-500">
         Professores e parceiros que indicam alunos e recebem comissão.
       </p>
-      <p className="mt-1 text-sm text-slate-500">
-        Professores e parceiros que indicam alunos e recebem comissão.
-      </p>
+
+      <div className="mt-4 flex gap-2">
+        {(
+          [
+            ["active", "Ativos"],
+            ["suspended", "Suspensos"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+              tab === key
+                ? "bg-primary-700 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {notice && (
         <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{notice}</div>
@@ -280,7 +302,9 @@ export function AdminAffiliates() {
                 ) : affiliates.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
-                      Nenhum afiliado ainda. Torne um usuário afiliado na aba Usuários.
+                      {tab === "suspended"
+                        ? "Nenhum afiliado suspenso. Ao desativar um afiliado, ele fica suspenso e pode ser reativado aqui."
+                        : "Nenhum afiliado ainda. Torne um usuário afiliado na aba Usuários."}
                     </td>
                   </tr>
                 ) : (
@@ -360,8 +384,13 @@ export function AdminAffiliates() {
                           <Button variant="outline" size="sm" onClick={() => openDetail(a)}>
                             Ver detalhes
                           </Button>
-                          <Button variant="ghost" size="sm" disabled={busy === a.id} onClick={() => toggleAffiliate(a)}>
-                            {a.affiliateCode ? "Desativar" : "Ativar"}
+                          <Button
+                            variant={tab === "suspended" ? "outline" : "ghost"}
+                            size="sm"
+                            disabled={busy === a.id}
+                            onClick={() => toggleAffiliate(a)}
+                          >
+                            {tab === "suspended" ? "Reativar" : "Desativar"}
                           </Button>
                         </div>
                       </td>

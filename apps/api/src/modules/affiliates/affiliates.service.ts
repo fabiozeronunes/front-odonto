@@ -17,7 +17,10 @@ function generateAffiliateCode(name: string, id: string) {
 export async function listAffiliates(query: Request["query"]) {
   const { page, perPage, skip } = getPagination(query);
 
-  const where: Record<string, unknown> = { isAffiliate: true };
+  const suspended = query.suspended === "true";
+  const where: Record<string, unknown> = suspended
+    ? { isAffiliate: false, affiliateCode: { not: null } }
+    : { isAffiliate: true };
   if (query.search) {
     where.OR = [
       { name: { contains: String(query.search), mode: "insensitive" as const } },
@@ -79,10 +82,10 @@ export async function enableAffiliate(userId: string, commissionRate: number) {
 
   const rate = commissionRate >= 0 && commissionRate <= 100 ? commissionRate : 20;
 
-  if (user.isAffiliate && user.affiliateCode) {
+  if (user.affiliateCode) {
     return prisma.user.update({
       where: { id: userId },
-      data: { commissionRate: rate },
+      data: { isAffiliate: true, commissionRate: rate },
       select: { id: true, name: true, email: true, isAffiliate: true, affiliateCode: true, commissionRate: true },
     });
   }
@@ -109,7 +112,7 @@ export async function disableAffiliate(userId: string) {
   if (!user) throw new NotFoundError("Usuário não encontrado");
   return prisma.user.update({
     where: { id: userId },
-    data: { isAffiliate: false, affiliateCode: null },
+    data: { isAffiliate: false },
     select: { id: true, name: true, email: true, isAffiliate: true, affiliateCode: true, commissionRate: true },
   });
 }
