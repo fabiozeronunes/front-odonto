@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingBag, Package, Percent, Check } from "lucide-react";
+import { Search, ShoppingBag, Package, Percent, Check, Loader2 } from "lucide-react";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
 import type { Paginated, Product, ProductCategory } from "../types";
@@ -9,27 +9,30 @@ import { Button } from "../components/ui/button";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 
+const PER_PAGE = 9;
+
 export function Shop() {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [onSale, setOnSale] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [added, setAdded] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<"2" | "4">(() => {
+  const [rows, setRows] = useState<"2" | "3">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "4" ? "4" : "2";
+      return localStorage.getItem("odonto_shop_rows") === "2" ? "2" : "3";
     } catch {
-      return "4";
+      return "3";
     }
   });
 
-  function changeRows(value: "2" | "4") {
+  function changeRows(value: "2" | "3") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -46,7 +49,7 @@ export function Shop() {
 
   useEffect(() => {
     setLoading(true);
-    const params = new URLSearchParams({ perPage: "4", page: String(page) });
+    const params = new URLSearchParams({ perPage: String(PER_PAGE), page: "1" });
     if (search) params.set("search", search);
     if (category) params.set("category", category);
     if (onSale) params.set("onSale", "true");
@@ -57,7 +60,26 @@ export function Shop() {
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [page, search, category, onSale]);
+  }, [search, category, onSale]);
+
+  async function loadMore() {
+    const next = page + 1;
+    setLoadingMore(true);
+    const params = new URLSearchParams({ perPage: String(PER_PAGE), page: String(next) });
+    if (search) params.set("search", search);
+    if (category) params.set("category", category);
+    if (onSale) params.set("onSale", "true");
+    try {
+      const d = await api<Paginated<Product>>(`/api/products?${params.toString()}`);
+      setProducts((prev) => [...prev, ...d.data]);
+      setPage(next);
+      setTotalPages(d.pagination.totalPages);
+    } catch {
+      /* ignore */
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   function applyFilter(key: "category" | "onSale" | "search", value: string | boolean) {
     setPage(1);
@@ -140,7 +162,7 @@ export function Shop() {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         <span className="text-muted-foreground">Produtos por linha:</span>
         <div className="inline-flex overflow-hidden rounded-lg border border-border">
-          {(["2", "4"] as const).map((value) => (
+          {(["3", "2"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -171,7 +193,7 @@ export function Shop() {
         <div
           className={cn(
             "mt-8 grid gap-4 sm:gap-6",
-            rows === "4" ? "grid-cols-2 lg:grid-cols-4" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
+            rows === "3" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
           )}
         >
           {products.map((p) => {
@@ -247,16 +269,11 @@ export function Shop() {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            Anterior
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Página {page} de {Math.max(totalPages, 1)}
-          </span>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-            Próxima
+      {page < totalPages && (
+        <div className="mt-8 flex justify-center">
+          <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : <Package className="h-4 w-4" />}
+            {loadingMore ? "Carregando..." : "Carregar mais produtos"}
           </Button>
         </div>
       )}
