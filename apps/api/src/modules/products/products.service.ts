@@ -294,7 +294,7 @@ export async function createOrder(userId: string, input: CreateOrderInput) {
 export async function confirmOrder(userId: string, orderId: string) {
   const order = await prisma.order.findFirst({
     where: { id: orderId, userId, status: "PENDING" },
-    include: { items: true },
+    include: { items: { include: { product: { select: { name: true } } } } },
   });
   if (!order) throw new NotFoundError("Pedido não encontrado");
 
@@ -314,6 +314,42 @@ export async function confirmOrder(userId: string, orderId: string) {
       });
     }
   });
+
+  const referred = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { referredById: true },
+  });
+
+  if (referred?.referredById && order.items.length > 0) {
+    const affiliate = await prisma.user.findUnique({
+      where: { id: referred.referredById },
+      select: { id: true, isAffiliate: true, productCommissionRate: true },
+    });
+    if (affiliate?.isAffiliate) {
+      const existing = await prisma.affiliateCommission.findFirst({
+        where: {
+          affiliateId: affiliate.id,
+          referredUserId: userId,
+          source: "PRODUCT",
+          status: "PENDING",
+        },
+      });
+      if (!existing) {
+        const amount = Math.round(Number(order.total) * Number(affiliate.productCommissionRate)) / 100;
+        const productName = order.items.map((it) => it.product.name).filter(Boolean).join(", ");
+        await prisma.affiliateCommission.create({
+          data: {
+            affiliateId: affiliate.id,
+            referredUserId: userId,
+            amount,
+            percent: Number(affiliate.productCommissionRate),
+            source: "PRODUCT",
+            productName: productName || null,
+          },
+        });
+      }
+    }
+  }
 
   return { ok: true, orderId };
 }

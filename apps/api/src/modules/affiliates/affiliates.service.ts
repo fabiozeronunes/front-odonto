@@ -39,6 +39,7 @@ export async function listAffiliates(query: Request["query"]) {
         phone: true,
         affiliateCode: true,
         commissionRate: true,
+        productCommissionRate: true,
         createdAt: true,
         referrals: { select: { id: true, name: true, email: true, createdAt: true } },
         affiliateCommissions: { select: { id: true, amount: true, status: true } },
@@ -61,6 +62,7 @@ export async function listAffiliates(query: Request["query"]) {
       phone: a.phone,
       affiliateCode: a.affiliateCode,
       commissionRate: Number(a.commissionRate),
+      productCommissionRate: Number(a.productCommissionRate),
       createdAt: a.createdAt,
       referredCount: a.referrals.length,
       paidCommissions: paid,
@@ -112,14 +114,31 @@ export async function disableAffiliate(userId: string) {
   });
 }
 
-export async function setAffiliateCommissionRate(userId: string, commissionRate: number) {
+export async function setAffiliateCommissionRate(
+  userId: string,
+  commissionRate: number,
+  productCommissionRate?: number
+) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError("Usuário não encontrado");
   const rate = commissionRate >= 0 && commissionRate <= 100 ? commissionRate : 20;
+  const data: { commissionRate: number; productCommissionRate?: number } = { commissionRate: rate };
+  if (productCommissionRate != null) {
+    data.productCommissionRate =
+      productCommissionRate >= 0 && productCommissionRate <= 100 ? productCommissionRate : 20;
+  }
   return prisma.user.update({
     where: { id: userId },
-    data: { commissionRate: rate },
-    select: { id: true, name: true, email: true, isAffiliate: true, affiliateCode: true, commissionRate: true },
+    data,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      isAffiliate: true,
+      affiliateCode: true,
+      commissionRate: true,
+      productCommissionRate: true,
+    },
   });
 }
 
@@ -133,6 +152,7 @@ export async function getAffiliateDetail(affiliateId: string) {
       phone: true,
       affiliateCode: true,
       commissionRate: true,
+      productCommissionRate: true,
       createdAt: true,
       referrals: {
         orderBy: { createdAt: "desc" },
@@ -150,6 +170,9 @@ export async function getAffiliateDetail(affiliateId: string) {
           id: true,
           amount: true,
           percent: true,
+          source: true,
+          planName: true,
+          productName: true,
           status: true,
           createdAt: true,
           paidAt: true,
@@ -174,12 +197,16 @@ export async function getAffiliateDetail(affiliateId: string) {
     phone: affiliate.phone,
     affiliateCode: affiliate.affiliateCode,
     commissionRate: Number(affiliate.commissionRate),
+    productCommissionRate: Number(affiliate.productCommissionRate),
     createdAt: affiliate.createdAt,
     referrals: affiliate.referrals,
     commissions: affiliate.affiliateCommissions.map((c) => ({
       id: c.id,
       amount: Number(c.amount),
       percent: Number(c.percent),
+      source: c.source,
+      planName: c.planName,
+      productName: c.productName,
       status: c.status,
       createdAt: c.createdAt,
       paidAt: c.paidAt,
@@ -218,6 +245,7 @@ export async function registerReferredPayment(affiliateId: string, referredUserI
       referredUserId,
       amount: commission,
       percent: Number(affiliate.commissionRate),
+      source: "MANUAL",
     },
     select: {
       id: true,
@@ -251,4 +279,84 @@ export async function cancelCommission(commissionId: string) {
     where: { id: commissionId },
     data: { status: "CANCELED", paidAt: null },
   });
+}
+
+export async function getAffiliateSummary(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      isAffiliate: true,
+      affiliateCode: true,
+      commissionRate: true,
+      productCommissionRate: true,
+    },
+  });
+  if (!user) throw new NotFoundError("Usuário não encontrado");
+  if (!user.isAffiliate) throw new ConflictError("Usuário não é um afiliado");
+
+  const commissions = await prisma.affiliateCommission.findMany({
+    where: { affiliateId: userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      amount: true,
+      percent: true,
+      source: true,
+      planName: true,
+      productName: true,
+      status: true,
+      createdAt: true,
+      paidAt: true,
+      referred: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  const plans = commissions.filter((c) => c.source === "PLAN");
+  const products = commissions.filter((c) => c.source === "PRODUCT");
+  const paid = commissions
+    .filter((c) => c.status === "PAID")
+    .reduce((acc, c) => acc + Number(c.amount), 0);
+  const pending = commissions
+    .filter((c) => c.status === "PENDING")
+    .reduce((acc, c) => acc + Number(c.amount), 0);
+
+  return {
+    id: user.id,
+    name: user.name,
+    affiliateCode: user.affiliateCode,
+    commissionRate: Number(user.commissionRate),
+    productCommissionRate: Number(user.productCommissionRate),
+    totals: {
+      plansPending: plans
+        .filter((c) => c.status === "PENDING")
+        .reduce((acc, c) => acc + Number(c.amount), 0),
+      productsPending: products
+        .filter((c) => c.status === "PENDING")
+        .reduce((acc, c) => acc + Number(c.amount), 0),
+      paid,
+      pending,
+    },
+    plans: plans.map((c) => ({
+      id: c.id,
+      amount: Number(c.amount),
+      percent: Number(c.percent),
+      planName: c.planName,
+      status: c.status,
+      createdAt: c.createdAt,
+      paidAt: c.paidAt,
+      referred: c.referred,
+    })),
+    products: products.map((c) => ({
+      id: c.id,
+      amount: Number(c.amount),
+      percent: Number(c.percent),
+      productName: c.productName,
+      status: c.status,
+      createdAt: c.createdAt,
+      paidAt: c.paidAt,
+      referred: c.referred,
+    })),
+  };
 }

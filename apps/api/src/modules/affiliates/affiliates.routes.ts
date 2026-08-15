@@ -8,6 +8,8 @@ import * as ctrl from "./affiliates.controller.js";
 
 export const affiliatesRouter = Router();
 
+affiliatesRouter.get("/me", authenticate, ctrl.me);
+
 affiliatesRouter.use(authenticate, requireRole(Role.ADMIN));
 
 affiliatesRouter.get("/", ctrl.list);
@@ -20,7 +22,12 @@ affiliatesRouter.put(
 affiliatesRouter.put("/:id/disable", ctrl.disable);
 affiliatesRouter.put(
   "/:id/rate",
-  validate(z.object({ commissionRate: z.coerce.number().min(0).max(100) })),
+  validate(
+    z.object({
+      commissionRate: z.coerce.number().min(0).max(100),
+      productCommissionRate: z.coerce.number().min(0).max(100).optional(),
+    })
+  ),
   ctrl.setRate
 );
 affiliatesRouter.post(

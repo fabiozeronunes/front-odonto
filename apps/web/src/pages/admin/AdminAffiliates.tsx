@@ -25,6 +25,7 @@ interface Affiliate {
   phone: string | null;
   affiliateCode: string | null;
   commissionRate: number;
+  productCommissionRate: number;
   createdAt: string;
   referredCount: number;
   paidCommissions: number;
@@ -38,12 +39,16 @@ interface AffiliateDetail {
   phone: string | null;
   affiliateCode: string | null;
   commissionRate: number;
+  productCommissionRate: number;
   createdAt: string;
   referrals: { id: string; name: string; email: string; createdAt: string; plan?: { name: string } | null }[];
   commissions: {
     id: string;
     amount: number;
     percent: number;
+    source: string;
+    planName: string | null;
+    productName: string | null;
     status: "PENDING" | "PAID" | "CANCELED";
     createdAt: string;
     paidAt: string | null;
@@ -71,6 +76,7 @@ export function AdminAffiliates() {
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [rateDrafts, setRateDrafts] = useState<Record<string, { referral: string; product: string }>>({});
 
   async function load() {
     setLoading(true);
@@ -116,18 +122,42 @@ export function AdminAffiliates() {
     }
   }
 
-  async function setRate(a: Affiliate, rate: number) {
+  async function setRate(a: Affiliate, rate: number, productRate?: number) {
     setBusy(a.id);
     try {
       await api(`/api/affiliates/${a.id}/rate`, {
         method: "PUT",
-        body: JSON.stringify({ commissionRate: rate }),
+        body: JSON.stringify({
+          commissionRate: rate,
+          ...(productRate != null ? { productCommissionRate: productRate } : {}),
+        }),
       });
       await load();
       if (selected?.id === a.id) await loadDetail(a.id);
     } finally {
       setBusy(null);
     }
+  }
+
+  function rateDraftFor(a: Affiliate) {
+    return (
+      rateDrafts[a.id] ?? {
+        referral: String(a.commissionRate),
+        product: String(a.productCommissionRate ?? 0),
+      }
+    );
+  }
+
+  function updateRateDraft(a: Affiliate, key: "referral" | "product", value: string) {
+    setRateDrafts((prev) => {
+      const current = prev[a.id] ?? { referral: String(a.commissionRate), product: String(a.productCommissionRate ?? 0) };
+      return { ...prev, [a.id]: { ...current, [key]: value } };
+    });
+  }
+
+  async function saveRates(a: Affiliate) {
+    const draft = rateDraftFor(a);
+    await setRate(a, Number(draft.referral) || 0, Number(draft.product) || 0);
   }
 
   async function registerPayment() {
@@ -268,16 +298,43 @@ export function AdminAffiliates() {
                         )}
                       </td>
                       <td className="px-5 py-3">
-                        <Select
-                          className="h-8 w-24"
-                          value={String(a.commissionRate)}
-                          disabled={busy === a.id}
-                          onChange={(e) => setRate(a, Number(e.target.value))}
-                        >
-                          {[10, 15, 20, 25, 30, 40, 50].map((r) => (
-                            <option key={r} value={r}>{r}%</option>
-                          ))}
-                        </Select>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              className="h-7 w-16"
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={rateDraftFor(a).referral}
+                              disabled={busy === a.id}
+                              title="Comissão de indicação de aluno (%)"
+                              onChange={(e) => updateRateDraft(a, "referral", e.target.value)}
+                            />
+                            <span className="text-[10px] leading-tight text-slate-400">% aluno</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              className="h-7 w-16"
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={rateDraftFor(a).product}
+                              disabled={busy === a.id}
+                              title="Comissão de produtos do site (%)"
+                              onChange={(e) => updateRateDraft(a, "product", e.target.value)}
+                            />
+                            <span className="text-[10px] leading-tight text-slate-400">% produtos</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 w-fit px-2 text-xs"
+                            disabled={busy === a.id}
+                            onClick={() => saveRates(a)}
+                          >
+                            Salvar
+                          </Button>
+                        </div>
                       </td>
                       <td className="px-5 py-3">
                         <span className="font-medium text-slate-700">{a.referredCount}</span>
@@ -386,6 +443,7 @@ export function AdminAffiliates() {
                     <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
                       <tr>
                         <th className="px-4 py-2">Aluno</th>
+                        <th className="px-4 py-2">Origem</th>
                         <th className="px-4 py-2">Comissão</th>
                         <th className="px-4 py-2">Status</th>
                         <th className="px-4 py-2">Criada em</th>
@@ -398,6 +456,18 @@ export function AdminAffiliates() {
                           <td className="px-4 py-2">
                             <p className="font-medium text-slate-700">{c.referred.name}</p>
                             <p className="text-xs text-slate-400">{c.referred.email}</p>
+                          </td>
+                          <td className="px-4 py-2">
+                            <p className="text-xs font-medium text-slate-700">
+                              {c.source === "PRODUCT"
+                                ? "Produtos"
+                                : c.source === "PLAN"
+                                  ? "Plano"
+                                  : "Manual"}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {c.productName ?? c.planName ?? "—"}
+                            </p>
                           </td>
                           <td className="px-4 py-2 font-semibold text-slate-800">
                             {formatPrice(c.amount)}

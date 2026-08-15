@@ -87,6 +87,7 @@ model User {
   isAffiliate  Boolean        @default(false)
   affiliateCode String?       @unique
   commissionRate Decimal      @default(20)
+  productCommissionRate Decimal @default(20)
   referredBy   User?          @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
   referredById String?
   createdAt    DateTime       @default(now())
@@ -439,6 +440,9 @@ model AffiliateCommission {
   referredUserId String
   amount        Decimal          @default(0)
   percent       Decimal          @default(20)
+  source        String           @default("PLAN")
+  planName      String?
+  productName   String?
   status        CommissionStatus @default(PENDING)
   createdAt     DateTime         @default(now())
   paidAt        DateTime?

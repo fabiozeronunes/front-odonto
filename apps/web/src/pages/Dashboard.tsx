@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
@@ -76,8 +76,13 @@ export function Dashboard() {
       </div>
 
       {user?.isAffiliate && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-3">
           <AffiliateShareCard />
+          <Link to="/comissoes">
+            <Button variant="outline" className="w-full sm:w-auto">
+              <HandCoins className="h-4 w-4" /> Minhas comissões
+            </Button>
+          </Link>
         </div>
       )}
 

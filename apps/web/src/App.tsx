@@ -18,6 +18,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { Dashboard } from "./pages/Dashboard";
+import { Commissions } from "./pages/Commissions";
 import { Favorites } from "./pages/Favorites";
 import { Legal } from "./pages/Legal";
 import { Profile } from "./pages/Profile";
@@ -100,6 +101,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/comissoes"
+            element={
+              <ProtectedRoute>
+                <Commissions />
               </ProtectedRoute>
             }
           />

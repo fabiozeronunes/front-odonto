@@ -106,6 +106,8 @@ export async function confirmCheckout(userId: string, orderId: string) {
             referredUserId: userId,
             amount,
             percent: Number(affiliate.commissionRate),
+            source: "PLAN",
+            planName: subscription.plan.name,
           },
         });
       }
