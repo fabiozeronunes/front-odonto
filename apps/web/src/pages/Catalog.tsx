@@ -8,7 +8,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
-import { resolveImageUrl } from "../lib/utils";
+import { resolveImageUrl, cn } from "../lib/utils";
 
 interface ImageSearchItem {
   id: string;
@@ -28,8 +28,24 @@ export function Catalog() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(8);
   const isLoadMoreRef = useRef(false);
+  const [rows, setRows] = useState<"1" | "2">(() => {
+    try {
+      return localStorage.getItem("odonto_catalog_rows") === "1" ? "1" : "2";
+    } catch {
+      return "2";
+    }
+  });
+
+  function changeRows(value: "1" | "2") {
+    setRows(value);
+    try {
+      localStorage.setItem("odonto_catalog_rows", value);
+    } catch {
+      /* ignore */
+    }
+  }
 
   const search = searchParams.get("search") ?? "";
   const specialty = searchParams.get("specialty") ?? "";
@@ -43,7 +59,7 @@ export function Catalog() {
   const filterKey = [search, specialty, tag, imageTag, difficulty, access, source, sort].join("|");
 
   useEffect(() => {
-    setVisibleCount(12);
+    setVisibleCount(8);
   }, [filterKey]);
 
   useEffect(() => {
@@ -110,10 +126,15 @@ export function Catalog() {
     if (loadingMore) return;
     isLoadMoreRef.current = true;
     setLoadingMore(true);
-    setVisibleCount((c) => c + 12);
+    setVisibleCount((c) => c + 8);
   }
 
   const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length;
+
+  const gridClass =
+    rows === "2"
+      ? "grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4"
+      : "mx-auto max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3";
 
   const matchingImages = videos.flatMap((video) =>
     (video.images ?? [])
@@ -199,6 +220,30 @@ export function Catalog() {
             <Flame className="h-4 w-4" />
             Mais assistidos
           </button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <span className="mr-1 text-sm font-semibold text-foreground">Vídeos por linha:</span>
+          <div className="inline-flex overflow-hidden rounded-lg border border-border">
+            {(["1", "2"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => changeRows(value)}
+                className={cn(
+                  "px-4 py-1.5 font-semibold transition-colors",
+                  rows === value
+                    ? "bg-primary-700 text-primary-foreground"
+                    : "bg-surface text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          <span className="ml-1 text-xs text-muted-foreground">
+            {rows === "1" ? "1 por linha no celular · 2 no tablet" : "2 por linha no celular · 4 no tablet"}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -287,7 +332,7 @@ export function Catalog() {
       )}
 
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={gridClass}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-video animate-pulse rounded-2xl bg-muted" />
           ))}
@@ -303,7 +348,7 @@ export function Catalog() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className={gridClass}>
               {matchingImages.map(({ img, video }) => (
                 <Link
                   key={`${video.id}-${img.id}`}
@@ -357,7 +402,7 @@ export function Catalog() {
               <h2 className="mb-4 text-lg font-bold text-foreground">
                 Imagens encontradas ({searchImages.length})
               </h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className={gridClass}>
                 {searchImages.map((img) => (
                   <Link
                     key={img.id}
@@ -391,7 +436,7 @@ export function Catalog() {
           )}
           {videos.length > 0 && (
             <>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={gridClass}>
                 {videos.map((video) => (
                   <VideoCard key={video.id} video={video} />
                 ))}
