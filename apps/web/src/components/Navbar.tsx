@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { Search, User as UserIcon, Menu, X, ShoppingCart, Moon, Sun } from "lucide-react";
+import { Search, User as UserIcon, Menu, X, ShoppingCart, Moon, Sun, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
 import { useCart } from "../lib/cart";
@@ -22,7 +22,7 @@ const outlineClass =
 const ghostClass = "text-muted-foreground hover:bg-muted hover:text-foreground";
 
 export function Navbar() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const { count } = useCart();
   const { theme, toggle } = useTheme();
   const logoUrl = useSiteLogo();
@@ -178,6 +178,11 @@ export function Navbar() {
                     <Button className="w-full">Criar conta</Button>
                   </Link>
                 </>
+              )}
+              {user && (
+                <Button variant="ghost" className={`w-full ${ghostClass}`} onClick={logout}>
+                  <LogOut className="h-4 w-4" /> Sair
+                </Button>
               )}
             </div>
           </div>

@@ -10,6 +10,7 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { PieChart } from "../../components/ui/pie-chart";
 import { formatDate, formatPrice } from "../../lib/utils";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 type StatusFilter = "" | "pagos" | "atraso" | "gratuito";
 
@@ -181,7 +182,13 @@ export function AdminUsers() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Usuários</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+        Usuários
+        <InfoPopover
+          title="Como usar"
+          text="Lista todos os usuários cadastrados. Use a busca por nome/e-mail, filtre por plano ou status. Você pode tornar um usuário afiliado (gerando o link de indicação) e ativar/desativar o acesso de quem não deve entrar mais."
+        />
+      </h1>
       <p className="mt-1 text-sm text-slate-500">{total} no extrato atual</p>
 
       <Card className="mt-5">

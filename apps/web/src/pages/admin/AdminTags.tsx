@@ -5,6 +5,7 @@ import type { Tag } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 export function AdminTags() {
   const [items, setItems] = useState<Tag[]>([]);
@@ -49,7 +50,13 @@ export function AdminTags() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Tags</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+            Tags
+            <InfoPopover
+              title="Como usar"
+              text="Palavras-chave que tornam os conteúdos encontráveis. Ao cadastrar um vídeo ou caso, você pode marcar várias tags. Os alunos usam as tags na busca e na página de tags para filtrar por assunto."
+            />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">Etiquetas de conteúdo pesquisáveis</p>
         </div>
         <Button onClick={() => setEditing({ name: "" })}>

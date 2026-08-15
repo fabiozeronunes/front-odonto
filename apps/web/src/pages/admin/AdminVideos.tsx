@@ -9,6 +9,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 interface VideoFormState {
   id?: string;
@@ -153,7 +154,13 @@ export function AdminVideos() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Vídeos</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+            Vídeos
+            <InfoPopover
+              title="Como usar"
+              text="Cadastre e edite os vídeos do catálogo. Pode informar URL (YouTube/Vimeo) ou fazer upload de arquivo. Associe a uma especialidade e a tags para aparecer na busca. Vídeos marcados como 'pago' exigem plano de assinatura para assistir."
+            />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">Gerenciar conteúdos da plataforma</p>
         </div>
         <Button onClick={startCreate}>

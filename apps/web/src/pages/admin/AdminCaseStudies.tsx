@@ -10,6 +10,7 @@ import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 interface CaseForm {
   id?: string;
@@ -127,7 +128,13 @@ export function AdminCaseStudies() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Estudos de caso</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+            Estudos de caso
+            <InfoPopover
+              title="Como usar"
+              text="Casos clínicos exibidos na seção 'Casos' do site. Cada caso traz uma especialidade, tags e pode conter imagens do passo a passo clínico. Ajudam o aluno a ver a teoria aplicada na prática."
+            />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">Casos clínicos da plataforma</p>
         </div>
         <Button onClick={() => setEditing(emptyForm)}>

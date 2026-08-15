@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Badge } from "../../components/ui/badge";
 import { PieChart } from "../../components/ui/pie-chart";
 import { formatDate, formatPrice } from "../../lib/utils";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 interface PlanSummary {
   id: string;
@@ -68,7 +69,12 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+        Dashboard
+        <InfoPopover
+          text="Visão geral do negócio: total de alunos, planos ativos, receita estimada, vendas do Shop Odontus e os vídeos mais acessados."
+        />
+      </h1>
       <p className="mt-1 text-sm text-slate-500">Visão geral da plataforma</p>
 
       <Card className="mt-6">

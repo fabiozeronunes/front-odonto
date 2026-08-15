@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { InfoPopover } from "../../components/ui/info-popover";
 
 export function AdminSpecialties() {
   const [items, setItems] = useState<Specialty[]>([]);
@@ -53,7 +54,13 @@ export function AdminSpecialties() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Especialidades</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+            Especialidades
+            <InfoPopover
+              title="Como usar"
+              text="As especialidades da odontologia (ex.: Endodontia, Ortodontia) organizam os conteúdos. Cada vídeo ou caso é associado a uma. Elas aparecem na página de especialidades do site para o aluno navegar."
+            />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">Categorias de conteúdo</p>
         </div>
         <Button onClick={() => setEditing({ name: "", description: "" })}>

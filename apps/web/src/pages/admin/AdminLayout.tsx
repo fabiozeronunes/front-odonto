@@ -9,9 +9,11 @@ import {
   CreditCard,
   Link2,
   ShoppingBag,
+  LogOut,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { useAuth } from "../../lib/auth";
 
 const items = [
   {
@@ -72,6 +74,7 @@ const items = [
 ];
 
 export function AdminLayout() {
+  const { logout } = useAuth();
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row">
       <aside className="lg:w-60 lg:shrink-0">
@@ -97,6 +100,15 @@ export function AdminLayout() {
               </span>
             </NavLink>
           ))}
+          <div className="mt-1 border-t border-slate-200 pt-2">
+            <button
+              type="button"
+              onClick={logout}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4" /> Sair
+            </button>
+          </div>
         </nav>
       </aside>
 
