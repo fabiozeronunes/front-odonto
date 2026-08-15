@@ -46,6 +46,7 @@ export function CaseStudies() {
                 {video && (
                   <Link
                     to={`/video/${video.slug}`}
+                    state={{ fromCaseStudies: true }}
                     className="group relative block aspect-video overflow-hidden bg-muted"
                   >
                     {video.thumbnailUrl ? (

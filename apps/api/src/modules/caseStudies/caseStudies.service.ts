@@ -57,6 +57,16 @@ const caseStudySelect = {
   },
 } satisfies Prisma.CaseStudySelect;
 
+function caseStudySelectFor(opts?: { admin?: boolean }) {
+  return {
+    ...caseStudySelect,
+    videoCases: {
+      ...(opts?.admin ? {} : { where: { video: { status: "PUBLISHED" } } }),
+      ...caseStudySelect.videoCases,
+    },
+  } satisfies Prisma.CaseStudySelect;
+}
+
 function stripPrivateFields<T extends { observations?: string | null }>(item: T) {
   const { observations, ...rest } = item;
   void observations;
@@ -91,7 +101,7 @@ export async function listCaseStudies(query: Request["query"], opts: { admin?: b
       orderBy: { publishedAt: "desc" },
       skip,
       take: perPage,
-      select: caseStudySelect,
+      select: caseStudySelectFor(opts),
     }),
     prisma.caseStudy.count({ where }),
   ]);
@@ -106,7 +116,7 @@ export async function getCaseStudy(slugOrId: string, opts: { admin?: boolean } =
       ...(opts.admin ? {} : { status: "PUBLISHED" }),
     },
     select: {
-      ...caseStudySelect,
+      ...caseStudySelectFor(opts),
       relatedCases: {
         select: { related: { select: { id: true, title: true, slug: true, isFree: true, difficulty: true } } },
       },
