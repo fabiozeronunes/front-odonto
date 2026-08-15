@@ -187,7 +187,9 @@ export function ProductDetail() {
               Economize {formatPrice(price - promo)} ({discount}% de desconto)
             </p>
           )}
-          {product.saleEndsAt && <CountdownTimer endsAt={product.saleEndsAt} className="mt-3" />}
+          {product.saleEndsAt && (
+            <CountdownTimer startsAt={product.saleStartsAt} endsAt={product.saleEndsAt} className="mt-3" />
+          )}
 
           <div className="mt-6 space-y-4">
             {/* Quantidade + ações */}

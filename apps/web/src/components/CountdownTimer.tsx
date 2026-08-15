@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Timer } from "lucide-react";
+import { Timer, Rocket } from "lucide-react";
 
 interface CountdownTimerProps {
+  startsAt?: string | Date | null;
   endsAt: string | Date | null;
   className?: string;
 }
@@ -22,8 +23,14 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-export function CountdownTimer({ endsAt, className }: CountdownTimerProps) {
-  const target = endsAt ? new Date(endsAt).getTime() : 0;
+export function CountdownTimer({ startsAt, endsAt, className }: CountdownTimerProps) {
+  const start = startsAt ? new Date(startsAt).getTime() : 0;
+  const end = endsAt ? new Date(endsAt).getTime() : 0;
+  const now = Date.now();
+  const counting = end > now && (!start || now >= start);
+  const waiting = start > now;
+  const target = waiting ? start : end;
+
   const [left, setLeft] = useState(() => getDiff(target));
 
   useEffect(() => {
@@ -32,7 +39,7 @@ export function CountdownTimer({ endsAt, className }: CountdownTimerProps) {
     return () => clearInterval(id);
   }, [target]);
 
-  if (!left) return null;
+  if (!left || (!waiting && !counting)) return null;
 
   const cells = [
     { label: "dias", value: left.days },
@@ -44,7 +51,8 @@ export function CountdownTimer({ endsAt, className }: CountdownTimerProps) {
   return (
     <div className={className}>
       <p className="flex items-center gap-1 text-xs font-semibold text-red-600">
-        <Timer className="h-3.5 w-3.5" /> Termina em
+        {waiting ? <Rocket className="h-3.5 w-3.5" /> : <Timer className="h-3.5 w-3.5" />}
+        {waiting ? "Promoção começa em" : "Termina em"}
       </p>
       <div className="mt-1 inline-flex divide-x divide-red-200 overflow-hidden rounded-lg border border-red-200 bg-red-50">
         {cells.map((c) => (

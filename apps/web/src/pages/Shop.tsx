@@ -223,7 +223,9 @@ export function Shop() {
                       {formatPrice(p.promoPrice)}
                     </span>
                   </div>
-                  {p.saleEndsAt && <CountdownTimer endsAt={p.saleEndsAt} className="mt-3" />}
+                  {p.saleEndsAt && (
+                    <CountdownTimer startsAt={p.saleStartsAt} endsAt={p.saleEndsAt} className="mt-3" />
+                  )}
                   <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:pt-1">
                     <Button
                       variant="outline"

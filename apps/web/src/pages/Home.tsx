@@ -183,30 +183,7 @@ export function Home() {
         <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
 
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:py-24">
-          {/* Bloco de vídeo da hero (configurável no admin) */}
-          <div className="relative mx-auto max-w-3xl animate-fade-in-up anim-delay-200">
-            {heroVideo ? (
-              <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
-                <iframe
-                  src={cleanYoutubeEmbedUrl(heroVideo) ?? heroVideo}
-                  title="Vídeo da Front Odontus"
-                  className="aspect-video w-full bg-black"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen={false}
-                />
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
-                <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
-                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
-                    <PlayCircle className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-10 text-center">
+          <div className="text-center">
             <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
@@ -219,7 +196,30 @@ export function Home() {
               Estudando por Vídeos, Imagens e Estudos de Casos.
             </h1>
 
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
+            {/* Bloco de vídeo da hero (configurável no admin) */}
+            <div className="relative mx-auto mt-8 max-w-3xl animate-fade-in-up anim-delay-200">
+              {heroVideo ? (
+                <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
+                  <iframe
+                    src={cleanYoutubeEmbedUrl(heroVideo) ?? heroVideo}
+                    title="Vídeo da Front Odontus"
+                    className="aspect-video w-full bg-black"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen={false}
+                  />
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
+                  <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
+                      <PlayCircle className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
               Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e
               Questionários que vão ajudar na sua formação e aprendizado.
             </p>

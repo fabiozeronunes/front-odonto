@@ -236,7 +236,7 @@ export function Dashboard() {
                       <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
                     </div>
                     {p.saleEndsAt && (
-                      <CountdownTimer endsAt={p.saleEndsAt} className="mt-3" />
+                      <CountdownTimer startsAt={p.saleStartsAt} endsAt={p.saleEndsAt} className="mt-3" />
                     )}
                   </div>
                 </Link>

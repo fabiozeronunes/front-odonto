@@ -20,6 +20,7 @@ interface ProductFormState {
   description: string;
   price: string;
   promoPrice: string;
+  saleStartsAt: string;
   saleEndsAt: string;
   sku: string;
   stock: string;
@@ -37,6 +38,7 @@ const emptyForm: ProductFormState = {
   description: "",
   price: "",
   promoPrice: "",
+  saleStartsAt: "",
   saleEndsAt: "",
   sku: "",
   stock: "0",
@@ -114,6 +116,7 @@ export function AdminShop() {
       description: p.description ?? "",
       price: String(Number(p.price) || 0),
       promoPrice: p.promoPrice != null ? String(Number(p.promoPrice)) : "",
+      saleStartsAt: p.saleStartsAt ? new Date(p.saleStartsAt).toISOString().slice(0, 16) : "",
       saleEndsAt: p.saleEndsAt ? new Date(p.saleEndsAt).toISOString().slice(0, 16) : "",
       sku: p.sku ?? "",
       stock: String(p.stock),
@@ -137,6 +140,7 @@ export function AdminShop() {
       description: editing.description || undefined,
       price: Number(editing.price) || 0,
       promoPrice: editing.promoPrice ? Number(editing.promoPrice) : null,
+      saleStartsAt: editing.saleStartsAt ? new Date(editing.saleStartsAt).toISOString() : null,
       saleEndsAt: editing.saleEndsAt ? new Date(editing.saleEndsAt).toISOString() : null,
       sku: editing.sku || undefined,
       stock: Number(editing.stock) || 0,
@@ -300,6 +304,17 @@ export function AdminShop() {
                   onChange={(e) => setEditing({ ...editing, promoPrice: e.target.value })}
                   placeholder="Deixe vazio se não houver desconto"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Início da promoção</Label>
+                <Input
+                  type="datetime-local"
+                  value={editing.saleStartsAt}
+                  onChange={(e) => setEditing({ ...editing, saleStartsAt: e.target.value })}
+                />
+                <p className="text-xs text-slate-400">
+                  Quando a promoção começa. Deixe vazio para começar imediatamente.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label>Fim da promoção (temporizador)</Label>
