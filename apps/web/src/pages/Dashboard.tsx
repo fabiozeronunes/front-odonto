@@ -203,8 +203,9 @@ export function Dashboard() {
               const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
               const img = p.images?.[0]?.url;
               return (
-                <div
+                <Link
                   key={p.id}
+                  to={`/loja/${p.slug}`}
                   className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
                   <div className="relative aspect-[4/3] bg-muted">
@@ -234,7 +235,7 @@ export function Dashboard() {
                       <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
