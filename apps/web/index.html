@@ -11,7 +11,10 @@
     <script>
       (function () {
         try {
-          document.documentElement.classList.add("dark");
+          var t = localStorage.getItem("odonto_theme");
+          if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+          }
         } catch (e) {}
       })();
     </script>

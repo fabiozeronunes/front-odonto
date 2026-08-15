@@ -1,9 +1,10 @@
 import { Link, NavLink } from "react-router-dom";
-import { Search, User as UserIcon, Menu, X, ShoppingCart } from "lucide-react";
+import { Search, User as UserIcon, Menu, X, ShoppingCart, Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
 import { useCart } from "../lib/cart";
 import { useSiteLogo } from "../lib/useSiteLogo";
+import { useTheme } from "../lib/useTheme";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 
@@ -23,6 +24,7 @@ const ghostClass = "text-muted-foreground hover:bg-muted hover:text-foreground";
 export function Navbar() {
   const { user, isAdmin } = useAuth();
   const { count } = useCart();
+  const { theme, toggle } = useTheme();
   const logoUrl = useSiteLogo();
   const [open, setOpen] = useState(false);
 
@@ -63,6 +65,15 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            aria-label="Alternar tema"
+            className={ghostClass}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
           <Link to="/carrinho" aria-label="Carrinho de compras">
             <Button variant="ghost" size="icon" className={`relative ${ghostClass}`}>
               <ShoppingCart className="h-5 w-5" />
@@ -100,6 +111,15 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-1 lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            aria-label="Alternar tema"
+            className={ghostClass}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
           <button
             className="rounded-lg p-2 text-muted-foreground hover:bg-muted"
             onClick={() => setOpen(!open)}
