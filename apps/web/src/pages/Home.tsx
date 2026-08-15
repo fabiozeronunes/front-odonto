@@ -159,6 +159,22 @@ function ShopPreview() {
 }
 
 export function Home() {
+  const [heroVideo, setHeroVideo] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    api<{ data: string | null }>("/api/settings/hero-video", { skipAuth: true })
+      .then((res) => {
+        if (active) setHeroVideo(res.data ?? null);
+      })
+      .catch(() => {
+        if (active) setHeroVideo(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* ===== FIRST FOLD: HERO ===== */}
@@ -186,15 +202,27 @@ export function Home() {
             </p>
           </div>
 
-          {/* Mockup do player */}
+          {/* Bloco de vídeo da hero (configurável no admin) */}
           <div className="relative mx-auto mt-10 max-w-3xl animate-fade-in-up anim-delay-200">
-            <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
-              <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
-                  <PlayCircle className="h-8 w-8 text-white" />
+            {heroVideo ? (
+              <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
+                <iframe
+                  src={heroVideo}
+                  title="Vídeo da Front Odontus"
+                  className="aspect-video w-full bg-black"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
+                <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
+                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow animate-pulse-ring">
+                    <PlayCircle className="h-8 w-8 text-white" />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             <div className="absolute -right-4 top-8 animate-float rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground shadow-lift">
               <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" /> Plano Premium ativo
             </div>

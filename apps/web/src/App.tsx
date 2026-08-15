@@ -25,6 +25,7 @@ import { Profile } from "./pages/Profile";
 import { MyContent } from "./pages/my/MyContent";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { AdminHome } from "./pages/admin/AdminHome";
 import { AdminUsers } from "./pages/admin/AdminUsers";
 import { AdminVideos } from "./pages/admin/AdminVideos";
 import { AdminSpecialties } from "./pages/admin/AdminSpecialties";
@@ -122,6 +123,7 @@ export default function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="home" element={<AdminHome />} />
             <Route path="usuarios" element={<AdminUsers />} />
             <Route path="videos" element={<AdminVideos />} />
             <Route path="especialidades" element={<AdminSpecialties />} />
