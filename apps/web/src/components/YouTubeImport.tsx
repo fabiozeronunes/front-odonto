@@ -75,29 +75,22 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
         text?: string;
         error?: { code?: string };
       } | null;
-      if (!res.ok || !data) {
-        setMessage("Falha no download pelo serviço externo. Use \"Usar link do vídeo\".");
+      if (!data || !res.ok) {
+        setMessage("O serviço de download externo falhou. Use \"Usar link do vídeo\".");
         return;
       }
       if (data.status === "redirect" || data.status === "tunnel") {
-        const a = document.createElement("a");
-        a.href = data.url ?? "";
-        a.download = data.filename ?? "video.mp4";
-        a.rel = "noopener";
-        a.target = "_blank";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setMessage(
-          `Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.`
-        );
+        window.open(data.url, "_blank", "noopener");
+        setMessage("Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.");
         return;
       }
       if (data.status === "picker") {
         setMessage("O YouTube exige escolher entre vídeo/áudio. Use \"Usar link do vídeo\".");
         return;
       }
-      setMessage(data.text ?? data.error?.code ?? "Falha no download do vídeo.");
+      setMessage(
+        data.text ?? data.error?.code ?? "Falha no download do vídeo. Use \"Usar link do vídeo\"."
+      );
     } catch {
       setMessage("Falha ao baixar no navegador. Use \"Usar link do vídeo\".");
     } finally {
