@@ -8,7 +8,7 @@ import { VideoCard } from "../components/VideoCard";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { formatPrice, resolveImageUrl } from "../lib/utils";
+import { formatPrice, resolveImageUrl, cn } from "../lib/utils";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -16,7 +16,23 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
+  const [rows, setRows] = useState<"1" | "2">(() => {
+    try {
+      return localStorage.getItem("odonto_dashboard_sale_rows") === "2" ? "2" : "1";
+    } catch {
+      return "1";
+    }
+  });
   const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
+
+  function changeRows(value: "1" | "2") {
+    setRows(value);
+    try {
+      localStorage.setItem("odonto_dashboard_sale_rows", value);
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     api<Paginated<{ watchedAt: string; video: Video }>>("/api/videos/me/history?perPage=6")
@@ -143,6 +159,26 @@ export function Dashboard() {
         <p className="mb-5 -mt-3 text-sm text-muted-foreground">
           Descontos exclusivos em kits, uniformes e materiais odontológicos para assinantes.
         </p>
+
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Produtos por linha:</span>
+          <div className="inline-flex overflow-hidden rounded-lg border border-border">
+            {(["1", "2"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => changeRows(value)}
+                className={cn(
+                  "px-4 py-1.5 font-semibold transition-colors",
+                  rows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {value} produto{value === "2" ? "s" : ""}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {loadingSales ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -155,7 +191,12 @@ export function Dashboard() {
             <p className="mt-2 text-muted-foreground">Novas ofertas em breve.</p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            className={cn(
+              "grid gap-4 sm:gap-6",
+              rows === "2" ? "grid-cols-2" : "mx-auto max-w-md grid-cols-1"
+            )}
+          >
             {saleProducts.map((p) => {
               const price = Number(p.price);
               const promo = Number(p.promoPrice);
