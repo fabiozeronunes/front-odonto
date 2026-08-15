@@ -39,7 +39,7 @@ export function Plans() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <div className="mx-auto max-w-[90%] px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
         <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
           <Sparkles className="h-3 w-3" /> Planos de assinatura
