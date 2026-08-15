@@ -53,21 +53,53 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
     setDownloading(true);
     setMessage(null);
     try {
-      const res = await api<{ data: YouTubeVideo }>("/api/youtube/import", {
+      const cobaltUrl =
+        (import.meta.env.VITE_COBALT_API_URL as string | undefined) ??
+        "https://api.cobalt.tools/api/json";
+      const res = await fetch(cobaltUrl, {
         method: "POST",
-        body: JSON.stringify({ url: info.watchUrl }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: info.watchUrl,
+          downloadMode: "auto",
+          videoQuality: "720",
+        }),
       });
-      setInfo(res.data);
-      onInfo({
-        title: res.data.title,
-        author: res.data.author,
-        thumbnailUrl: res.data.thumbnailUrl,
-        videoUrl: res.data.absoluteVideoUrl ?? res.data.embedUrl,
-      });
-      setMessage("Vídeo baixado! URL preenchida.");
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Falha no download";
-      setMessage(msg.includes("yt-dlp") ? msg + " (instale o yt-dlp no servidor)" : msg);
+      const data = (await res.json().catch(() => null)) as {
+        status?: string;
+        url?: string;
+        filename?: string;
+        text?: string;
+        error?: { code?: string };
+      } | null;
+      if (!res.ok || !data) {
+        setMessage("Falha no download pelo serviço externo. Use \"Usar link do vídeo\".");
+        return;
+      }
+      if (data.status === "redirect" || data.status === "tunnel") {
+        const a = document.createElement("a");
+        a.href = data.url ?? "";
+        a.download = data.filename ?? "video.mp4";
+        a.rel = "noopener";
+        a.target = "_blank";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setMessage(
+          `Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.`
+        );
+        return;
+      }
+      if (data.status === "picker") {
+        setMessage("O YouTube exige escolher entre vídeo/áudio. Use \"Usar link do vídeo\".");
+        return;
+      }
+      setMessage(data.text ?? data.error?.code ?? "Falha no download do vídeo.");
+    } catch {
+      setMessage("Falha ao baixar no navegador. Use \"Usar link do vídeo\".");
     } finally {
       setDownloading(false);
     }
