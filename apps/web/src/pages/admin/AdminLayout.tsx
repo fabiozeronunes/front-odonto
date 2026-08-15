@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
+  Home as HomeIcon,
   Users,
   Video,
   Stethoscope,
@@ -22,6 +23,12 @@ const items = [
     icon: LayoutDashboard,
     end: true,
     help: "Visão geral do admin: total de usuários, vídeos, planos ativos e vendas do site.",
+  },
+  {
+    to: "/admin/home",
+    label: "Página inicial",
+    icon: HomeIcon,
+    help: "Configura o vídeo exibido no topo da página inicial (hero), no lugar do mockup.",
   },
   {
     to: "/admin/usuarios",

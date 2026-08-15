@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { GraduationCap, AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { api, ApiRequestError } from "../lib/api";
+import { useSiteLogo } from "../lib/useSiteLogo";
 import type { MembershipPlan } from "../types";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -14,6 +15,7 @@ import { formatPrice } from "../lib/utils";
 export function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const logoUrl = useSiteLogo();
   const [searchParams] = useSearchParams();
   const ref = searchParams.get("ref") ?? undefined;
   const initialPlan = searchParams.get("plan") ?? "gratuito";
@@ -21,6 +23,7 @@ export function Register() {
   const [planSlug, setPlanSlug] = useState(initialPlan);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +47,7 @@ export function Register() {
     setError(null);
     setLoading(true);
     try {
-      await register(name, email, password, ref, planSlug);
+      await register(name, email, password, ref, planSlug, phone);
       if (planSlug && planSlug !== "gratuito") {
         navigate(`/checkout?plan=${planSlug}`, { replace: true });
       } else {
@@ -60,13 +63,20 @@ export function Register() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="mb-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-700 text-primary-foreground">
-          <GraduationCap className="h-6 w-6" />
-        </span>
-        <p className="mt-2 text-lg font-bold text-foreground">
-          Front<span className="text-primary-700">Odontus</span>
-        </p>
-        <h1 className="mt-1 font-display text-2xl font-bold text-foreground">Crie sua conta</h1>
+        <Link to="/" className="mx-auto flex justify-center">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="OdontoStudy"
+              className="h-auto w-[70vw] max-w-full object-contain md:max-w-[240px] lg:max-w-[220px]"
+            />
+          ) : (
+            <span className="font-display text-2xl font-bold text-primary-700 dark:text-primary-400">
+              Odontus
+            </span>
+          )}
+        </Link>
+        <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Crie sua conta</h1>
         <p className="mt-1 text-sm text-muted-foreground">Escolha seu plano e comece a estudar</p>
       </div>
 
@@ -162,6 +172,16 @@ export function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="voce@email.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone / WhatsApp</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(11) 99999-9999"
               />
             </div>
             <div className="space-y-2">

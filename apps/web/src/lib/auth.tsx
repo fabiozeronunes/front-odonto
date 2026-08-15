@@ -20,7 +20,8 @@ interface AuthContextValue {
     email: string,
     password: string,
     ref?: string,
-    planSlug?: string
+    planSlug?: string,
+    phone?: string
   ) => Promise<void>;
   logout: () => void;
   loadProfile: () => Promise<void>;
@@ -82,10 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(
-    async (name: string, email: string, password: string, ref?: string, planSlug?: string) => {
+    async (name: string, email: string, password: string, ref?: string, planSlug?: string, phone?: string) => {
       const data = await api<AuthResponse>("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify({ name, email, password, ref, planSlug }),
+        body: JSON.stringify({ name, email, phone, password, ref, planSlug }),
         skipAuth: true,
       });
       setTokens(data.tokens.accessToken, data.tokens.refreshToken);

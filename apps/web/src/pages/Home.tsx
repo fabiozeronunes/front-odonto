@@ -183,27 +183,8 @@ export function Home() {
         <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
 
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:py-24">
-          <div className="text-center">
-            <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
-              <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
-            </Badge>
-
-            <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
-              Domine a{" "}
-              <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
-                Odontologia
-              </span>{" "}
-              Estudando por Vídeos, Imagens e Estudos de Casos.
-            </h1>
-
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
-              Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e
-              Questionários que vão ajudar na sua formação e aprendizado.
-            </p>
-          </div>
-
           {/* Bloco de vídeo da hero (configurável no admin) */}
-          <div className="relative mx-auto mt-10 max-w-3xl animate-fade-in-up anim-delay-200">
+          <div className="relative mx-auto max-w-3xl animate-fade-in-up anim-delay-200">
             {heroVideo ? (
               <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
                 <iframe
@@ -231,7 +212,24 @@ export function Home() {
             </div>
           </div>
 
-          <div className="text-center">
+          <div className="mt-10 text-center">
+            <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
+              <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
+            </Badge>
+
+            <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
+              Domine a{" "}
+              <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
+                Odontologia
+              </span>{" "}
+              Estudando por Vídeos, Imagens e Estudos de Casos.
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
+              Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e
+              Questionários que vão ajudar na sua formação e aprendizado.
+            </p>
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center animate-fade-in-up anim-delay-200">
               <Link to="/cadastro">
                 <Button
@@ -242,7 +240,7 @@ export function Home() {
                   <PlayCircle className="h-5 w-5" /> Começar a estudar grátis
                 </Button>
               </Link>
-              <Link to="/planos">
+              <a href="#planos">
                 <Button
                   size="lg"
                   variant="outline"
@@ -250,7 +248,7 @@ export function Home() {
                 >
                   Ver planos
                 </Button>
-              </Link>
+              </a>
             </div>
 
             <div className="mt-10 flex flex-wrap justify-center gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
@@ -277,7 +275,7 @@ export function Home() {
       <ShopPreview />
 
       {/* ===== PLANS SECTION ===== */}
-      <section className="py-12 bg-background">
+      <section id="planos" className="scroll-mt-16 bg-background py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Plans />
         </div>
