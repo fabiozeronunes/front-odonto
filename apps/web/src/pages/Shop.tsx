@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingBag, Package, Percent, Check } from "lucide-react";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
@@ -183,27 +183,33 @@ export function Shop() {
                 key={p.id}
                 className="group flex flex-col rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-muted">
-                  {img ? (
-                    <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center text-muted-foreground">
-                      <Package className="h-10 w-10" />
-                    </span>
-                  )}
-                  {discount > 0 && (
-                    <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                      -{discount}%
-                    </span>
-                  )}
-                  {p.stock <= 0 && (
-                    <span className="absolute right-2 top-2 rounded-full bg-slate-800/80 px-2 py-0.5 text-xs font-semibold text-white">
-                      Esgotado
-                    </span>
-                  )}
-                </div>
+                <Link to={`/loja/${p.slug}`} className="block">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-muted">
+                    {img ? (
+                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-muted-foreground">
+                        <Package className="h-10 w-10" />
+                      </span>
+                    )}
+                    {discount > 0 && (
+                      <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                        -{discount}%
+                      </span>
+                    )}
+                    {p.stock <= 0 && (
+                      <span className="absolute right-2 top-2 rounded-full bg-slate-800/80 px-2 py-0.5 text-xs font-semibold text-white">
+                        Esgotado
+                      </span>
+                    )}
+                  </div>
+                </Link>
                 <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
-                  <p className="truncate text-sm font-semibold text-foreground">{p.name}</p>
+                  <Link to={`/loja/${p.slug}`} className="block">
+                    <p className="truncate text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
+                      {p.name}
+                    </p>
+                  </Link>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
                     {p.brand ?? "Odontus"}
                     {p.category ? ` • ${p.category.name}` : ""}

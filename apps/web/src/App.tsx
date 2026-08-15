@@ -10,6 +10,7 @@ import { CaseStudies } from "./pages/CaseStudies";
 import { CaseStudyDetail } from "./pages/CaseStudyDetail";
 import { Plans } from "./pages/Plans";
 import { Shop } from "./pages/Shop";
+import { ProductDetail } from "./pages/ProductDetail";
 import { Cart } from "./pages/Cart";
 import { StoreCheckout } from "./pages/StoreCheckout";
 import { Checkout } from "./pages/Checkout";
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/casos/:slug" element={<CaseStudyDetail />} />
           <Route path="/planos" element={<Plans />} />
           <Route path="/loja" element={<Shop />} />
+          <Route path="/loja/:slug" element={<ProductDetail />} />
           <Route path="/carrinho" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Register />} />

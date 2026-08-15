@@ -105,7 +105,7 @@ function ShopPreview() {
                   key={p.id}
                   className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
-                  <Link to="/loja" className="block">
+                  <Link to={`/loja/${p.slug}`} className="block">
                     <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                       {img ? (
                         <img
@@ -126,7 +126,7 @@ function ShopPreview() {
                     </div>
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col p-3">
-                    <Link to="/loja">
+                    <Link to={`/loja/${p.slug}`}>
                       <p className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
                         {p.name}
                       </p>
