@@ -101,7 +101,11 @@ export function Checkout() {
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center justify-between text-lg">
             <span>Resumo do pedido</span>
-            {isPremium && <Badge variant="premium">MAIS POPULAR</Badge>}
+            {isPremium && (
+              <Badge variant="gradientYellow" className="rounded-2xl">
+                MAIS POPULAR
+              </Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>

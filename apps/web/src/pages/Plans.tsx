@@ -62,6 +62,7 @@ export function Plans() {
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
             const isPremium = plan.slug === "odontus-premium";
+            const isVip = plan.slug === "odontus-vip";
             return (
               <Card
                 key={plan.id}
@@ -73,7 +74,23 @@ export function Plans() {
               >
                 {isPremium && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge variant="premium">MAIS POPULAR</Badge>
+                    <Badge variant="gradientYellow" className="rounded-2xl">
+                      MAIS POPULAR
+                    </Badge>
+                  </div>
+                )}
+                {isVip && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge variant="gradientTeal" className="rounded-2xl">
+                      MELHOR CUSTO-BENEFÍCIO
+                    </Badge>
+                  </div>
+                )}
+                {!isVip && !isPremium && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge variant="gradientTeal" className="rounded-2xl">
+                      GRATUITO
+                    </Badge>
                   </div>
                 )}
                 <CardHeader>
