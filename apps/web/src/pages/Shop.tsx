@@ -24,15 +24,15 @@ export function Shop() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [added, setAdded] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<"2" | "3">(() => {
+  const [rows, setRows] = useState<"1" | "2">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "2" ? "2" : "3";
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
     } catch {
-      return "3";
+      return "2";
     }
   });
 
-  function changeRows(value: "2" | "3") {
+  function changeRows(value: "1" | "2") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -162,7 +162,7 @@ export function Shop() {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         <span className="text-muted-foreground">Produtos por linha:</span>
         <div className="inline-flex overflow-hidden rounded-lg border border-border">
-          {(["2", "3"] as const).map((value) => (
+          {(["1", "2"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -179,7 +179,7 @@ export function Shop() {
       </div>
 
       {loading ? (
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-muted" />
           ))}
@@ -193,7 +193,7 @@ export function Shop() {
         <div
           className={cn(
             "mt-8 grid gap-4 sm:gap-6",
-            rows === "3" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
+            rows === "2" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2" : "mx-auto max-w-2xl grid-cols-1"
           )}
         >
           {products.map((p) => {
