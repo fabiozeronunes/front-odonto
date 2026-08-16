@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
+import { PixQrCode } from "../../components/PixQrCode";
 import { InfoPopover } from "../../components/ui/info-popover";
 import { formatPrice } from "../../lib/utils";
 
@@ -227,6 +228,19 @@ export function AdminFinanceiro() {
             </div>
 
             <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              {form.pixKey && (
+                <div className="mb-3 flex flex-col items-center gap-2">
+                  <PixQrCode
+                    pixKey={form.pixKey}
+                    beneficiary={form.beneficiary}
+                    amount={718.8}
+                    size={170}
+                  />
+                  <p className="text-[11px] text-slate-400">
+                    QR code gerado a partir dos dados acima
+                  </p>
+                </div>
+              )}
               <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                 Chave Pix ({form.pixKeyType || "pix"})
               </p>

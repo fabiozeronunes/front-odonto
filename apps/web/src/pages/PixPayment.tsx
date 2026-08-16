@@ -5,6 +5,7 @@ import { api } from "../lib/api";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { PixQrCode } from "../components/PixQrCode";
 import { formatPrice } from "../lib/utils";
 
 interface PaymentSettings {
@@ -99,6 +100,20 @@ export function PixPayment() {
             <CardContent>
               {settings?.pixKey ? (
                 <div className="space-y-4">
+                  <div className="flex flex-col items-center gap-3">
+                    <PixQrCode
+                      pixKey={settings.pixKey}
+                      beneficiary={settings.beneficiary}
+                      amount={amount}
+                      size={200}
+                    />
+                    {settings.pixKey && (
+                      <p className="text-xs text-muted-foreground">
+                        Aponte a câmera do seu banco para o QR code e pague.
+                      </p>
+                    )}
+                  </div>
+
                   <div className="rounded-xl border border-border bg-muted p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Chave Pix ({settings.pixKeyType ?? "pix"})
