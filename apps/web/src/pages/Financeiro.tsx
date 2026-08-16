@@ -14,6 +14,7 @@ import {
 import { api } from "../lib/api";
 import { formatDate, formatPrice } from "../lib/utils";
 import { useCart } from "../lib/cart";
+import { useAuth } from "../lib/auth";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -92,6 +93,7 @@ export function Financeiro() {
   const [data, setData] = useState<FinanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const { items: cartItems, total: cartTotal } = useCart();
+  const { user } = useAuth();
 
   useEffect(() => {
     api<{ data: FinanceData }>("/api/checkout/me")
@@ -128,6 +130,11 @@ export function Financeiro() {
       <p className="mt-1 text-muted-foreground">
         Acompanhe seus pagamentos de assinatura e o extrato de compras na Shop Odontus.
       </p>
+      {user?.registrationNumber && (
+        <p className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
+          Matrícula: <span className="font-bold text-foreground">{user.registrationNumber}</span>
+        </p>
+      )}
 
       {pendingTotal > 0 && (
         <div className="mt-6 flex flex-col justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center">
