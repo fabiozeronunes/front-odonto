@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/badge";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
 import { cn, cleanYoutubeEmbedUrl, formatPrice, resolveImageUrl } from "../lib/utils";
+import { useMediaQuery } from "../lib/useMediaQuery";
 import type { Product } from "../types";
 
 function ShopPreview() {
@@ -14,15 +15,16 @@ function ShopPreview() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<"2" | "4">(() => {
+  const isTablet = useMediaQuery("(min-width: 768px)");
+  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "4" ? "4" : "2";
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "3";
     } catch {
-      return "4";
+      return "3";
     }
   });
 
-  function changeRows(value: "2" | "4") {
+  function changeRows(value: "1" | "2" | "3") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -30,6 +32,8 @@ function ShopPreview() {
       /* ignore */
     }
   }
+
+  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
 
   useEffect(() => {
     api<{ data: Product[] }>("/api/products?perPage=4")
@@ -55,14 +59,14 @@ function ShopPreview() {
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Por linha:</span>
               <div className="inline-flex overflow-hidden rounded-lg border border-border">
-                {(["2", "4"] as const).map((value) => (
+                {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
                   <button
                     key={value}
                     type="button"
                     onClick={() => changeRows(value)}
                     className={cn(
                       "px-3 py-1 font-semibold transition-colors",
-                      rows === value
+                      activeRows === value
                         ? "bg-primary-700 text-primary-foreground"
                         : "bg-surface text-muted-foreground hover:bg-muted"
                     )}
@@ -92,7 +96,11 @@ function ShopPreview() {
           <div
             className={cn(
               "grid gap-4 sm:gap-6",
-              rows === "4" ? "grid-cols-2 lg:grid-cols-4" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
+              activeRows === "2"
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2"
+                : activeRows === "3"
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : "mx-auto max-w-2xl grid-cols-1"
             )}
           >
             {products.map((p) => {
