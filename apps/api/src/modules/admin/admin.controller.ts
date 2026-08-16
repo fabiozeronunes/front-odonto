@@ -48,6 +48,11 @@ export const notifyWhatsApp = asyncHandler(async (req: Request, res: Response) =
   res.json({ data: result });
 });
 
+export const confirmPayment = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.confirmUserPayment(req.params.id);
+  res.json({ data: result });
+});
+
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.deleteUser(
     req.params.id,

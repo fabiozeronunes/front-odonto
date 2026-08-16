@@ -14,6 +14,7 @@ import { ProductDetail } from "./pages/ProductDetail";
 import { Cart } from "./pages/Cart";
 import { StoreCheckout } from "./pages/StoreCheckout";
 import { Checkout } from "./pages/Checkout";
+import { PixPayment } from "./pages/PixPayment";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
@@ -34,6 +35,7 @@ import { AdminCaseStudies } from "./pages/admin/AdminCaseStudies";
 import { AdminPlans } from "./pages/admin/AdminPlans";
 import { AdminAffiliates } from "./pages/admin/AdminAffiliates";
 import { AdminShop } from "./pages/admin/AdminShop";
+import { AdminFinanceiro } from "./pages/admin/AdminFinanceiro";
 
 export default function App() {
   return (
@@ -62,6 +64,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pagamento-pix"
+            element={
+              <ProtectedRoute>
+                <PixPayment />
               </ProtectedRoute>
             }
           />
@@ -132,6 +142,7 @@ export default function App() {
             <Route path="planos" element={<AdminPlans />} />
             <Route path="loja" element={<AdminShop />} />
             <Route path="afiliados" element={<AdminAffiliates />} />
+            <Route path="financeiro" element={<AdminFinanceiro />} />
           </Route>
 
           <Route

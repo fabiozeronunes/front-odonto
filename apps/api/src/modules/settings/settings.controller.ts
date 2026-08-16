@@ -37,3 +37,17 @@ export const heroVideoDelete = asyncHandler(async (_req: Request, res: Response)
   await prisma.siteSetting.deleteMany({ where: { key: "heroVideo" } });
   res.json({ data: null });
 });
+
+export const paymentGet = asyncHandler(async (_req: Request, res: Response) => {
+  const value = await service.getPaymentSettings();
+  res.json({ data: value });
+});
+
+export const paymentPost = asyncHandler(async (req: Request, res: Response) => {
+  const data =
+    req.body && typeof req.body === "object" && !Array.isArray(req.body)
+      ? req.body
+      : {};
+  const value = await service.upsertPaymentSettings(data);
+  res.json({ data: value });
+});

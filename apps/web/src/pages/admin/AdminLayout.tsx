@@ -10,6 +10,7 @@ import {
   CreditCard,
   Link2,
   ShoppingBag,
+  Wallet,
   LogOut,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -77,6 +78,12 @@ const items = [
     label: "Afiliados",
     icon: Link2,
     help: "Parceiros que indicam alunos. Aqui você cadastra o afiliado, define as comissões (aluno e produtos) e acompanha/repassa os valores.",
+  },
+  {
+    to: "/admin/financeiro",
+    label: "Dados financeiros",
+    icon: Wallet,
+    help: "Configure a chave Pix e os dados bancários que aparecem na tela de pagamento dos alunos.",
   },
 ];
 

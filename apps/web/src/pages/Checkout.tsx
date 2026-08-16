@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Check, Sparkles, ShieldCheck, AlertCircle, Lock } from "lucide-react";
+import { Check, Sparkles, AlertCircle, Lock } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { MembershipPlan } from "../types";
@@ -18,7 +18,7 @@ interface CheckoutResult {
 }
 
 export function Checkout() {
-  const { user, loadProfile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const planSlug = searchParams.get("plan") ?? "";
@@ -45,9 +45,10 @@ export function Checkout() {
         method: "POST",
         body: JSON.stringify({ planId: plan.id }),
       });
-      await api(`/api/checkout/${checkout.data.orderId}/confirm`, { method: "POST" });
-      await loadProfile();
-      navigate("/dashboard", { replace: true });
+      navigate(
+        `/pagamento-pix?orderId=${checkout.data.orderId}&plan=${plan.slug}&amount=${checkout.data.amount}`,
+        { replace: true }
+      );
     } catch (err) {
       setError(err instanceof ApiRequestError ? err.message : "Erro ao processar o pagamento");
     } finally {
@@ -152,12 +153,8 @@ export function Checkout() {
           </Button>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-            <Lock className="h-3 w-3" /> Pagamento seguro · O acesso é liberado imediatamente após a
-            confirmação.
-          </p>
-          <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-            <ShieldCheck className="h-3 w-3" /> Em breve você poderá pagar com Pix ou cartão de
-            crédito.
+            <Lock className="h-3 w-3" /> Ao confirmar, você receberá os dados para pagamento via Pix.
+            O acesso é liberado após a confirmação do pagamento.
           </p>
         </CardContent>
       </Card>

@@ -10,3 +10,5 @@ settingsRouter.get("/logo", ctrl.logoGet);
 settingsRouter.get("/hero-video", ctrl.heroVideoGet);
 settingsRouter.post("/hero-video", authenticate, requireRole(Role.ADMIN), ctrl.heroVideoPost);
 settingsRouter.delete("/hero-video", authenticate, requireRole(Role.ADMIN), ctrl.heroVideoDelete);
+settingsRouter.get("/payment", ctrl.paymentGet);
+settingsRouter.post("/payment", authenticate, requireRole(Role.ADMIN), ctrl.paymentPost);

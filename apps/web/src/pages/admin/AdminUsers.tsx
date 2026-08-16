@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, Search, Link2, Trash2 } from "lucide-react";
+import { MessageCircle, Search, Link2, Trash2, CheckCircle2 } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import type { Paginated, MembershipPlan, User } from "../../types";
@@ -12,7 +12,7 @@ import { PieChart } from "../../components/ui/pie-chart";
 import { formatDate, formatPrice } from "../../lib/utils";
 import { InfoPopover } from "../../components/ui/info-popover";
 
-type StatusFilter = "" | "pagos" | "atraso" | "gratuito";
+type StatusFilter = "" | "pagos" | "atraso" | "aguardando" | "gratuito";
 
 interface PlanSummary {
   id: string;
@@ -162,12 +162,32 @@ export function AdminUsers() {
     }
   }
 
+  async function confirmPayment(user: User) {
+    if (!confirm(`Confirmar o pagamento do usuário ${user.name}? O acesso ao plano será liberado.`)) {
+      return;
+    }
+    setBusy(user.id);
+    try {
+      await api(`/api/admin/users/${user.id}/confirm-payment`, { method: "POST" });
+      setNotice(`Pagamento de ${user.name} confirmado! Acesso liberado.`);
+      setTimeout(() => setNotice(null), 3000);
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Erro ao confirmar pagamento");
+      setTimeout(() => setNotice(null), 4000);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   function paymentBadge(status?: User["paymentStatus"]) {
     switch (status) {
       case "PAGO":
         return <Badge variant="free">PAGO</Badge>;
       case "EM_ATRASO":
         return <Badge variant="danger">EM ATRASO</Badge>;
+      case "AGUARDANDO_PAGAMENTO":
+        return <Badge variant="info">AGUARDANDO PAGAMENTO</Badge>;
       default:
         return <Badge variant="outline">GRATUITO</Badge>;
     }
@@ -176,6 +196,7 @@ export function AdminUsers() {
   const tabs: { value: StatusFilter; label: string }[] = [
     { value: "", label: "Todos" },
     { value: "pagos", label: "Pagos" },
+    { value: "aguardando", label: "Aguardando pagamento" },
     { value: "atraso", label: "Em atraso" },
     { value: "gratuito", label: "Gratuitos" },
   ];
@@ -384,6 +405,18 @@ export function AdminUsers() {
                           >
                             <MessageCircle className="h-4 w-4 text-green-600" />
                           </Button>
+                          {u.paymentStatus === "AGUARDANDO_PAGAMENTO" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={busy === u.id}
+                              onClick={() => confirmPayment(u)}
+                              className="text-emerald-700"
+                              title="Confirmar pagamento via Pix"
+                            >
+                              <CheckCircle2 className="h-4 w-4" /> Confirmar pagamento
+                            </Button>
+                          )}
                           <Button
                             variant={u.isActive ? "ghost" : "outline"}
                             size="sm"

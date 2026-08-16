@@ -88,6 +88,8 @@ export async function listUsers(query: Request["query"]) {
   let filtered = items;
   if (query.status === "pagos") filtered = items.filter((u) => u.paymentStatus === "PAGO");
   if (query.status === "atraso") filtered = items.filter((u) => u.paymentStatus === "EM_ATRASO");
+  if (query.status === "aguardando")
+    filtered = items.filter((u) => u.paymentStatus === "AGUARDANDO_PAGAMENTO");
   if (query.status === "gratuito") filtered = items.filter((u) => u.paymentStatus === "GRATUITO");
 
   const total = filtered.length;
@@ -141,7 +143,7 @@ function classifyUser(u: UserBillingRow) {
   const isPremiumPlan = u.plan?.slug != null && u.plan.slug !== "gratuito";
   const now = new Date();
 
-  let paymentStatus: "PAGO" | "EM_ATRASO" | "GRATUITO" = "GRATUITO";
+  let paymentStatus: "PAGO" | "EM_ATRASO" | "AGUARDANDO_PAGAMENTO" | "GRATUITO" = "GRATUITO";
   let lastPaymentAt: string | null = null;
   let expiresAt: string | null = null;
 
@@ -150,6 +152,12 @@ function classifyUser(u: UserBillingRow) {
     lastPaymentAt = null;
     expiresAt = null;
   } else {
+    if (sub && sub.status === "PENDING") {
+      paymentStatus = "AGUARDANDO_PAGAMENTO";
+    }
+    if (order && order.status === "PENDING") {
+      paymentStatus = "AGUARDANDO_PAGAMENTO";
+    }
     if (order && order.status === "PAID") {
       paymentStatus = "PAGO";
       lastPaymentAt = order.createdAt.toISOString();
@@ -160,7 +168,9 @@ function classifyUser(u: UserBillingRow) {
       expiresAt = sub.endsAt?.toISOString() ?? null;
     }
     if (isPremiumPlan && !(order && order.status === "PAID") && !(sub && sub.status === "ACTIVE")) {
-      paymentStatus = "EM_ATRASO";
+      if (paymentStatus !== "AGUARDANDO_PAGAMENTO") {
+        paymentStatus = "EM_ATRASO";
+      }
     }
     if (sub && sub.status === "EXPIRED") {
       paymentStatus = "EM_ATRASO";
@@ -250,6 +260,96 @@ export async function setUserPlan(id: string, planId: string) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError("Usuário não encontrado");
   return prisma.user.update({ where: { id }, data: { planId } });
+}
+
+export async function confirmUserPayment(id: string) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, name: true },
+  });
+  if (!user) throw new NotFoundError("Usuário não encontrado");
+
+  const subscription = await prisma.subscription.findFirst({
+    where: { userId: id, status: "PENDING" },
+    orderBy: { createdAt: "desc" },
+    include: { plan: true },
+  });
+  if (!subscription) {
+    throw new ConflictError("Nenhuma assinatura pendente para confirmar");
+  }
+
+  const order = await prisma.order.findFirst({
+    where: { userId: id, status: "PENDING" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!order) {
+    throw new ConflictError("Nenhum pedido pendente para confirmar");
+  }
+
+  const startsAt = new Date();
+  const endsAt = addBillingPeriod(subscription.plan.billing, startsAt);
+
+  await prisma.$transaction([
+    prisma.order.update({ where: { id: order.id }, data: { status: "PAID" } }),
+    prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { status: "ACTIVE", startsAt, endsAt },
+    }),
+    prisma.user.update({ where: { id }, data: { planId: subscription.planId } }),
+  ]);
+
+  const referred = await prisma.user.findUnique({
+    where: { id },
+    select: { referredById: true },
+  });
+
+  if (referred?.referredById) {
+    const affiliate = await prisma.user.findUnique({
+      where: { id: referred.referredById },
+      select: { id: true, isAffiliate: true, commissionRate: true },
+    });
+    if (affiliate?.isAffiliate) {
+      const existing = await prisma.affiliateCommission.findFirst({
+        where: {
+          affiliateId: affiliate.id,
+          referredUserId: id,
+          status: "PENDING",
+        },
+      });
+      if (!existing) {
+        const amount = Math.round(Number(order.total) * Number(affiliate.commissionRate)) / 100;
+        await prisma.affiliateCommission.create({
+          data: {
+            affiliateId: affiliate.id,
+            referredUserId: id,
+            amount,
+            percent: Number(affiliate.commissionRate),
+            source: "PLAN",
+            planName: subscription.plan.name,
+          },
+        });
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    userId: id,
+    planId: subscription.planId,
+    planName: subscription.plan.name,
+    startsAt: startsAt.toISOString(),
+    endsAt: endsAt.toISOString(),
+  };
+}
+
+function addBillingPeriod(billing: "MONTHLY" | "YEARLY", from: Date) {
+  const date = new Date(from);
+  if (billing === "YEARLY") {
+    date.setFullYear(date.getFullYear() + 1);
+  } else {
+    date.setMonth(date.getMonth() + 1);
+  }
+  return date;
 }
 
 export async function updateUserContact(id: string, data: { phone?: string | null }) {
