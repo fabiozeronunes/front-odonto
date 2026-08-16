@@ -39,7 +39,7 @@ export function Plans() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-[95%] px-4 py-14 sm:px-6">
+    <div className="mx-auto max-w-[99%] px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
         <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
           <Sparkles className="h-3 w-3" /> Planos de assinatura
@@ -53,20 +53,20 @@ export function Plans() {
       </div>
 
       {loading ? (
-        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-4 lg:gap-6">
+        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-3 lg:gap-5">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : (
-        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-4 lg:gap-6">
+        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-3 lg:gap-5">
           {plans.map((plan) => {
             const isPremium = plan.slug === "odontus-premium";
             const isVip = plan.slug === "odontus-vip";
             return (
               <Card
                 key={plan.id}
-                className={`relative flex flex-col transition-all hover:-translate-y-1 hover:shadow-lift ${
+                className={`relative flex min-w-0 flex-col overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lift ${
                   isPremium
                     ? "border-primary-600 ring-2 ring-primary-600/20 dark:border-primary-400"
                     : ""
@@ -96,7 +96,7 @@ export function Plans() {
                 <CardHeader>
                   <CardTitle className="text-xl">{PLAN_TITLE[plan.slug] ?? plan.name}</CardTitle>
                   {plan.description && (
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm break-words text-muted-foreground">{plan.description}</p>
                   )}
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
@@ -131,7 +131,7 @@ export function Plans() {
                   <ul className="mt-6 flex-1 space-y-3">
                     {Array.isArray(plan.benefits) &&
                       plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <li key={i} className="flex min-w-0 items-start gap-2 text-sm break-words text-muted-foreground">
                           <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
                           {benefit}
                         </li>
