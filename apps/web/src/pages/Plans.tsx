@@ -53,13 +53,13 @@ export function Plans() {
       </div>
 
       {loading ? (
-        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-3 lg:gap-5">
+        <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-3 lg:gap-5">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : (
-        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-3 lg:gap-5">
+        <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-3 lg:gap-5">
           {plans.map((plan) => {
             const isPremium = plan.slug === "odontus-premium";
             const isVip = plan.slug === "odontus-vip";
