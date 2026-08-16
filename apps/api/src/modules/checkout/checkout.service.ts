@@ -123,3 +123,44 @@ export async function confirmCheckout(userId: string, orderId: string) {
     endsAt: endsAt.toISOString(),
   };
 }
+
+export async function getMyFinance(userId: string) {
+  const [subscriptions, orders] = await Promise.all([
+    prisma.subscription.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        status: true,
+        startsAt: true,
+        endsAt: true,
+        createdAt: true,
+        plan: {
+          select: { id: true, name: true, slug: true, price: true, billing: true },
+        },
+      },
+    }),
+    prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        status: true,
+        subtotal: true,
+        discount: true,
+        total: true,
+        createdAt: true,
+        items: {
+          select: {
+            id: true,
+            quantity: true,
+            unitPrice: true,
+            product: { select: { id: true, name: true, slug: true } },
+          },
+        },
+      },
+    }),
+  ]);
+
+  return { subscriptions, orders };
+}

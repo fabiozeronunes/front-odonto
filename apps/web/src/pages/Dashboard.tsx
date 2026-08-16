@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
@@ -88,6 +88,11 @@ export function Dashboard() {
           <Link to="/perfil">
             <Button variant="outline">
               <User className="h-4 w-4" /> Perfil
+            </Button>
+          </Link>
+          <Link to="/financeiro">
+            <Button variant="outline">
+              <Wallet className="h-4 w-4" /> Dados financeiros
             </Button>
           </Link>
           <Button variant="outline" onClick={logout} className="text-red-600 hover:text-red-700">

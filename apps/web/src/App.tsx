@@ -23,6 +23,7 @@ import { Commissions } from "./pages/Commissions";
 import { Favorites } from "./pages/Favorites";
 import { Legal } from "./pages/Legal";
 import { Profile } from "./pages/Profile";
+import { Financeiro } from "./pages/Financeiro";
 import { MyContent } from "./pages/my/MyContent";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -112,6 +113,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/financeiro"
+            element={
+              <ProtectedRoute>
+                <Financeiro />
               </ProtectedRoute>
             }
           />

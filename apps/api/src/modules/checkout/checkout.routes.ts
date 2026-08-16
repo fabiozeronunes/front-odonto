@@ -10,3 +10,4 @@ checkoutRouter.use(authenticate);
 
 checkoutRouter.post("/", validate(createCheckoutSchema), ctrl.create);
 checkoutRouter.post("/:orderId/confirm", ctrl.confirm);
+checkoutRouter.get("/me", ctrl.myFinance);
