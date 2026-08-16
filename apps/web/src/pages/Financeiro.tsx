@@ -9,9 +9,11 @@ import {
   AlertCircle,
   ArrowRight,
   CalendarDays,
+  ShoppingCart,
 } from "lucide-react";
 import { api } from "../lib/api";
 import { formatDate, formatPrice } from "../lib/utils";
+import { useCart } from "../lib/cart";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -89,6 +91,7 @@ function orderStatusBadge(status: FinanceData["orders"][0]["status"]) {
 export function Financeiro() {
   const [data, setData] = useState<FinanceData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { items: cartItems, total: cartTotal } = useCart();
 
   useEffect(() => {
     api<{ data: FinanceData }>("/api/checkout/me")
@@ -213,6 +216,41 @@ export function Financeiro() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {cartItems.length > 0 && (
+              <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+                <p className="flex items-center gap-2 text-sm font-bold text-amber-900">
+                  <ShoppingCart className="h-4 w-4" /> Itens no carrinho (aguardando pagamento)
+                </p>
+                <div className="mt-2 space-y-1">
+                  {cartItems.map((item) => (
+                    <div
+                      key={item.productId}
+                      className="flex items-center justify-between text-sm text-amber-800"
+                    >
+                      <span>
+                        {item.name} <span className="text-xs">× {item.quantity}</span>
+                      </span>
+                      <span className="font-medium">
+                        {formatPrice(
+                          (item.promoPrice && item.promoPrice < item.price ? item.promoPrice : item.price) *
+                            item.quantity
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center justify-between border-t border-amber-200 pt-2 text-sm">
+                  <span className="text-muted-foreground">Total a pagar</span>
+                  <span className="font-bold text-foreground">{formatPrice(cartTotal)}</span>
+                </div>
+                <Link to="/carrinho" className="mt-3 block">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Finalizar pagamento dos itens <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+
             {shopOrders.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Você ainda não fez compras na Shop Odontus.
