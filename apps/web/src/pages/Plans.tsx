@@ -89,7 +89,7 @@ export function Plans() {
                 {!isVip && !isPremium && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge variant="gradientTeal" className="rounded-2xl">
-                      GRATUITO
+                      COMECE GRÁTIS
                     </Badge>
                   </div>
                 )}
