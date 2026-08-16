@@ -49,10 +49,7 @@ export function Login() {
             <GraduationCap className="h-6 w-6" />
           </span>
         )}
-        <p className="mt-2 text-lg font-bold text-foreground">
-          Front<span className="text-primary-700">Odontus</span>
-        </p>
-        <h1 className="mt-1 font-display text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
+        <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
         <p className="mt-1 text-sm text-muted-foreground">Entre para acessar sua área de estudos</p>
       </div>
 
