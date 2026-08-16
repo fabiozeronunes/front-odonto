@@ -14,6 +14,7 @@ interface PaymentSettings {
   agency?: string;
   account?: string;
   beneficiary?: string;
+  cpfCnpj?: string;
   instructions?: string;
 }
 
@@ -124,6 +125,13 @@ export function PixPayment() {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <UserIcon className="h-4 w-4 shrink-0" />
                       Beneficiário: {settings.beneficiary}
+                    </div>
+                  )}
+
+                  {settings.cpfCnpj && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <UserIcon className="h-4 w-4 shrink-0" />
+                      CPF/CNPJ: {settings.cpfCnpj}
                     </div>
                   )}
 

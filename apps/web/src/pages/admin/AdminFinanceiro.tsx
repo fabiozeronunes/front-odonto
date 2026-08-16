@@ -15,6 +15,7 @@ interface PaymentSettings {
   agency?: string;
   account?: string;
   beneficiary?: string;
+  cpfCnpj?: string;
   instructions?: string;
 }
 
@@ -121,6 +122,16 @@ export function AdminFinanceiro() {
                 placeholder="Nome da pessoa/empresa que recebe"
                 value={form.beneficiary ?? ""}
                 onChange={(e) => update("beneficiary", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="cpfCnpj">CPF / CNPJ</Label>
+              <Input
+                id="cpfCnpj"
+                placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                value={form.cpfCnpj ?? ""}
+                onChange={(e) => update("cpfCnpj", e.target.value)}
               />
             </div>
           </CardContent>
