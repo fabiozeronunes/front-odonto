@@ -8,6 +8,7 @@ import { VideoCard } from "../components/VideoCard";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { Button } from "../components/ui/button";
+import { useMediaQuery } from "../lib/useMediaQuery";
 import { Badge } from "../components/ui/badge";
 import { formatPrice, resolveImageUrl, cn } from "../lib/utils";
 
@@ -17,16 +18,17 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
-  const [rows, setRows] = useState<"2" | "3">(() => {
+  const isTablet = useMediaQuery("(min-width: 768px)");
+  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
     try {
-      return localStorage.getItem("odonto_dashboard_sale_rows") === "2" ? "2" : "3";
+      return localStorage.getItem("odonto_dashboard_sale_rows") === "1" ? "1" : "3";
     } catch {
       return "3";
     }
   });
   const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
 
-  function changeRows(value: "2" | "3") {
+  function changeRows(value: "1" | "2" | "3") {
     setRows(value);
     try {
       localStorage.setItem("odonto_dashboard_sale_rows", value);
@@ -34,6 +36,8 @@ export function Dashboard() {
       /* ignore */
     }
   }
+
+  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
 
   useEffect(() => {
     api<Paginated<{ watchedAt: string; video: Video }>>("/api/videos/me/history?perPage=6")
@@ -164,17 +168,17 @@ export function Dashboard() {
         <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted-foreground">Produtos por linha:</span>
           <div className="inline-flex overflow-hidden rounded-lg border border-border">
-            {(["2", "3"] as const).map((value) => (
+            {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => changeRows(value)}
                 className={cn(
                   "px-4 py-1.5 font-semibold transition-colors",
-                  rows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
+                  activeRows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
                 )}
               >
-                {value} produtos
+                {value} produto{value === "2" || value === "3" ? "s" : ""}
               </button>
             ))}
           </div>
@@ -195,7 +199,11 @@ export function Dashboard() {
           <div
             className={cn(
               "grid gap-4 sm:gap-6",
-              rows === "3" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2"
+              activeRows === "2"
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2"
+                : activeRows === "3"
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : "mx-auto max-w-2xl grid-cols-1"
             )}
           >
             {saleProducts.map((p) => {

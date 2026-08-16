@@ -8,6 +8,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
+import { useMediaQuery } from "../lib/useMediaQuery";
 
 const PER_PAGE = 9;
 
@@ -24,15 +25,16 @@ export function Shop() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [added, setAdded] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<"1" | "2">(() => {
+  const isTablet = useMediaQuery("(min-width: 768px)");
+  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "3";
     } catch {
-      return "2";
+      return "3";
     }
   });
 
-  function changeRows(value: "1" | "2") {
+  function changeRows(value: "1" | "2" | "3") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -40,6 +42,8 @@ export function Shop() {
       /* ignore */
     }
   }
+
+  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
 
   useEffect(() => {
     api<{ data: ProductCategory[] }>("/api/products/categories")
@@ -162,17 +166,17 @@ export function Shop() {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         <span className="text-muted-foreground">Produtos por linha:</span>
         <div className="inline-flex overflow-hidden rounded-lg border border-border">
-          {(["1", "2"] as const).map((value) => (
+          {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
             <button
               key={value}
               type="button"
               onClick={() => changeRows(value)}
               className={cn(
                 "px-4 py-1.5 font-semibold transition-colors",
-                rows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
+                activeRows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
               )}
             >
-              {value} produtos
+              {value} produto{value === "2" ? "s" : value === "3" ? "s" : ""}
             </button>
           ))}
         </div>
@@ -193,7 +197,11 @@ export function Shop() {
         <div
           className={cn(
             "mt-8 grid gap-4 sm:gap-6",
-            rows === "2" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2" : "mx-auto max-w-2xl grid-cols-1"
+            activeRows === "2"
+              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2"
+              : activeRows === "3"
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              : "mx-auto max-w-2xl grid-cols-1"
           )}
         >
           {products.map((p) => {
