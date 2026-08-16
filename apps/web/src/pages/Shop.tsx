@@ -198,9 +198,9 @@ export function Shop() {
           className={cn(
             "mt-8 grid gap-4 sm:gap-6",
             activeRows === "2"
-              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-2"
+              ? "grid-cols-2"
               : activeRows === "3"
-              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              ? "grid-cols-2 md:grid-cols-3"
               : "mx-auto max-w-2xl grid-cols-1"
           )}
         >
