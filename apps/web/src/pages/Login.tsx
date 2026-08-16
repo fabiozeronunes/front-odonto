@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { GraduationCap, AlertCircle } from "lucide-react";
+import { AlertCircle, GraduationCap } from "lucide-react";
 import { useAuth } from "../lib/auth";
+import { useSiteLogo } from "../lib/useSiteLogo";
 import { ApiRequestError } from "../lib/api";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -12,6 +13,7 @@ export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const logoUrl = useSiteLogo();
   const from = (location.state as { from?: string })?.from ?? "/dashboard";
 
   const [email, setEmail] = useState("");
@@ -36,9 +38,17 @@ export function Login() {
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-16">
       <div className="mb-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-700 text-primary-foreground">
-          <GraduationCap className="h-6 w-6" />
-        </span>
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt="OdontoStudy"
+            className="mx-auto h-auto w-56 max-w-full object-contain"
+          />
+        ) : (
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-700 text-primary-foreground">
+            <GraduationCap className="h-6 w-6" />
+          </span>
+        )}
         <p className="mt-2 text-lg font-bold text-foreground">
           Front<span className="text-primary-700">Odontus</span>
         </p>
