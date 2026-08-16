@@ -186,6 +186,7 @@ function classifyUser(u: UserBillingRow) {
     id: u.id,
     name: u.name,
     email: u.email,
+    registrationNumber: u.registrationNumber,
     phone: u.phone,
     role: u.role,
     isActive: u.isActive,
