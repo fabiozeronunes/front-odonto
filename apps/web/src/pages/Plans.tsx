@@ -66,7 +66,7 @@ export function Plans() {
             return (
               <Card
                 key={plan.id}
-                className={`relative flex min-w-0 flex-col overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lift ${
+                className={`relative flex min-w-0 flex-col transition-all hover:-translate-y-1 hover:shadow-lift ${
                   isPremium
                     ? "border-primary-600 ring-2 ring-primary-600/20 dark:border-primary-400"
                     : ""
@@ -106,12 +106,12 @@ export function Plans() {
                         Anual
                       </p>
                       <div className="mt-1 flex items-baseline gap-1">
-                        <span className="font-display text-4xl font-bold text-foreground">
+                        <span className="font-display text-3xl font-bold text-foreground">
                           {formatPrice(plan.price)}
                         </span>
                         <span className="text-sm text-muted-foreground">/ ano</span>
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         sai a{" "}
                         <span className="font-semibold text-foreground">
                           {formatPrice(Number(plan.price) / 12)}
@@ -121,7 +121,7 @@ export function Plans() {
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-1">
-                      <span className="font-display text-4xl font-bold text-foreground">
+                      <span className="font-display text-3xl font-bold text-foreground">
                         {formatPrice(plan.price)}
                       </span>
                       <span className="text-sm text-muted-foreground">/ mês</span>
