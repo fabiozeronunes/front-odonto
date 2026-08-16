@@ -39,7 +39,7 @@ export function Plans() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-[90%] px-4 py-14 sm:px-6">
+    <div className="mx-auto max-w-[95%] px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
         <Badge className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
           <Sparkles className="h-3 w-3" /> Planos de assinatura
@@ -53,13 +53,13 @@ export function Plans() {
       </div>
 
       {loading ? (
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-4 lg:gap-6">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : (
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-4 lg:gap-6">
           {plans.map((plan) => {
             const isPremium = plan.slug === "odontus-premium";
             const isVip = plan.slug === "odontus-vip";
