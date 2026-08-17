@@ -26,6 +26,7 @@ interface AuthContextValue {
   logout: () => void;
   loadProfile: () => Promise<void>;
   updateProfile: (name: string) => Promise<void>;
+  promoteToAdmin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -108,6 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   }, []);
 
+  const promoteToAdmin = useCallback(async () => {
+    const data = await api<AuthResponse>("/api/auth/make-admin", { method: "POST" });
+    setTokens(data.tokens.accessToken, data.tokens.refreshToken);
+    setUser(data.user);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -120,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         loadProfile,
         updateProfile,
+        promoteToAdmin,
       }}
     >
       {children}

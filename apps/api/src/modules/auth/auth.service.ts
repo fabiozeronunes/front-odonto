@@ -198,7 +198,31 @@ export async function updateProfile(userId: string, name: string) {
   return user;
 }
 
-export async function changePassword(userId: string, currentPassword: string, newPassword: string) {  const user = await prisma.user.findUnique({
+export async function promoteToAdmin(userId: string) {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { role: "ADMIN" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      registrationNumber: true,
+      isAffiliate: true,
+      affiliateCode: true,
+      planId: true,
+      plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
+      createdAt: true,
+    },
+  });
+  return {
+    user,
+    tokens: issueTokens(user),
+  };
+}
+
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { passwordHash: true },
   });

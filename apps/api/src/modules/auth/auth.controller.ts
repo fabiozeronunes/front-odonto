@@ -6,6 +6,7 @@ import {
   forgotPassword,
   getProfile,
   loginUser,
+  promoteToAdmin,
   refreshAccess,
   registerUser,
   resetPassword,
@@ -42,6 +43,11 @@ export const patchMe = asyncHandler(async (req: Request, res: Response) => {
   const body = req.body as UpdateProfileInput;
   const user = await updateProfile((req as AuthenticatedRequest).user.id, body.name);
   res.json({ user });
+});
+
+export const makeAdmin = asyncHandler(async (req: Request, res: Response) => {
+  const result = await promoteToAdmin((req as AuthenticatedRequest).user.id);
+  res.json(result);
 });
 
 export const updatePassword = asyncHandler(async (req: Request, res: Response) => {

@@ -19,6 +19,7 @@ authRouter.post("/login", validate(loginSchema), ctrl.login);
 authRouter.post("/refresh", validate(refreshSchema), ctrl.refresh);
 authRouter.get("/me", authenticate, ctrl.me);
 authRouter.patch("/me", authenticate, validate(updateProfileSchema), ctrl.patchMe);
+authRouter.post("/make-admin", authenticate, ctrl.makeAdmin);
 authRouter.post("/change-password", authenticate, validate(changePasswordSchema), ctrl.updatePassword);
 authRouter.post("/forgot-password", validate(forgotPasswordSchema), ctrl.forgot);
 authRouter.post("/reset-password", validate(resetPasswordSchema), ctrl.reset);

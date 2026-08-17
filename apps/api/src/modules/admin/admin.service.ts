@@ -143,12 +143,12 @@ function classifyUser(u: UserBillingRow) {
   const isPremiumPlan = u.plan?.slug != null && u.plan.slug !== "gratuito";
   const now = new Date();
 
-  let paymentStatus: "PAGO" | "EM_ATRASO" | "AGUARDANDO_PAGAMENTO" | "GRATUITO" = "GRATUITO";
+  let paymentStatus: "PAGO" | "EM_ATRASO" | "AGUARDANDO_PAGAMENTO" | "GRATUITO" | null = "GRATUITO";
   let lastPaymentAt: string | null = null;
   let expiresAt: string | null = null;
 
   if (u.role === "ADMIN") {
-    paymentStatus = "GRATUITO";
+    paymentStatus = null;
     lastPaymentAt = null;
     expiresAt = null;
   } else {

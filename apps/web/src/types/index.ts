@@ -204,7 +204,7 @@ export interface User {
   role: Role;
   isActive?: boolean;
   plan?: { id: string; name: string; slug: string; price: string | number; billing: BillingPeriod };
-  paymentStatus?: "PAGO" | "EM_ATRASO" | "AGUARDANDO_PAGAMENTO" | "GRATUITO";
+  paymentStatus?: "PAGO" | "EM_ATRASO" | "AGUARDANDO_PAGAMENTO" | "GRATUITO" | null;
   lastPaymentAt?: string | null;
   expiresAt?: string | null;
   subscriptionStatus?: string | null;

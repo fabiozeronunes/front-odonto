@@ -26,7 +26,7 @@ export function Dashboard() {
       return "3";
     }
   });
-  const isPremium = !!user?.plan && user.plan.slug !== "gratuito";
+  const isPremium = user?.role === "ADMIN" || (!!user?.plan && user.plan.slug !== "gratuito");
 
   function changeRows(value: "1" | "2" | "3") {
     setRows(value);

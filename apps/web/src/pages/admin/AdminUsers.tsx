@@ -180,8 +180,11 @@ export function AdminUsers() {
     }
   }
 
-  function paymentBadge(status?: User["paymentStatus"]) {
-    switch (status) {
+  function paymentBadge(user: User) {
+    if (user.role === "ADMIN" || user.paymentStatus == null) {
+      return <Badge variant="default">ADMIN</Badge>;
+    }
+    switch (user.paymentStatus) {
       case "PAGO":
         return <Badge variant="free">PAGO</Badge>;
       case "EM_ATRASO":
@@ -367,7 +370,7 @@ export function AdminUsers() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex flex-col gap-1">
-                          {paymentBadge(u.paymentStatus)}
+                          {paymentBadge(u)}
                           {u.lastPaymentAt && (
                             <span className="text-[11px] text-slate-400">
                               pago em {formatDate(u.lastPaymentAt)}
@@ -405,7 +408,7 @@ export function AdminUsers() {
                           >
                             <MessageCircle className="h-4 w-4 text-green-600" />
                           </Button>
-                          {u.paymentStatus === "AGUARDANDO_PAGAMENTO" && (
+                          {u.role !== "ADMIN" && u.paymentStatus === "AGUARDANDO_PAGAMENTO" && (
                             <Button
                               variant="outline"
                               size="sm"
