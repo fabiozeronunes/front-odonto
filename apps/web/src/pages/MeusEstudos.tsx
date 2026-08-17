@@ -23,8 +23,8 @@ export function MeusEstudos() {
 
   function load() {
     setLoading(true);
-    api<StudyResource[]>("/api/study/me")
-      .then((d) => setResources(d))
+    api<{ data: StudyResource[] }>("/api/study/me")
+      .then((d) => setResources(d.data))
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar seus estudos"))
       .finally(() => setLoading(false));
   }

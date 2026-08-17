@@ -47,16 +47,16 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
 
   function load() {
     setLoading(true);
-    api<StudyResource[]>(`/api/study/video/${videoId}`)
-      .then((d) => setResources(d))
+    api<{ data: StudyResource[] }>(`/api/study/video/${videoId}`)
+      .then((d) => setResources(d.data))
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar estudos"))
       .finally(() => setLoading(false));
   }
 
   useEffect(() => {
     load();
-    api<{ hasKey: boolean }>("/api/study/gemini-key")
-      .then((d) => setHasKey(d.hasKey))
+    api<{ data: { hasKey: boolean } }>("/api/study/gemini-key")
+      .then((d) => setHasKey(d.data.hasKey))
       .catch(() => setHasKey(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
