@@ -21,6 +21,8 @@ export function StudyResourceRenderer({ resource }: { resource: StudyResource })
     case "RESUMO":
     case "AUDIO_RESUMO":
       return <SummaryView content={content} />;
+    case "TRANSCRICAO":
+      return <TranscriptView content={content} />;
     default:
       return (
         <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
@@ -199,6 +201,16 @@ function InfoView({ content }: { content: Record<string, unknown> }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function TranscriptView({ content }: { content: Record<string, unknown> }) {
+  const text = (content.text as string) ?? (content.raw as string) ?? "";
+  if (!text) return <p className="text-sm text-muted-foreground">Sem transcrição.</p>;
+  return (
+    <p className="max-h-96 overflow-auto whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+      {text}
+    </p>
   );
 }
 

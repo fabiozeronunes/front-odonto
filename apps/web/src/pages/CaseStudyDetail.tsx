@@ -5,6 +5,7 @@ import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { CaseStudy, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
+import { StudySection } from "../components/StudySection";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { resolveImageUrl } from "../lib/utils";
@@ -158,6 +159,10 @@ export function CaseStudyDetail() {
           </div>
         )}
       </div>
+
+      {isAuthenticated && (data.isFree || hasPremiumAccess(user)) && (
+        <StudySection caseStudyId={data.id} caseTitle={data.title} />
+      )}
 
       {data.videoCases.length > 0 && (
         <section className="mt-10">

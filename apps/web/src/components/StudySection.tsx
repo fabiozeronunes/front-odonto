@@ -7,6 +7,7 @@ import {
   Heart,
   LayoutList,
   Loader2,
+  ListChecks,
   Send,
   Sparkles,
   Trash2,
@@ -34,10 +35,20 @@ const STATUS_LABEL: Record<string, string> = {
   REJEITADO: "Rejeitado",
 };
 
-export function StudySection({ videoId, videoTitle }: { videoId: string; videoTitle: string }) {
+export function StudySection({
+  videoId,
+  videoTitle,
+  caseStudyId,
+  caseTitle,
+}: {
+  videoId?: string;
+  videoTitle?: string;
+  caseStudyId?: string;
+  caseTitle?: string;
+}) {
   const [resources, setResources] = useState<StudyResource[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState<StudyResourceType | null>(null);
+  const [generating, setGenerating] = useState<StudyResourceType | "ALL" | "TRANSCRICAO" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showKeyForm, setShowKeyForm] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -45,9 +56,14 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
   const [hasKey, setHasKey] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const title = videoTitle ?? caseTitle ?? "";
+
   function load() {
     setLoading(true);
-    api<{ data: StudyResource[] }>(`/api/study/video/${videoId}`)
+    const url = videoId
+      ? `/api/study/video/${videoId}`
+      : `/api/study/case/${caseStudyId}`;
+    api<{ data: StudyResource[] }>(url)
       .then((d) => setResources(d.data))
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar estudos"))
       .finally(() => setLoading(false));
@@ -59,20 +75,61 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
       .then((d) => setHasKey(d.data.hasKey))
       .catch(() => setHasKey(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId]);
+  }, [videoId, caseStudyId]);
 
-  async function generate(type: StudyResourceType) {
+  async function generate(type: StudyResourceType, useTranscription = false) {
     setError(null);
     setGenerating(type);
     try {
       const res = await api<StudyResource>(`/api/study/generate`, {
         method: "POST",
-        body: JSON.stringify({ videoId, type }),
+        body: JSON.stringify({
+          ...(videoId ? { videoId } : { caseStudyId }),
+          type,
+          useTranscription,
+        }),
       });
       setResources((prev) => [res, ...prev]);
       setOpenId(res.id);
     } catch (e) {
       setError(e instanceof ApiRequestError ? e.message : "Erro ao gerar estudo");
+    } finally {
+      setGenerating(null);
+    }
+  }
+
+  async function generateAll() {
+    setError(null);
+    setGenerating("ALL");
+    try {
+      const res = await api<StudyResource[]>(`/api/study/generate-all`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...(videoId ? { videoId } : { caseStudyId }),
+          generateAll: true,
+        }),
+      });
+      setResources((prev) => [...res, ...prev]);
+      if (res.length > 0) setOpenId(res[0].id);
+    } catch (e) {
+      setError(e instanceof ApiRequestError ? e.message : "Erro ao gerar todos os estudos");
+    } finally {
+      setGenerating(null);
+    }
+  }
+
+  async function transcribe() {
+    setError(null);
+    setGenerating("TRANSCRICAO");
+    try {
+      const res = await api<StudyResource>(`/api/study/transcribe`, {
+        method: "POST",
+        body: JSON.stringify(videoId ? { videoId } : { caseStudyId }),
+      });
+      setResources((prev) => [res, ...prev]);
+      setOpenId(res.id);
+    } catch (e) {
+      setError(e instanceof ApiRequestError ? e.message : "Erro ao transcrever");
     } finally {
       setGenerating(null);
     }
@@ -134,8 +191,8 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">
-        Gere materiais de estudo personalizados sobre este vídeo usando IA. Os recursos ficam salvos
-        na sua área pessoal.
+        Transcreva o conteúdo e gere materiais de estudo personalizados usando IA. Os recursos ficam
+        salvos na sua área pessoal.
       </p>
 
       {showKeyForm && (
@@ -174,6 +231,38 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          disabled={generating !== null || !hasKey}
+          onClick={transcribe}
+          title="Transcrever o áudio/vídeo deste conteúdo"
+        >
+          {generating === "TRANSCRICAO" ? <Loader2 className="animate-spin" /> : <Headphones className="h-4 w-4" />}
+          {generating === "TRANSCRICAO" ? "Transcrevendo..." : "Transcrever"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={generating !== null || !hasKey}
+          onClick={() => generate("RESUMO", true)}
+          title="Gerar resumo baseado na transcrição do conteúdo"
+        >
+          {generating === "RESUMO" ? <Loader2 className="animate-spin" /> : <FileText className="h-4 w-4" />}
+          {generating === "RESUMO" ? "Gerando..." : "Resumo da transcrição"}
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={generating !== null || !hasKey}
+          onClick={generateAll}
+          title="Gerar todos os materiais de uma vez (resumo, quiz, flashcards, questionário, mapa mental e infográfico)"
+        >
+          {generating === "ALL" ? <Loader2 className="animate-spin" /> : <ListChecks className="h-4 w-4" />}
+          {generating === "ALL" ? "Gerando todos..." : "Gerar tudo"}
+        </Button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
         {TYPES.map(({ type, label, icon: Icon }) => (
           <Button
             key={type}
@@ -214,15 +303,17 @@ export function StudySection({ videoId, videoTitle }: { videoId: string; videoTi
           )}
           {resources.length === 0 && (
             <p className="mt-5 rounded-lg bg-muted/50 px-3 py-6 text-center text-sm text-muted-foreground">
-              Nenhum material de estudo por aqui ainda. Escolha um tipo acima para começar.
+              Nenhum material de estudo por aqui ainda. Transcreva o conteúdo ou escolha um tipo acima para começar.
             </p>
           )}
         </>
       )}
 
-      <p className="mt-4 text-xs text-muted-foreground">
-        <span className="font-medium text-foreground">{videoTitle}</span>
-      </p>
+      {title && (
+        <p className="mt-4 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{title}</span>
+        </p>
+      )}
     </div>
   );
 }
@@ -261,6 +352,11 @@ function ResourceGroup({
                 {r.type === "AUDIO_RESUMO" && r.audioUrl ? (
                   <span className="flex items-center gap-1">
                     <Headphones className="h-4 w-4" /> Áudio
+                  </span>
+                ) : null}
+                {r.type === "TRANSCRICAO" ? (
+                  <span className="flex items-center gap-1 text-primary-700">
+                    <Headphones className="h-4 w-4" /> Transcrição
                   </span>
                 ) : null}
                 {typeof r.votes === "number" ? (

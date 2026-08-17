@@ -6,6 +6,20 @@ import type { Prisma } from "@prisma/client";
 import type { SaveResourceInput, GenerateResourceInput } from "./study.validators.js";
 
 const ALGO = "aes-256-gcm";
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
+const GEMINI_MODEL = "gemini-2.0-flash";
+const GENERATABLE_TYPES = ["QUIZ", "FLASHCARDS", "QUESTIONARIO", "MIND_MAP", "INFOGRAPHIC", "RESUMO"] as const;
+type GeneratableType = (typeof GENERATABLE_TYPES)[number];
+
+const YOUTUBE_ID_REGEX =
+  /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/;
+
+function toWatchUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = url.match(YOUTUBE_ID_REGEX) ?? url.match(/^([\w-]{11})$/);
+  if (!match) return null;
+  return `https://www.youtube.com/watch?v=${match[1]}`;
+}
 
 function encryptionKey(): Buffer {
   return crypto.createHash("sha256").update(env.jwtSecret).digest();
@@ -43,12 +57,19 @@ export async function getMyGeminiKey(userId: string) {
 }
 
 export async function saveResource(userId: string, input: SaveResourceInput) {
-  const video = await prisma.video.findUnique({ where: { id: input.videoId }, select: { id: true } });
-  if (!video) throw new NotFoundError("Vídeo não encontrado");
+  if (input.videoId) {
+    const video = await prisma.video.findUnique({ where: { id: input.videoId }, select: { id: true } });
+    if (!video) throw new NotFoundError("Vídeo não encontrado");
+  }
+  if (input.caseStudyId) {
+    const cs = await prisma.caseStudy.findUnique({ where: { id: input.caseStudyId }, select: { id: true } });
+    if (!cs) throw new NotFoundError("Estudo de caso não encontrado");
+  }
 
   return prisma.studyResource.create({
     data: {
-      videoId: input.videoId,
+      videoId: input.videoId ?? null,
+      caseStudyId: input.caseStudyId ?? null,
       authorId: userId,
       type: input.type,
       title: input.title,
@@ -73,10 +94,23 @@ export async function listMyResources(userId: string) {
       createdAt: true,
       updatedAt: true,
       video: { select: { id: true, title: true, slug: true, thumbnailUrl: true } },
+      caseStudy: { select: { id: true, title: true, slug: true } },
       _count: { select: { votes: true } },
     },
   });
 }
+
+const resourceSelect = {
+  id: true,
+  type: true,
+  status: true,
+  title: true,
+  content: true,
+  audioUrl: true,
+  createdAt: true,
+  author: { select: { id: true, name: true } },
+  _count: { select: { votes: true } },
+} as const;
 
 export async function listVideoResources(userId: string, videoId: string) {
   const video = await prisma.video.findUnique({ where: { id: videoId }, select: { id: true } });
@@ -85,17 +119,25 @@ export async function listVideoResources(userId: string, videoId: string) {
   const resources = await prisma.studyResource.findMany({
     where: { videoId, OR: [{ status: "PUBLICADO" }, { authorId: userId }] },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      type: true,
-      status: true,
-      title: true,
-      content: true,
-      audioUrl: true,
-      createdAt: true,
-      author: { select: { id: true, name: true } },
-      _count: { select: { votes: true } },
-    },
+    select: resourceSelect,
+  });
+
+  return resources.map((r) => ({
+    ...r,
+    mine: r.author.id === userId,
+    votes: r._count.votes,
+    _count: undefined,
+  }));
+}
+
+export async function listCaseResources(userId: string, caseStudyId: string) {
+  const cs = await prisma.caseStudy.findUnique({ where: { id: caseStudyId }, select: { id: true } });
+  if (!cs) throw new NotFoundError("Estudo de caso não encontrado");
+
+  const resources = await prisma.studyResource.findMany({
+    where: { caseStudyId, OR: [{ status: "PUBLICADO" }, { authorId: userId }] },
+    orderBy: [{ status: "desc" }, { createdAt: "desc" }],
+    select: resourceSelect,
   });
 
   return resources.map((r) => ({
@@ -159,13 +201,26 @@ export async function voteResource(userId: string, resourceId: string, value: nu
   return { ok: true };
 }
 
-async function buildContext(videoId: string) {
+type StudyContext = {
+  type: "video" | "case";
+  id: string;
+  titulo: string;
+  descricao: string;
+  observacoes: string;
+  especialidade: string;
+  tags: string;
+  casosRelacionados: string[];
+  mediaUrl: string | null;
+};
+
+async function buildVideoContext(videoId: string): Promise<StudyContext> {
   const video = await prisma.video.findUnique({
     where: { id: videoId },
     select: {
       title: true,
       description: true,
       observations: true,
+      videoUrl: true,
       specialty: { select: { name: true } },
       tags: { select: { tag: { select: { name: true } } } },
       caseStudies: {
@@ -178,6 +233,8 @@ async function buildContext(videoId: string) {
   if (!video) throw new NotFoundError("Vídeo não encontrado");
 
   return {
+    type: "video",
+    id: videoId,
     titulo: video.title,
     descricao: video.description ?? "",
     observacoes: video.observations ?? "",
@@ -186,6 +243,36 @@ async function buildContext(videoId: string) {
     casosRelacionados: video.caseStudies.map(
       (c) => `${c.caseStudy.title}: ${c.caseStudy.description ?? ""} ${c.caseStudy.diagnosis ?? ""}`
     ),
+    mediaUrl: video.videoUrl ?? null,
+  };
+}
+
+async function buildCaseContext(caseStudyId: string): Promise<StudyContext> {
+  const cs = await prisma.caseStudy.findUnique({
+    where: { id: caseStudyId },
+    select: {
+      title: true,
+      description: true,
+      diagnosis: true,
+      observations: true,
+      audioUrl: true,
+      audioTitle: true,
+      specialty: { select: { name: true } },
+      tags: { select: { tag: { select: { name: true } } } },
+    },
+  });
+  if (!cs) throw new NotFoundError("Estudo de caso não encontrado");
+
+  return {
+    type: "case",
+    id: caseStudyId,
+    titulo: cs.title,
+    descricao: cs.description ?? "",
+    observacoes: cs.observations ?? "",
+    especialidade: cs.specialty?.name ?? "",
+    tags: cs.tags.map((t) => t.tag.name).join(", "),
+    casosRelacionados: cs.diagnosis ? [`Diagnóstico: ${cs.diagnosis}`] : [],
+    mediaUrl: cs.audioUrl ?? null,
   };
 }
 
@@ -198,14 +285,30 @@ const PROMPTS: Record<string, string> = {
   RESUMO: "Escreva um resumo didático e objetivo do conteúdo, destacando os conceitos principais. Responda em JSON com formato {\"title\":\"\",\"summary\":\"\",\"keyPoints\":[\"\"]}",
 };
 
-async function callGemini(apiKey: string, prompt: string): Promise<string> {
+const TRANSCRIBE_PROMPT =
+  "Transcreva fielmente todo o conteúdo de áudio/vídeo em texto corrido, em português. " +
+  "Mantenha a ordem do que foi dito, sem resumir e sem comentários. Responda apenas com a transcrição.";
+
+async function callGemini(apiKey: string, prompt: string, mediaUrl?: string | null): Promise<string> {
+  const parts: Record<string, unknown>[] = [];
+  if (mediaUrl && /^https?:\/\//.test(mediaUrl)) {
+    const watch = toWatchUrl(mediaUrl);
+    parts.push({
+      file_data: {
+        file_uri: watch ?? mediaUrl,
+        mime_type: watch || /youtube|youtu\.be/.test(mediaUrl) ? "video/mp4" : "audio/mpeg",
+      },
+    });
+  }
+  parts.push({ text: prompt });
+
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{ parts }],
         generationConfig: { responseMimeType: "application/json", temperature: 0.4 },
       }),
     }
@@ -229,7 +332,15 @@ async function callGemini(apiKey: string, prompt: string): Promise<string> {
   return text;
 }
 
-export async function generateResource(userId: string, input: GenerateResourceInput) {
+function parseJsonOutput(raw: string): unknown {
+  try {
+    return JSON.parse(raw.replace(/^```json\s*|```$/g, ""));
+  } catch {
+    return { raw };
+  }
+}
+
+async function getApiKey(userId: string): Promise<string> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { geminiApiKey: true },
@@ -237,9 +348,11 @@ export async function generateResource(userId: string, input: GenerateResourceIn
   if (!user?.geminiApiKey) {
     throw new ConflictError("Você ainda não configurou sua chave da API Gemini. Adicione em Dados de estudo.");
   }
+  return decryptApiKey(user.geminiApiKey);
+}
 
-  const context = await buildContext(input.videoId);
-  const prompt = `${PROMPTS[input.type]}
+function buildPrompt(basePrompt: string, context: StudyContext, transcription: string | null): string {
+  return `${basePrompt}
 
 Baseie-se exclusivamente no conteúdo abaixo (conteúdo odontológico). Seja preciso e fiel à fonte.
 Título: ${context.titulo}
@@ -247,20 +360,44 @@ Descrição: ${context.descricao}
 Observações: ${context.observacoes}
 Especialidade: ${context.especialidade}
 Tags: ${context.tags}
-Casos relacionados: ${JSON.stringify(context.casosRelacionados)}`;
+Casos relacionados: ${JSON.stringify(context.casosRelacionados)}
+${transcription ? `Transcrição do conteúdo:\n${transcription}` : ""}`;
+}
 
-  const raw = await callGemini(decryptApiKey(user.geminiApiKey), prompt);
+async function findLatestTranscription(context: StudyContext) {
+  const t = await prisma.studyResource.findFirst({
+    where: { type: "TRANSCRICAO", ...(context.type === "video" ? { videoId: context.id } : { caseStudyId: context.id }) },
+    orderBy: { createdAt: "desc" },
+    select: { content: true },
+  });
+  if (!t) return null;
+  return (t.content as { text?: string }).text?.trim() ? t.content : null;
+}
 
-  let content: unknown;
-  try {
-    content = JSON.parse(raw.replace(/^```json\s*|```$/g, ""));
-  } catch {
-    content = { raw };
+export async function generateResource(userId: string, input: GenerateResourceInput) {
+  const apiKey = await getApiKey(userId);
+  if (!input.type) throw new BadRequestError("Informe o tipo de recurso");
+
+  const context = input.caseStudyId
+    ? await buildCaseContext(input.caseStudyId)
+    : await buildVideoContext(input.videoId!);
+
+  let transcription: string | null = null;
+  if (input.useTranscription) {
+    const t = await findLatestTranscription(context);
+    if (t) {
+      transcription = (t as { text?: string }).text?.trim() ? (t as { text: string }).text : null;
+    }
   }
+
+  const prompt = buildPrompt(PROMPTS[input.type], context, transcription);
+  const raw = await callGemini(apiKey, prompt);
+  const content = parseJsonOutput(raw);
 
   return prisma.studyResource.create({
     data: {
-      videoId: input.videoId,
+      videoId: context.type === "video" ? context.id : null,
+      caseStudyId: context.type === "case" ? context.id : null,
       authorId: userId,
       type: input.type,
       title: `Estudo gerado por IA — ${context.titulo}`,
@@ -277,4 +414,99 @@ Casos relacionados: ${JSON.stringify(context.casosRelacionados)}`;
       createdAt: true,
     },
   });
+}
+
+export async function generateAll(userId: string, input: GenerateResourceInput) {
+  const apiKey = await getApiKey(userId);
+
+  const context = input.caseStudyId
+    ? await buildCaseContext(input.caseStudyId)
+    : await buildVideoContext(input.videoId!);
+
+  const transcriptionSource =
+    input.useTranscription || input.generateAll
+      ? await findLatestTranscription(context)
+      : null;
+  const transcription = transcriptionSource
+    ? (transcriptionSource as { text?: string }).text?.trim() ?? null
+    : null;
+
+  const created: Awaited<ReturnType<typeof generateResource>>[] = [];
+  for (const type of GENERATABLE_TYPES) {
+    const prompt = buildPrompt(PROMPTS[type], context, transcription);
+    const raw = await callGemini(apiKey, prompt);
+    const content = parseJsonOutput(raw);
+    const resource = await prisma.studyResource.create({
+      data: {
+        videoId: context.type === "video" ? context.id : null,
+        caseStudyId: context.type === "case" ? context.id : null,
+        authorId: userId,
+        type,
+        title: `Estudo gerado por IA — ${context.titulo}`,
+        content: content as Prisma.InputJsonValue,
+        status: "RASCUNHO",
+      },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        title: true,
+        content: true,
+        audioUrl: true,
+        createdAt: true,
+      },
+    });
+    created.push(resource);
+  }
+
+  return created;
+}
+
+export async function transcribeResource(userId: string, input: { videoId?: string; caseStudyId?: string }) {
+  const apiKey = await getApiKey(userId);
+
+  const context = input.caseStudyId
+    ? await buildCaseContext(input.caseStudyId)
+    : await buildVideoContext(input.videoId!);
+
+  if (!context.mediaUrl || !/^https?:\/\//.test(context.mediaUrl)) {
+    throw new ConflictError(
+      "Não há mídia pública disponível para transcrição (vídeo/áudio não configurado). Use a descrição para gerar os estudos."
+    );
+  }
+
+  const isYouTube = /youtube\.com|youtu\.be/.test(context.mediaUrl);
+  const videoId = toWatchUrl(context.mediaUrl);
+  if (isYouTube && !videoId) {
+    throw new ConflictError(
+      "Este vídeo não possui uma URL pública do YouTube válida para transcrição. Use a descrição para gerar os estudos."
+    );
+  }
+
+  const raw = await callGemini(apiKey, TRANSCRIBE_PROMPT, context.mediaUrl);
+  const content = parseJsonOutput(raw);
+  const text = typeof content === "string" ? content : (content as { raw?: string }).raw ?? JSON.stringify(content);
+
+  const resource = await prisma.studyResource.create({
+    data: {
+      videoId: context.type === "video" ? context.id : null,
+      caseStudyId: context.type === "case" ? context.id : null,
+      authorId: userId,
+      type: "TRANSCRICAO",
+      title: `Transcrição — ${context.titulo}`,
+      content: { text } as Prisma.InputJsonValue,
+      status: "RASCUNHO",
+    },
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      title: true,
+      content: true,
+      audioUrl: true,
+      createdAt: true,
+    },
+  });
+
+  return resource;
 }

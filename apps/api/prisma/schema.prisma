@@ -81,6 +81,7 @@ enum StudyResourceType {
   INFOGRAPHIC
   RESUMO
   AUDIO_RESUMO
+  TRANSCRICAO
 }
 
 enum StudyResourceStatus {
@@ -277,6 +278,7 @@ model CaseStudy {
   relatedCases CaseStudyRelated[]  @relation("related")
   relatedFrom  CaseStudyRelated[]  @relation("relatedFrom")
   images       Media[]
+  studyResources StudyResource[]
 
   @@index([specialtyId, status])
   @@index([createdById])
@@ -494,13 +496,16 @@ model StudyResource {
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
 
-  video    Video       @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  videoId  String
+  video      Video?     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId    String?
+  caseStudy  CaseStudy? @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudyId String?
   author   User        @relation("StudyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
   votes    StudyVote[]
 
   @@index([videoId])
+  @@index([caseStudyId])
   @@index([authorId])
   @@index([status])
 }

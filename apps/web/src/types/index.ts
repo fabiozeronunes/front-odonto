@@ -14,7 +14,8 @@ export type StudyResourceType =
   | "MIND_MAP"
   | "INFOGRAPHIC"
   | "RESUMO"
-  | "AUDIO_RESUMO";
+  | "AUDIO_RESUMO"
+  | "TRANSCRICAO";
 
 export type StudyResourceStatus = "RASCUNHO" | "EM_REVISAO" | "PUBLICADO" | "REJEITADO";
 
@@ -28,6 +29,7 @@ export interface StudyResource {
   createdAt: string;
   updatedAt?: string;
   video?: { id: string; title: string; slug: string; thumbnailUrl?: string | null } | null;
+  caseStudy?: { id: string; title: string; slug: string } | null;
   author?: { id: string; name: string | null; email?: string } | null;
   mine?: boolean;
   votes?: number;

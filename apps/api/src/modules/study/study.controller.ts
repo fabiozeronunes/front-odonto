@@ -20,6 +20,22 @@ export const generate = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json({ data: result });
 });
 
+export const generateAll = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.generateAll(
+    (req as AuthenticatedRequest).user.id,
+    req.body as GenerateResourceInput
+  );
+  res.status(201).json({ data: result });
+});
+
+export const transcribe = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.transcribeResource(
+    (req as AuthenticatedRequest).user.id,
+    req.body as { videoId?: string; caseStudyId?: string }
+  );
+  res.status(201).json({ data: result });
+});
+
 export const mine = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.listMyResources((req as AuthenticatedRequest).user.id);
   res.json({ data: result });
@@ -29,6 +45,14 @@ export const byVideo = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.listVideoResources(
     (req as AuthenticatedRequest).user.id,
     req.params.videoId
+  );
+  res.json({ data: result });
+});
+
+export const byCase = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.listCaseResources(
+    (req as AuthenticatedRequest).user.id,
+    req.params.caseStudyId
   );
   res.json({ data: result });
 });
