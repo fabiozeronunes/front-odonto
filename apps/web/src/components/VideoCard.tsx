@@ -22,16 +22,24 @@ export function VideoCard({ video }: { video: Video }) {
               <PlayCircle className="h-12 w-12 text-white/80" />
             </div>
           )}
-          <div className="absolute left-2 top-2 flex gap-2">
+          <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
             {video.isFree ? (
-              <Badge variant="free">GRATUITO</Badge>
+              <Badge variant="free" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+                GRATUITO
+              </Badge>
             ) : (
-              <Badge variant="premium">Pago</Badge>
+              <Badge variant="premium" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+                Pago
+              </Badge>
             )}
             {video.source === "FRONTODONTUS" ? (
-              <Badge variant="default">Front Odontus</Badge>
+              <Badge variant="default" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+                Front Odontus
+              </Badge>
             ) : video.source === "STUDENT" ? (
-              <Badge variant="info">Estudante</Badge>
+              <Badge variant="info" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+                Estudante
+              </Badge>
             ) : null}
           </div>
           {video.durationSeconds ? (
