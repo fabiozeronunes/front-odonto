@@ -201,6 +201,50 @@ function classifyUser(u: UserBillingRow) {
   };
 }
 
+export async function listStudyResources(query: Request["query"]) {
+  const { page, perPage, skip } = getPagination(query);
+  const where: Record<string, unknown> = {};
+  if (query.status) {
+    where.status = query.status;
+  }
+
+  const [items, total] = await Promise.all([
+    prisma.studyResource.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: perPage,
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        title: true,
+        createdAt: true,
+        video: { select: { id: true, title: true, slug: true } },
+        author: { select: { id: true, name: true, email: true } },
+        _count: { select: { votes: true } },
+      },
+    }),
+    prisma.studyResource.count({ where }),
+  ]);
+
+  return paginated(
+    items.map((r) => ({ ...r, votes: r._count.votes, _count: undefined })),
+    total,
+    { page, perPage, skip }
+  );
+}
+
+export async function setStudyStatus(resourceId: string, status: "PUBLICADO" | "REJEITADO") {
+  const resource = await prisma.studyResource.findUnique({ where: { id: resourceId } });
+  if (!resource) throw new NotFoundError("Recurso de estudo não encontrado");
+  return prisma.studyResource.update({
+    where: { id: resourceId },
+    data: { status },
+    select: { id: true, status: true },
+  });
+}
+
 export async function getBillingSummary() {
   const plans = await prisma.membershipPlan.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],

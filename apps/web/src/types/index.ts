@@ -7,6 +7,33 @@ export type PlanStatus = "ACTIVE" | "INACTIVE";
 export type BillingPeriod = "MONTHLY" | "YEARLY";
 export type AccessLevelType = "PUBLIC" | "MEMBER" | "PREMIUM";
 
+export type StudyResourceType =
+  | "QUIZ"
+  | "FLASHCARDS"
+  | "QUESTIONARIO"
+  | "MIND_MAP"
+  | "INFOGRAPHIC"
+  | "RESUMO"
+  | "AUDIO_RESUMO";
+
+export type StudyResourceStatus = "RASCUNHO" | "EM_REVISAO" | "PUBLICADO" | "REJEITADO";
+
+export interface StudyResource {
+  id: string;
+  type: StudyResourceType;
+  status: StudyResourceStatus;
+  title: string;
+  content: unknown;
+  audioUrl?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+  video?: { id: string; title: string; slug: string; thumbnailUrl?: string | null } | null;
+  author?: { id: string; name: string | null; email?: string } | null;
+  mine?: boolean;
+  votes?: number;
+  rejectedReason?: string | null;
+}
+
 export interface Pagination {
   page: number;
   perPage: number;

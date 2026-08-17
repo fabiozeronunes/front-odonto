@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -73,36 +73,56 @@ enum CommissionStatus {
   CANCELED
 }
 
-model User {
-  id           String         @id @default(cuid())
-  name         String
-  email        String         @unique
-  passwordHash String
-  registrationNumber String?  @unique
-  phone        String?
-  role         Role           @default(USER)
-  isActive     Boolean        @default(true)
-  plan         MembershipPlan @relation(fields: [planId], references: [id])
-  planId       String
-  isAffiliate  Boolean        @default(false)
-  affiliateCode String?       @unique
-  commissionRate Decimal      @default(20)
-  productCommissionRate Decimal @default(20)
-  referredBy   User?          @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
-  referredById String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+enum StudyResourceType {
+  QUIZ
+  FLASHCARDS
+  QUESTIONARIO
+  MIND_MAP
+  INFOGRAPHIC
+  RESUMO
+  AUDIO_RESUMO
+}
 
-  videos        Video[]
-  caseStudies   CaseStudy[]
-  watchHistory  WatchHistory[]
-  favorites     Favorite[]
-  subscriptions Subscription[]
-  orders        Order[]
-  specialties   Specialty[]
-  tags          Tag[]
-  referrals     User[]           @relation("Referrals")
+enum StudyResourceStatus {
+  RASCUNHO
+  EM_REVISAO
+  PUBLICADO
+  REJEITADO
+}
+
+model User {
+  id                    String         @id @default(cuid())
+  name                  String
+  email                 String         @unique
+  passwordHash          String
+  registrationNumber    String?        @unique
+  phone                 String?
+  role                  Role           @default(USER)
+  isActive              Boolean        @default(true)
+  plan                  MembershipPlan @relation(fields: [planId], references: [id])
+  planId                String
+  isAffiliate           Boolean        @default(false)
+  affiliateCode         String?        @unique
+  commissionRate        Decimal        @default(20)
+  productCommissionRate Decimal        @default(20)
+  referredBy            User?          @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referredById          String?
+  geminiApiKey          String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  videos               Video[]
+  caseStudies          CaseStudy[]
+  watchHistory         WatchHistory[]
+  favorites            Favorite[]
+  subscriptions        Subscription[]
+  orders               Order[]
+  specialties          Specialty[]
+  tags                 Tag[]
+  referrals            User[]                @relation("Referrals")
   affiliateCommissions AffiliateCommission[] @relation("AffiliateCommissions")
+  studyResources       StudyResource[]       @relation("StudyAuthor")
+  studyVotes           StudyVote[]
   referredCommissions  AffiliateCommission[] @relation("ReferredCommissions")
 
   @@index([email])
@@ -144,16 +164,16 @@ model Subscription {
 }
 
 model Specialty {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
   description String?
-  isActive    Boolean   @default(true)
-  sortOrder   Int       @default(0)
-  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   videos      Video[]
   caseStudies CaseStudy[]
@@ -162,54 +182,55 @@ model Specialty {
 }
 
 model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  isActive  Boolean  @default(true)
-  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  isActive    Boolean  @default(true)
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  videos      VideoTag[]
-  caseStudies CaseStudyTag[]
-  products    ProductTag[]
-  media       MediaTag[]
+  videos          VideoTag[]
+  caseStudies     CaseStudyTag[]
+  products        ProductTag[]
+  media           MediaTag[]
   caseStudyAudios CaseStudyAudioTag[]
 
   @@index([createdById])
 }
 
 model Video {
-  id              String         @id @default(cuid())
+  id              String        @id @default(cuid())
   title           String
-  slug            String         @unique
+  slug            String        @unique
   description     String?
   thumbnailUrl    String?
-  videoType       VideoType      @default(EMBED)
+  videoType       VideoType     @default(EMBED)
   videoUrl        String
   durationSeconds Int?
-  difficulty      Difficulty     @default(BASICO)
-  isFree          Boolean        @default(true)
-  source          VideoSource    @default(FRONTODONTUS)
+  difficulty      Difficulty    @default(BASICO)
+  isFree          Boolean       @default(true)
+  source          VideoSource   @default(FRONTODONTUS)
   author          String?
   institution     String?
-  status          ContentStatus  @default(DRAFT)
+  status          ContentStatus @default(DRAFT)
   publishedAt     DateTime?
-  viewCount       Int            @default(0)
+  viewCount       Int           @default(0)
   observations    String?
-  specialty       Specialty?     @relation(fields: [specialtyId], references: [id])
+  specialty       Specialty?    @relation(fields: [specialtyId], references: [id])
   specialtyId     String?
-  createdBy       User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy       User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById     String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  tags         VideoTag[]
-  caseStudies  VideoCaseStudy[]
-  watchHistory WatchHistory[]
-  favorites    Favorite[]
-  images       Media[]
+  tags           VideoTag[]
+  caseStudies    VideoCaseStudy[]
+  watchHistory   WatchHistory[]
+  favorites      Favorite[]
+  studyResources StudyResource[]
+  images         Media[]
 
   @@index([specialtyId, status])
   @@index([status, isFree])
@@ -219,9 +240,9 @@ model Video {
 }
 
 model VideoTag {
-  video   Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
   videoId String
-  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
   tagId   String
 
   @@id([videoId, tagId])
@@ -229,33 +250,33 @@ model VideoTag {
 }
 
 model CaseStudy {
-  id          String        @id @default(cuid())
-  title       String
-  slug        String        @unique
-  description String?
-  diagnosis   String?
-  difficulty  Difficulty    @default(BASICO)
-  isFree      Boolean       @default(false)
-  status      ContentStatus @default(DRAFT)
-  author      String?
-  institution String?
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  description  String?
+  diagnosis    String?
+  difficulty   Difficulty    @default(BASICO)
+  isFree       Boolean       @default(false)
+  status       ContentStatus @default(DRAFT)
+  author       String?
+  institution  String?
   observations String?
-  audioUrl    String?
-  audioTitle  String?
-  specialty   Specialty?    @relation(fields: [specialtyId], references: [id])
-  specialtyId String?
-  createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String?
-  publishedAt DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  audioUrl     String?
+  audioTitle   String?
+  specialty    Specialty?    @relation(fields: [specialtyId], references: [id])
+  specialtyId  String?
+  createdBy    User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById  String?
+  publishedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  tags          CaseStudyTag[]
-  audioTags     CaseStudyAudioTag[]
-  videoCases    VideoCaseStudy[]
-  relatedCases  CaseStudyRelated[] @relation("related")
-  relatedFrom   CaseStudyRelated[] @relation("relatedFrom")
-  images        Media[]
+  tags         CaseStudyTag[]
+  audioTags    CaseStudyAudioTag[]
+  videoCases   VideoCaseStudy[]
+  relatedCases CaseStudyRelated[]  @relation("related")
+  relatedFrom  CaseStudyRelated[]  @relation("relatedFrom")
+  images       Media[]
 
   @@index([specialtyId, status])
   @@index([createdById])
@@ -300,8 +321,8 @@ model CaseStudyRelated {
   relatedId   String
   createdAt   DateTime  @default(now())
 
-  @@index([caseStudyId])
   @@unique([caseStudyId, relatedId])
+  @@index([caseStudyId])
 }
 
 model WatchHistory {
@@ -329,24 +350,24 @@ model Favorite {
 }
 
 model Product {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
-  description String?
-  price       Decimal       @default(0)
-  promoPrice  Decimal?
+  id           String           @id @default(cuid())
+  name         String
+  slug         String           @unique
+  description  String?
+  price        Decimal          @default(0)
+  promoPrice   Decimal?
   saleStartsAt DateTime?
-  saleEndsAt  DateTime?
-  sku         String?
-  stock       Int           @default(0)
-  status      ContentStatus @default(DRAFT)
-  isFeatured  Boolean       @default(false)
-  brand       String?
-  category    ProductCategory? @relation(fields: [categoryId], references: [id])
-  categoryId  String?
-  accessLevel AccessLevel   @default(PUBLIC)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  saleEndsAt   DateTime?
+  sku          String?
+  stock        Int              @default(0)
+  status       ContentStatus    @default(DRAFT)
+  isFeatured   Boolean          @default(false)
+  brand        String?
+  category     ProductCategory? @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  accessLevel  AccessLevel      @default(PUBLIC)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
   tags       ProductTag[]
   images     Media[]
@@ -357,12 +378,12 @@ model Product {
 }
 
 model ProductCategory {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
-  slug      String    @unique
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   products Product[]
 }
@@ -378,9 +399,9 @@ model ProductTag {
 }
 
 model MediaTag {
-  media   Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  media   Media  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   mediaId String
-  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
   tagId   String
 
   @@id([mediaId, tagId])
@@ -388,16 +409,16 @@ model MediaTag {
 }
 
 model Media {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   url         String
   alt         String?
-  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product     Product?   @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId   String?
-  video       Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  video       Video?     @relation(fields: [videoId], references: [id], onDelete: Cascade)
   videoId     String?
   caseStudy   CaseStudy? @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
   caseStudyId String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime   @default(now())
 
   tags MediaTag[]
 
@@ -435,19 +456,19 @@ model OrderItem {
 }
 
 model AffiliateCommission {
-  id            String           @id @default(cuid())
-  affiliate     User             @relation("AffiliateCommissions", fields: [affiliateId], references: [id], onDelete: Cascade)
-  affiliateId   String
-  referred      User             @relation("ReferredCommissions", fields: [referredUserId], references: [id], onDelete: Cascade)
+  id             String           @id @default(cuid())
+  affiliate      User             @relation("AffiliateCommissions", fields: [affiliateId], references: [id], onDelete: Cascade)
+  affiliateId    String
+  referred       User             @relation("ReferredCommissions", fields: [referredUserId], references: [id], onDelete: Cascade)
   referredUserId String
-  amount        Decimal          @default(0)
-  percent       Decimal          @default(20)
-  source        String           @default("PLAN")
-  planName      String?
-  productName   String?
-  status        CommissionStatus @default(PENDING)
-  createdAt     DateTime         @default(now())
-  paidAt        DateTime?
+  amount         Decimal          @default(0)
+  percent        Decimal          @default(20)
+  source         String           @default("PLAN")
+  planName       String?
+  productName    String?
+  status         CommissionStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+  paidAt         DateTime?
 
   @@index([affiliateId])
   @@index([referredUserId])
@@ -461,4 +482,38 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 
   @@unique([key])
+}
+
+model StudyResource {
+  id        String              @id @default(cuid())
+  type      StudyResourceType
+  status    StudyResourceStatus @default(RASCUNHO)
+  title     String
+  content   Json
+  audioUrl  String?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  video    Video       @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId  String
+  author   User        @relation("StudyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  votes    StudyVote[]
+
+  @@index([videoId])
+  @@index([authorId])
+  @@index([status])
+}
+
+model StudyVote {
+  id        String   @id @default(cuid())
+  value     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  resource   StudyResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  resourceId String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+
+  @@unique([resourceId, userId])
 }

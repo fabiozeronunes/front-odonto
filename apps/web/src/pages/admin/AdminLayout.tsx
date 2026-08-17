@@ -11,6 +11,7 @@ import {
   Link2,
   ShoppingBag,
   Wallet,
+  BookOpen,
   LogOut,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -84,6 +85,12 @@ const items = [
     label: "Dados financeiros",
     icon: Wallet,
     help: "Configure a chave Pix e os dados bancários que aparecem na tela de pagamento dos alunos.",
+  },
+  {
+    to: "/admin/estudos",
+    label: "Biblioteca de estudos",
+    icon: BookOpen,
+    help: "Recursos de estudo gerados pelos alunos. Revise e aprove ou rejeite antes de publicar na biblioteca compartilhada.",
   },
 ];
 

@@ -53,6 +53,21 @@ export const confirmPayment = asyncHandler(async (req: Request, res: Response) =
   res.json({ data: result });
 });
 
+export const listStudy = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.listStudyResources(req.query);
+  res.json(result);
+});
+
+export const approveStudy = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.setStudyStatus(req.params.id, "PUBLICADO");
+  res.json({ data: result });
+});
+
+export const rejectStudy = asyncHandler(async (req: Request, res: Response) => {
+  const result = await service.setStudyStatus(req.params.id, "REJEITADO");
+  res.json({ data: result });
+});
+
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const result = await service.deleteUser(
     req.params.id,

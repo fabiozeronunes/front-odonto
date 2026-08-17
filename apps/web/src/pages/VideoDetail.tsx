@@ -7,6 +7,7 @@ import type { VideoDetail } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { StudySection } from "../components/StudySection";
 import { formatDate, formatDuration, resolveImageUrl, cn } from "../lib/utils";
 
 function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
@@ -277,6 +278,8 @@ export function VideoDetail() {
           <img src={resolveImageUrl(lightbox)} alt="" className="max-h-full max-w-full rounded-xl object-contain" />
         </div>
       )}
+
+      {isAuthenticated && !isPremiumLocked && <StudySection videoId={video.id} videoTitle={video.title} />}
 
       {related.length > 0 && (
         <section className="mt-12">

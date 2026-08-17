@@ -18,6 +18,10 @@ adminRouter.post("/users/:id/activate", ctrl.activate);
 adminRouter.post("/users/:id/deactivate", ctrl.deactivate);
 adminRouter.post("/users/:id/whatsapp", ctrl.notifyWhatsApp);
 adminRouter.post("/users/:id/confirm-payment", ctrl.confirmPayment);
+
+adminRouter.get("/study", ctrl.listStudy);
+adminRouter.post("/study/:id/approve", ctrl.approveStudy);
+adminRouter.post("/study/:id/reject", ctrl.rejectStudy);
 adminRouter.put(
   "/users/:id/role",
   validate(z.object({ role: z.enum(["ADMIN", "USER"]) })),

@@ -24,6 +24,7 @@ import { Favorites } from "./pages/Favorites";
 import { Legal } from "./pages/Legal";
 import { Profile } from "./pages/Profile";
 import { Financeiro } from "./pages/Financeiro";
+import { MeusEstudos } from "./pages/MeusEstudos";
 import { MyContent } from "./pages/my/MyContent";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -37,6 +38,7 @@ import { AdminPlans } from "./pages/admin/AdminPlans";
 import { AdminAffiliates } from "./pages/admin/AdminAffiliates";
 import { AdminShop } from "./pages/admin/AdminShop";
 import { AdminFinanceiro } from "./pages/admin/AdminFinanceiro";
+import { AdminEstudos } from "./pages/admin/AdminEstudos";
 
 export default function App() {
   return (
@@ -132,6 +134,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/meus-estudos"
+            element={
+              <ProtectedRoute>
+                <MeusEstudos />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin"
@@ -152,6 +162,7 @@ export default function App() {
             <Route path="loja" element={<AdminShop />} />
             <Route path="afiliados" element={<AdminAffiliates />} />
             <Route path="financeiro" element={<AdminFinanceiro />} />
+            <Route path="estudos" element={<AdminEstudos />} />
           </Route>
 
           <Route
