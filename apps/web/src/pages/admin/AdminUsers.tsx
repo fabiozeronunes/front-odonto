@@ -88,6 +88,19 @@ export function AdminUsers() {
     }
   }
 
+  async function changeRole(id: string, role: "ADMIN" | "USER") {
+    setBusy(id);
+    try {
+      await api(`/api/admin/users/${id}/role`, {
+        method: "PUT",
+        body: JSON.stringify({ role }),
+      });
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function savePhone(id: string, phone: string) {
     setBusy(id);
     try {
@@ -384,7 +397,15 @@ export function AdminUsers() {
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <Badge variant={u.role === "ADMIN" ? "default" : "outline"}>{u.role}</Badge>
+                        <Select
+                          className="h-8 w-32"
+                          value={u.role}
+                          disabled={busy === u.id}
+                          onChange={(e) => changeRole(u.id, e.target.value as "ADMIN" | "USER")}
+                        >
+                          <option value="USER">USER</option>
+                          <option value="ADMIN">ADMIN</option>
+                        </Select>
                       </td>
                       <td className="px-5 py-3 text-slate-500">{formatDate(u.createdAt)}</td>
                       <td className="px-5 py-3">

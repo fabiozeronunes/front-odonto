@@ -31,13 +31,11 @@ interface ProfileStats {
 }
 
 export function Profile() {
-  const { user, loading, updateProfile, promoteToAdmin } = useAuth();
+  const { user, loading, updateProfile } = useAuth();
   const [stats, setStats] = useState<ProfileStats>({ videos: 0, caseStudies: 0, favorites: 0 });
   const [name, setName] = useState("");
   const [nameMsg, setNameMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [savingName, setSavingName] = useState(false);
-  const [roleMsg, setRoleMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const [promoting, setPromoting] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -106,22 +104,6 @@ export function Profile() {
       setPassMsg({ ok: false, text: err instanceof ApiRequestError ? err.message : "Erro ao alterar senha" });
     } finally {
       setSavingPass(false);
-    }
-  }
-
-  async function handleMakeAdmin() {
-    if (!confirm("Tornar este usuário um administrador? Ele terá acesso total ao painel admin.")) {
-      return;
-    }
-    setPromoting(true);
-    setRoleMsg(null);
-    try {
-      await promoteToAdmin();
-      setRoleMsg({ ok: true, text: "Você agora é administrador. Acesse o painel admin pelo menu." });
-    } catch (err) {
-      setRoleMsg({ ok: false, text: err instanceof ApiRequestError ? err.message : "Erro ao promover a admin" });
-    } finally {
-      setPromoting(false);
     }
   }
 
@@ -260,39 +242,6 @@ export function Profile() {
 
         <div className="space-y-6">
           {user.isAffiliate && <AffiliateShareCard />}
-
-          {user.role !== "ADMIN" && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <ShieldCheck className="h-4 w-4 text-primary-700" /> Acesso de administrador
-                </CardTitle>
-                <CardDescription>
-                  O administrador tem acesso ao painel de controle e a todo o conteúdo, com plano
-                  liberado automaticamente.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {roleMsg && (
-                  <div
-                    className={`mb-3 flex items-start gap-2 rounded-lg px-3 py-2 text-sm ${
-                      roleMsg.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
-                    }`}
-                  >
-                    {roleMsg.ok ? (
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-                    ) : (
-                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                    )}
-                    {roleMsg.text}
-                  </div>
-                )}
-                <Button variant="default" onClick={handleMakeAdmin} disabled={promoting}>
-                  {promoting ? "Promovendo..." : "Tornar-me administrador"}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
 
           <Card>
             <CardContent className="pt-5">

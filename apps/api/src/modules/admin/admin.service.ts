@@ -296,7 +296,18 @@ export async function setUserActive(id: string, isActive: boolean) {
 export async function setUserRole(id: string, role: "ADMIN" | "USER") {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError("Usuário não encontrado");
-  return prisma.user.update({ where: { id }, data: { role } });
+
+  let planId = user.planId;
+  if (role === "ADMIN") {
+    const premium = await prisma.membershipPlan.findFirst({
+      where: { slug: { not: "gratuito" }, status: "ACTIVE" },
+      orderBy: { price: "asc" },
+      select: { id: true },
+    });
+    if (premium) planId = premium.id;
+  }
+
+  return prisma.user.update({ where: { id }, data: { role, planId } });
 }
 
 export async function setUserPlan(id: string, planId: string) {
