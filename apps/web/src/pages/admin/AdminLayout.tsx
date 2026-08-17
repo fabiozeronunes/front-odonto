@@ -98,8 +98,8 @@ export function AdminLayout() {
   const { logout } = useAuth();
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row">
-      <aside className="lg:w-60 lg:shrink-0">
-        <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card lg:flex-col">
+      <aside className="sticky top-16 z-30 lg:top-24 lg:w-60 lg:shrink-0 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden">
+        <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card lg:h-full lg:flex-col lg:overflow-y-auto">
           {items.map((item) => (
             <NavLink
               key={item.to}
