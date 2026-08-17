@@ -16,7 +16,7 @@ function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | nul
 
 export function VideoDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const fromCaseStudies = (location.state as { fromCaseStudies?: boolean } | null)?.fromCaseStudies === true;
@@ -48,13 +48,13 @@ export function VideoDetail() {
     api<VideoDetail>(`/api/videos/${slug}`)
       .then((d) => {
         setData(d);
-        if (!d.video.isFree && !hasPremiumAccess(user)) {
-          setIsPremiumLocked(true);
+        if (!authLoading) {
+          setIsPremiumLocked(!d.video.isFree && !hasPremiumAccess(user));
         }
       })
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar vídeo"))
       .finally(() => setLoading(false));
-  }, [slug, isAuthenticated, user]);
+  }, [slug, isAuthenticated, user, authLoading]);
 
   if (loading) {
     return (
