@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Home as HomeIcon,
@@ -96,9 +97,27 @@ const items = [
 
 export function AdminLayout() {
   const { logout } = useAuth();
+  const [navOffset, setNavOffset] = useState(0);
+
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (!header) return;
+    const update = () => setNavOffset(header.getBoundingClientRect().height);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const stickyTop = navOffset ? `top-[${navOffset}px]` : "top-0";
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row">
-      <aside className="sticky top-16 z-30 lg:top-24 lg:w-60 lg:shrink-0 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden">
+      <aside
+        className={cn(
+          "sticky z-50 lg:w-60 lg:shrink-0 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden",
+          stickyTop
+        )}
+      >
         <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card lg:h-full lg:flex-col lg:overflow-y-auto">
           {items.map((item) => (
             <NavLink
