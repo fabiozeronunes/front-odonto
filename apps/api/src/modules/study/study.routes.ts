@@ -17,11 +17,11 @@ studyRouter.post("/save", validate(saveResourceSchema), ctrl.save);
 studyRouter.post("/generate", validate(generateResourceSchema), ctrl.generate);
 studyRouter.get("/me", ctrl.mine);
 studyRouter.get("/video/:videoId", ctrl.byVideo);
+studyRouter.post("/gemini-key", validate(saveGeminiKeySchema), ctrl.saveKey);
+studyRouter.get("/gemini-key", ctrl.myKey);
 studyRouter.get("/:id", ctrl.one);
 studyRouter.post("/:id/submit", ctrl.submit);
 studyRouter.delete("/:id", ctrl.remove);
 studyRouter.post("/:id/vote", validate(voteSchema), ctrl.vote);
-studyRouter.post("/gemini-key", validate(saveGeminiKeySchema), ctrl.saveKey);
-studyRouter.get("/gemini-key", ctrl.myKey);
 
 export { studyRouter };

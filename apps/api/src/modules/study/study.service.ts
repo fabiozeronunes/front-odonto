@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../config/env.js";
-import { NotFoundError, ConflictError } from "../../utils/errors.js";
+import { NotFoundError, ConflictError, BadRequestError } from "../../utils/errors.js";
 import type { Prisma } from "@prisma/client";
 import type { SaveResourceInput, GenerateResourceInput } from "./study.validators.js";
 
@@ -212,13 +212,20 @@ async function callGemini(apiKey: string, prompt: string): Promise<string> {
   );
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Erro na API Gemini (${res.status}): ${body.slice(0, 300)}`);
+    let message = `Erro na API Gemini (${res.status})`;
+    try {
+      const parsed = JSON.parse(body) as { error?: { message?: string } };
+      message = parsed.error?.message ?? message;
+    } catch {
+      /* keep generic message */
+    }
+    throw new BadRequestError(message.slice(0, 300));
   }
   const data = (await res.json()) as {
     candidates?: { content?: { parts?: { text?: string }[] } }[];
   };
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  if (!text) throw new Error("A API Gemini não retornou conteúdo");
+  if (!text) throw new BadRequestError("A API Gemini não retornou conteúdo");
   return text;
 }
 
