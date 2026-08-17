@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
+import { BottomNav } from "./components/BottomNav";
 import { ProtectedRoute, RequireAdmin } from "./components/guards";
 import { Home } from "./pages/Home";
 import { Catalog } from "./pages/Catalog";
@@ -44,7 +45,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pb-16 lg:pb-0">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
@@ -177,6 +178,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 }
