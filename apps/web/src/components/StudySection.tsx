@@ -177,7 +177,7 @@ export function StudySection({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <BookOpen className="h-5 w-5 text-primary-700" />
-          <h2 className="font-display text-lg font-bold text-foreground">Estudar</h2>
+          <h2 className="font-display text-lg font-bold text-foreground">Criar Estudos Personalizados</h2>
         </div>
         {hasKey ? (
           <Button size="sm" variant="outline" onClick={() => setShowKeyForm((v) => !v)}>
