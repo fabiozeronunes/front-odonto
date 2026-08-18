@@ -243,10 +243,8 @@ export function Home() {
           <TestimonialsSection />
 
           {/* ===== PLANS SECTION ===== */}
-          <section id="planos" className="scroll-mt-16 bg-background py-12">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              <Plans />
-            </div>
+          <section id="planos" className="scroll-mt-16">
+            <Plans />
           </section>
         </div>
       )}
