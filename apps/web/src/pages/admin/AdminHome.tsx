@@ -228,6 +228,12 @@ export function AdminHome() {
               onChange={(e) => setHeroTitle(e.target.value)}
               className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
             />
+            <p className="mt-1.5 text-xs text-slate-500">
+              Envolva uma palavra ou expressão com{" "}
+              <span className="font-mono font-semibold text-slate-700">*asteriscos*</span> para
+              aplicá-la o degrade da logomarca. Ex.:{" "}
+              <span className="font-mono">Domine a *Odontologia* estudando...</span>
+            </p>
           </div>
 
           <div>

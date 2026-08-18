@@ -13,6 +13,20 @@ import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 import { useMediaQuery } from "../lib/useMediaQuery";
 import type { Product } from "../types";
 
+const GRADIENT_CLASS = "bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent";
+
+function renderGradientText(text: string) {
+  return text.split(/(\*[^*]+\*)/g).map((part, i) =>
+    part.startsWith("*") && part.endsWith("*") ? (
+      <span key={i} className={GRADIENT_CLASS}>
+        {part.slice(1, -1)}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
+
 function ShopPreview() {
   const { addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
@@ -269,7 +283,9 @@ export function Home() {
             </Badge>
 
             <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
-              {heroTitle ?? (
+              {heroTitle ? (
+                renderGradientText(heroTitle)
+              ) : (
                 <>
                   Domine a{" "}
                   <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
@@ -305,8 +321,9 @@ export function Home() {
             </div>
 
             <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200">
-              {heroSubtitle ??
-                "Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e Questionários que vão ajudar na sua formação e aprendizado."}
+              {heroSubtitle
+                ? renderGradientText(heroSubtitle)
+                : "Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e Questionários que vão ajudar na sua formação e aprendizado."}
             </p>
 
             {!contentHidden && (
