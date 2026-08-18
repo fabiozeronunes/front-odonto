@@ -77,7 +77,10 @@ const BENEFITS = [
 
 export function RecursosSection() {
   return (
-    <section id="recursos" className="scroll-mt-16 bg-background py-14 lg:py-20">
+    <section
+      id="recursos"
+      className="scroll-mt-16 bg-gradient-to-b from-teal-50/70 via-background to-background py-14 lg:py-20 dark:from-primary-950/50 dark:via-background dark:to-background"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
           <Badge className="rounded-full border border-teal-300/60 bg-teal-50 px-4 py-1.5 text-teal-700">
