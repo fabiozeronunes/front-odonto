@@ -5,6 +5,7 @@ import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
+import { RecursosSection } from "../components/RecursosSection";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useHomeLock } from "../lib/homeLock";
@@ -243,6 +244,9 @@ export function Home() {
 
       {!contentHidden && (
         <div className="animate-fade-in-up anim-delay-100">
+          {/* ===== RECURSOS (BENEFÍCIOS) ===== */}
+          <RecursosSection />
+
           {/* ===== PLANS SECTION ===== */}
           <section id="planos" className="scroll-mt-16 bg-background py-12">
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
