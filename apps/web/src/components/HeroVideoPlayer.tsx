@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Play, Volume2, VolumeX, Gauge } from "lucide-react";
+import { Play, Volume2, VolumeX, Gauge, Sparkles } from "lucide-react";
 
 const YOUTUBE_ID_REGEX =
   /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/;
@@ -31,6 +31,8 @@ type Props = {
 
 const TURBO_SPEEDS = [1, 1.25, 1.5, 1.75, 2] as const;
 
+const SMART_PROGRESS_BOOST = 1.2;
+
 export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
   const videoId = getVideoId(videoUrl);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
   const [muted, setMuted] = useState(true);
   const [started, setStarted] = useState(false);
   const [speed, setSpeed] = useState<number>(1);
+  const [smartProgress, setSmartProgress] = useState(0);
   const onEndedRef = useRef(onEnded);
   onEndedRef.current = onEnded;
   const onStartRef = useRef(onStart);
@@ -104,6 +107,11 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
       if (!player) return;
       const current = player.getCurrentTime();
       const state = player.getPlayerState();
+      const duration = player.getDuration();
+      if (duration) {
+        const real = Math.min(1, Math.max(0, current / duration));
+        setSmartProgress(Math.min(1, real * SMART_PROGRESS_BOOST));
+      }
       if (lastTimeRef.current === null) {
         lastTimeRef.current = current;
         return;
@@ -214,6 +222,10 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
               {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
 
+            <span className="hidden items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-teal-300 backdrop-blur sm:inline-flex">
+              <Sparkles className="h-3 w-3" /> Progresso Inteligente™
+            </span>
+
             <button
               type="button"
               onClick={cycleSpeed}
@@ -223,6 +235,15 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
               <Gauge className="h-4 w-4" />
               {speed.toLocaleString("pt-BR")}x
             </button>
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 z-20">
+            <div className="relative h-1 w-full bg-white/15">
+              <div
+                className="absolute inset-y-0 left-0 rounded-r-full bg-gradient-to-r from-teal-400 to-amber-500 transition-[width] duration-300 ease-out"
+                style={{ width: `${smartProgress * 100}%` }}
+              />
+            </div>
           </div>
         </>
       )}
