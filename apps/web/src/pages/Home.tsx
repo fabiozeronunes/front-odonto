@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { Sparkles, PlayCircle } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
@@ -22,6 +21,24 @@ function isHomeUnlocked(): boolean {
   } catch {
     return false;
   }
+}
+
+function smoothScrollToPlanos() {
+  const target = document.getElementById("planos");
+  if (!target) return;
+  const startY = window.scrollY;
+  const targetY = target.getBoundingClientRect().top + window.scrollY - 64;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 1) return;
+  const duration = Math.min(Math.max(Math.abs(distance) * 0.45, 700), 1400);
+  const start = performance.now();
+  const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+  const step = (now: number) => {
+    const progress = Math.min((now - start) / duration, 1);
+    window.scrollTo(0, startY + distance * ease(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function renderGradientText(text: string) {
@@ -192,47 +209,21 @@ export function Home() {
 
             {!contentHidden && (
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center animate-fade-in-up anim-delay-200">
-                <Link to="/cadastro">
+                <a
+                  href="#planos"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    smoothScrollToPlanos();
+                  }}
+                >
                   <Button
                     size="lg"
                     variant="premium"
                     className="h-12 w-full px-8 font-semibold shadow-glow sm:w-auto"
                   >
-                    <PlayCircle className="h-5 w-5" /> Começar a estudar grátis
-                  </Button>
-                </Link>
-                <a
-                  href="#planos"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("planos")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                >
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-12 w-full border-2 border-white/25 bg-white/10 px-8 font-semibold text-white hover:bg-white/20 hover:text-white sm:w-auto"
-                  >
-                    Ver planos
+                    <Sparkles className="h-5 w-5" /> Escolher meu plano
                   </Button>
                 </a>
-              </div>
-            )}
-
-            {!contentHidden && (
-              <div className="mt-10 flex flex-wrap justify-center gap-10 border-t border-teal-400/25 pt-6 animate-fade-in-up anim-delay-300">
-                <div>
-                  <p className="font-display text-2xl font-bold sm:text-3xl">+300</p>
-                  <p className="text-sm text-teal-200">vídeos</p>
-                </div>
-                <div>
-                  <p className="font-display text-2xl font-bold sm:text-3xl">+2.000</p>
-                  <p className="text-sm text-teal-200">alunos ativos</p>
-                </div>
-                <div>
-                  <p className="font-display text-2xl font-bold sm:text-3xl">4.9★</p>
-                  <p className="text-sm text-teal-200">avaliação média</p>
-                </div>
               </div>
             )}
           </div>
