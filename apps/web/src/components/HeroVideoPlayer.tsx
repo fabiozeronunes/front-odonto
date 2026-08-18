@@ -27,13 +27,19 @@ type Props = {
   videoUrl: string;
   onEnded?: () => void;
   onStart?: () => void;
+  smartProgressBoost?: number;
 };
 
 const TURBO_SPEEDS = [1, 1.25, 1.5, 1.75, 2] as const;
 
-const SMART_PROGRESS_BOOST = 1.2;
+const DEFAULT_SMART_PROGRESS_BOOST = 1.2;
 
-export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
+export function HeroVideoPlayer({
+  videoUrl,
+  onEnded,
+  onStart,
+  smartProgressBoost = DEFAULT_SMART_PROGRESS_BOOST,
+}: Props) {
   const videoId = getVideoId(videoUrl);
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayerLike | null>(null);
@@ -110,7 +116,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
       const duration = player.getDuration();
       if (duration) {
         const real = Math.min(1, Math.max(0, current / duration));
-        setSmartProgress(Math.min(1, real * SMART_PROGRESS_BOOST));
+        setSmartProgress(Math.min(1, real * smartProgressBoost));
       }
       if (lastTimeRef.current === null) {
         lastTimeRef.current = current;
@@ -124,7 +130,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
       }
     }, 400);
     return () => clearInterval(interval);
-  }, [videoId]);
+  }, [videoId, smartProgressBoost]);
 
   const togglePlay = useCallback(() => {
     const player = playerRef.current;

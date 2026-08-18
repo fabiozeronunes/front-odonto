@@ -63,6 +63,7 @@ export function Home() {
   const [locked, setLocked] = useState(false);
   const [lockChecked, setLockChecked] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [smartProgressBoost, setSmartProgressBoost] = useState(1.2);
 
   useEffect(() => {
     let active = true;
@@ -99,6 +100,13 @@ export function Home() {
         if (!active) return;
         setLocked(false);
         setLockChecked(true);
+      });
+    api<{ data: { boost: number } }>("/api/settings/hero-smart-progress", { skipAuth: true })
+      .then((res) => {
+        if (active) setSmartProgressBoost(Number(res.data?.boost) || 1.2);
+      })
+      .catch(() => {
+        if (active) setSmartProgressBoost(1.2);
       });
     return () => {
       active = false;
@@ -182,13 +190,14 @@ export function Home() {
                 lockActive && locked ? (
                   <HeroVideoPlayer
                     videoUrl={heroVideo}
+                    smartProgressBoost={smartProgressBoost}
                     onStart={() => setVideoStarted(true)}
                     onEnded={() => {
                       if (!unlockMinutes) unlockHome();
                     }}
                   />
                 ) : (
-                  <HeroVideoPlayer videoUrl={heroVideo} onStart={() => setVideoStarted(true)} />
+                  <HeroVideoPlayer videoUrl={heroVideo} smartProgressBoost={smartProgressBoost} onStart={() => setVideoStarted(true)} />
                 )
               ) : (
                 <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">

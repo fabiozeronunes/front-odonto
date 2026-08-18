@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trash2, Video, Lock, Type, Sparkles, RefreshCw, Wand2 } from "lucide-react";
+import { Trash2, Video, Lock, Type, Sparkles, RefreshCw, Wand2, Gauge } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -35,6 +35,10 @@ export function AdminHome() {
   const [lockSaving, setLockSaving] = useState(false);
   const [lockNotice, setLockNotice] = useState<string | null>(null);
 
+  const [progressBoost, setProgressBoost] = useState(1.2);
+  const [progressSaving, setProgressSaving] = useState(false);
+  const [progressNotice, setProgressNotice] = useState<string | null>(null);
+
   async function load() {
     setLoading(true);
     try {
@@ -69,6 +73,15 @@ export function AdminHome() {
     } catch {
       setLockEnabled(false);
       setLockMinutes(0);
+    }
+    try {
+      const progress = await api<{ data: { boost: number } }>(
+        "/api/settings/hero-smart-progress",
+        { skipAuth: true }
+      );
+      setProgressBoost(progress.data?.boost ?? 1.2);
+    } catch {
+      setProgressBoost(1.2);
     } finally {
       setLoading(false);
     }
@@ -178,6 +191,27 @@ export function AdminHome() {
       setLockNotice("Falha ao salvar a configuração.");
     } finally {
       setLockSaving(false);
+    }
+  }
+
+  async function saveProgress() {
+    setProgressSaving(true);
+    setProgressNotice(null);
+    try {
+      const res = await api<{ data: { boost: number } }>("/api/settings/hero-smart-progress", {
+        method: "POST",
+        body: JSON.stringify({ boost: progressBoost }),
+      });
+      setProgressBoost(res.data?.boost ?? 1.2);
+      setProgressNotice(
+        `Barra configurada. Velocidade ${progressBoost.toLocaleString("pt-BR")}x — a barra enche aos ${Math.round(
+          (100 / progressBoost)
+        )}% do vídeo.`
+      );
+    } catch {
+      setProgressNotice("Falha ao salvar a configuração.");
+    } finally {
+      setProgressSaving(false);
     }
   }
 
@@ -372,6 +406,58 @@ export function AdminHome() {
           <p className="text-xs text-slate-400">
             Ao importar, o vídeo aparece acima para conferência antes de salvar.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Gauge className="h-4 w-4" /> Progresso Inteligente™ da barra do vídeo
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <InfoPopover
+            title="Progresso Inteligente"
+            text="A barra de progresso avança mais rápido que o tempo real do vídeo, dando a impressão de que o vídeo é mais curto. Isso aumenta a retenção e a conversão. O desbloqueio do conteúdo continua atrelado ao fim real do vídeo."
+          />
+
+          {progressNotice && (
+            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              {progressNotice}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="progress-boost" className="text-sm font-medium text-slate-700">
+              Velocidade da barra: {progressBoost.toLocaleString("pt-BR")}x
+            </label>
+            <input
+              id="progress-boost"
+              type="range"
+              min={1}
+              max={2}
+              step={0.1}
+              value={progressBoost}
+              onChange={(e) => setProgressBoost(Number(e.target.value))}
+              className="mt-2 w-full accent-teal-600"
+            />
+            <div className="mt-1 flex justify-between text-xs text-slate-400">
+              <span>1.0x — normal</span>
+              <span>1.5x — média</span>
+              <span>2.0x — agressiva</span>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Com {progressBoost.toLocaleString("pt-BR")}x, a barra enche aos{" "}
+              <span className="font-semibold text-slate-700">
+                {Math.round(100 / progressBoost)}%
+              </span>{" "}
+              do vídeo e segura até o fim.
+            </p>
+          </div>
+
+          <Button onClick={saveProgress} disabled={progressSaving}>
+            <Gauge className="h-4 w-4" /> {progressSaving ? "Salvando..." : "Salvar velocidade"}
+          </Button>
         </CardContent>
       </Card>
 
