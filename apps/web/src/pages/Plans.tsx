@@ -128,11 +128,7 @@ function GridPlan({ plan, isAuthenticated }: { plan: MembershipPlan; isAuthentic
         </ul>
       </div>
       <Link to={cta} className="mt-6 inline-block">
-        <Button
-          variant={isFree ? "outline" : "premium"}
-          size="lg"
-          className={cn("w-full rounded-full", isFree && "bg-muted text-foreground hover:bg-muted/80")}
-        >
+        <Button variant="premium" size="lg" className="w-full rounded-full">
           {ctaLabel}
         </Button>
       </Link>
@@ -212,7 +208,7 @@ export function Plans() {
           ))}
         </div>
       ) : (
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 lg:grid-cols-3">
           {featured && <FeaturedPlan plan={featured} isAuthenticated={isAuthenticated} />}
           {grid.map((plan) => (
             <GridPlan key={plan.id} plan={plan} isAuthenticated={isAuthenticated} />
