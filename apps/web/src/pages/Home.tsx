@@ -11,7 +11,7 @@ import { useAuth } from "../lib/auth";
 import { useHomeLock } from "../lib/homeLock";
 import { cn } from "../lib/utils";
 
-const GRADIENT_CLASS = "bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent";
+const GRADIENT_CLASS = "bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent";
 
 const HOME_UNLOCK_KEY = "odonto_home_unlocked";
 
@@ -166,7 +166,7 @@ export function Home() {
           )}
         >
           <div className="text-center">
-            <Badge className="animate-fade-in-up rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-teal-200 hover:bg-primary-900/60">
+            <Badge className="animate-fade-in-up rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700 hover:bg-white dark:border-primary-700 dark:bg-primary-900/40 dark:text-teal-300 dark:hover:bg-primary-900/40">
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
@@ -176,7 +176,7 @@ export function Home() {
               ) : (
                 <>
                   Domine a{" "}
-                  <span className="bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">
                     Odontologia
                   </span>{" "}
                   Estudando por Vídeos, Imagens e Estudos de Casos.
@@ -210,7 +210,7 @@ export function Home() {
               )}
             </div>
 
-            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200 sm:text-xl">
+            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/75 animate-fade-in-up anim-delay-200 sm:text-xl">
               {heroSubtitle
                 ? renderGradientText(heroSubtitle)
                 : "Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e Questionários que vão ajudar na sua formação e aprendizado."}
@@ -228,7 +228,7 @@ export function Home() {
                   <Button
                     size="lg"
                     variant="premium"
-                    className="h-12 w-full px-8 font-semibold shadow-glow sm:w-auto"
+                    className="h-12 w-full rounded-full px-8 font-semibold shadow-glow sm:w-auto"
                   >
                     <Sparkles className="h-5 w-5" /> Escolher meu plano
                   </Button>
