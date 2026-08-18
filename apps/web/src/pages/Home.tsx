@@ -6,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
 import { RecursosSection } from "../components/RecursosSection";
+import { TestimonialsSection } from "../components/TestimonialsSection";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useHomeLock } from "../lib/homeLock";
@@ -246,6 +247,9 @@ export function Home() {
         <div className="animate-fade-in-up anim-delay-100">
           {/* ===== RECURSOS (BENEFÍCIOS) ===== */}
           <RecursosSection />
+
+          {/* ===== DEPOIMENTOS ===== */}
+          <TestimonialsSection />
 
           {/* ===== PLANS SECTION ===== */}
           <section id="planos" className="scroll-mt-16 bg-background py-12">
