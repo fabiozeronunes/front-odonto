@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { BottomNav } from "./components/BottomNav";
+import { HomeLockProvider } from "./lib/homeLock";
 import { ProtectedRoute, RequireAdmin } from "./components/guards";
 import { Home } from "./pages/Home";
 import { Catalog } from "./pages/Catalog";
@@ -43,8 +44,9 @@ import { AdminEstudos } from "./pages/admin/AdminEstudos";
 
 export default function App() {
   return (
-    <div className="flex min-h-screen flex-col overflow-x-clip">
-      <Navbar />
+    <HomeLockProvider>
+      <div className="flex min-h-screen flex-col overflow-x-clip">
+        <Navbar />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -177,8 +179,9 @@ export default function App() {
           />
         </Routes>
       </main>
-      <Footer />
-      <BottomNav />
-    </div>
+<Footer />
+        <BottomNav />
+      </div>
+    </HomeLockProvider>
   );
 }

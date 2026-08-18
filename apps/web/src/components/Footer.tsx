@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { useSiteLogo } from "../lib/useSiteLogo";
+import { useHomeLock } from "../lib/homeLock";
+import { cn } from "../lib/utils";
 
 export function Footer() {
   const logoUrl = useSiteLogo();
+  const { contentHidden } = useHomeLock();
+  const linkClass = cn("hover:text-teal-400", contentHidden && "pointer-events-none select-none opacity-50");
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 pb-20 text-slate-400 lg:pb-0">
+    <footer className={cn("border-t border-slate-800 bg-slate-950 text-slate-400 lg:pb-0", contentHidden ? "pb-0" : "pb-20")}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
@@ -26,17 +30,17 @@ export function Footer() {
           <div>
             <p className="mb-3 text-sm font-semibold text-white">Navegação</p>
             <ul className="space-y-2 text-sm">
-              <li><Link className="hover:text-teal-400" to="/catalogo">Catálogo</Link></li>
-              <li><Link className="hover:text-teal-400" to="/especialidades">Especialidades</Link></li>
-              <li><Link className="hover:text-teal-400" to="/casos">Estudos de caso</Link></li>
-              <li><Link className="hover:text-teal-400" to="/planos">Planos</Link></li>
+              <li><Link className={linkClass} to="/catalogo">Catálogo</Link></li>
+              <li><Link className={linkClass} to="/especialidades">Especialidades</Link></li>
+              <li><Link className={linkClass} to="/casos">Estudos de caso</Link></li>
+              <li><Link className={linkClass} to="/planos">Planos</Link></li>
             </ul>
           </div>
           <div>
             <p className="mb-3 text-sm font-semibold text-white">Institucional</p>
             <ul className="space-y-2 text-sm">
-              <li><Link className="hover:text-teal-400" to="/privacidade">Política de Privacidade</Link></li>
-              <li><Link className="hover:text-teal-400" to="/termos">Termos de Uso</Link></li>
+              <li><Link className={linkClass} to="/privacidade">Política de Privacidade</Link></li>
+              <li><Link className={linkClass} to="/termos">Termos de Uso</Link></li>
             </ul>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
 import { useAuth } from "../lib/auth";
+import { useHomeLock } from "../lib/homeLock";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 import { useMediaQuery } from "../lib/useMediaQuery";
 import type { Product } from "../types";
@@ -232,6 +233,13 @@ export function Home() {
   const contentHidden = useMemo(
     () => (lockChecked ? lockActive && locked : true),    [lockChecked, lockActive, locked]
   );
+
+  const { setContentHidden } = useHomeLock();
+
+  useEffect(() => {
+    setContentHidden(contentHidden);
+    return () => setContentHidden(false);
+  }, [contentHidden, setContentHidden]);
 
   return (
     <div className={cn("flex flex-col", contentHidden ? "flex-1 bg-primary-950" : "min-h-screen bg-background")}>

@@ -9,6 +9,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useAuth } from "../lib/auth";
+import { useHomeLock } from "../lib/homeLock";
 import { cn } from "../lib/utils";
 
 const CAROUSEL_ITEMS = [
@@ -24,6 +25,9 @@ const CAROUSEL_ITEMS = [
 export function BottomNav() {
   const { isAdmin } = useAuth();
   const { pathname } = useLocation();
+  const { contentHidden } = useHomeLock();
+
+  if (contentHidden) return null;
 
   const items = CAROUSEL_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 

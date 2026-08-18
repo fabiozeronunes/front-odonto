@@ -5,6 +5,7 @@ import { useAuth } from "../lib/auth";
 import { useCart } from "../lib/cart";
 import { useSiteLogo } from "../lib/useSiteLogo";
 import { useTheme } from "../lib/useTheme";
+import { useHomeLock } from "../lib/homeLock";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 
@@ -27,6 +28,9 @@ export function Navbar() {
   const { theme, toggle } = useTheme();
   const logoUrl = useSiteLogo();
   const [open, setOpen] = useState(false);
+  const { contentHidden } = useHomeLock();
+
+  if (contentHidden) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
