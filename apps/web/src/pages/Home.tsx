@@ -162,7 +162,7 @@ export function Home() {
               <Sparkles className="h-3 w-3" /> Plataforma de estudos odontológicos
             </Badge>
 
-            <h1 className="mx-auto mt-5 max-w-4xl font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl animate-fade-in-up anim-delay-100">
+            <h1 className="mx-auto mt-5 max-w-4xl font-display text-2xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl animate-fade-in-up anim-delay-100">
               {heroTitle ? (
                 renderGradientText(heroTitle)
               ) : (
@@ -201,7 +201,7 @@ export function Home() {
               )}
             </div>
 
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/80 animate-fade-in-up anim-delay-200 sm:text-lg">
+            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/80 animate-fade-in-up anim-delay-200 sm:text-xl">
               {heroSubtitle
                 ? renderGradientText(heroSubtitle)
                 : "Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e Questionários que vão ajudar na sua formação e aprendizado."}

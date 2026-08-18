@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { BottomNav } from "./components/BottomNav";
@@ -43,11 +43,13 @@ import { AdminFinanceiro } from "./pages/admin/AdminFinanceiro";
 import { AdminEstudos } from "./pages/admin/AdminEstudos";
 
 export default function App() {
+  const location = useLocation();
   return (
     <HomeLockProvider>
       <div className="flex min-h-screen flex-col overflow-x-clip">
         <Navbar />
       <main className="flex-1">
+        <div key={location.pathname} className="animate-page-enter">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
@@ -178,6 +180,7 @@ export default function App() {
             }
           />
         </Routes>
+        </div>
       </main>
 <Footer />
         <BottomNav />
