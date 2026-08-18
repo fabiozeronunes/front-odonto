@@ -1,17 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ShoppingBag, Package, Check, PlayCircle } from "lucide-react";
+import { Sparkles, PlayCircle } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
 import { api } from "../lib/api";
-import { useCart } from "../lib/cart";
 import { useAuth } from "../lib/auth";
 import { useHomeLock } from "../lib/homeLock";
-import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
-import { useMediaQuery } from "../lib/useMediaQuery";
-import type { Product } from "../types";
+import { cn } from "../lib/utils";
 
 const GRADIENT_CLASS = "bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent";
 
@@ -24,162 +21,6 @@ function renderGradientText(text: string) {
     ) : (
       part
     )
-  );
-}
-
-function ShopPreview() {
-  const { addItem } = useCart();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [added, setAdded] = useState<Record<string, boolean>>({});
-  const isTablet = useMediaQuery("(min-width: 768px)");
-  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
-    try {
-      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "3";
-    } catch {
-      return "3";
-    }
-  });
-
-  function changeRows(value: "1" | "2" | "3") {
-    setRows(value);
-    try {
-      localStorage.setItem("odonto_shop_rows", value);
-    } catch {
-      /* ignore */
-    }
-  }
-
-  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
-
-  useEffect(() => {
-    api<{ data: Product[] }>("/api/products?perPage=4")
-      .then((d) => setProducts(d.data))
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  function handleAdd(p: Product) {
-    addItem(p, 1);
-    setAdded((prev) => ({ ...prev, [p.id]: true }));
-    setTimeout(() => setAdded((prev) => ({ ...prev, [p.id]: false })), 1500);
-  }
-
-  return (
-    <section className="py-12 bg-surface">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <ShoppingBag className="h-5 w-5 text-primary-700 dark:text-primary-400" /> Shop Odontus
-          </h2>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Por linha:</span>
-              <div className="inline-flex overflow-hidden rounded-lg border border-border">
-                {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => changeRows(value)}
-                    className={cn(
-                      "px-3 py-1 font-semibold transition-colors",
-                      activeRows === value
-                        ? "bg-primary-700 text-primary-foreground"
-                        : "bg-surface text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    {value}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <Link to="/loja">
-              <Button variant="ghost" size="sm" className="text-primary-700 dark:text-primary-400">
-                Ver todos
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Novos produtos em breve.</p>
-        ) : (
-          <div
-            className={cn(
-              "grid gap-4 sm:gap-6",
-              activeRows === "2"
-                ? "grid-cols-2"
-                : activeRows === "3"
-                ? "grid-cols-2 md:grid-cols-3"
-                : "mx-auto max-w-2xl grid-cols-1"
-            )}
-          >
-            {products.map((p) => {
-              const price = Number(p.price);
-              const promo = Number(p.promoPrice);
-              const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
-              const img = p.images?.[0]?.url;
-              return (
-                <div
-                  key={p.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
-                >
-                  <Link to={`/loja/${p.slug}`} className="block">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-white">
-                      {img ? (
-                        <img
-                          src={resolveImageUrl(img)}
-                          alt={p.name}
-                          className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center text-muted-foreground">
-                          <Package className="h-8 w-8" />
-                        </span>
-                      )}
-                      {discount > 0 && (
-                        <span className="absolute left-1.5 top-1.5 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
-                          -{discount}%
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                  <div className="flex min-w-0 flex-1 flex-col p-3">
-                    <Link to={`/loja/${p.slug}`}>
-                      <p className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
-                        {p.name}
-                      </p>
-                    </Link>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {p.brand ?? "Odontus"}
-                      {p.category ? ` • ${p.category.name}` : ""}
-                    </p>
-                    <div className="mt-2 flex items-baseline gap-2">
-                      {discount > 0 && (
-                        <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
-                      )}
-                      <span className="font-display text-base font-bold text-foreground">
-                        {formatPrice(p.promoPrice)}
-                      </span>
-                    </div>
-                    <Button size="sm" className="mt-3 w-full" onClick={() => handleAdd(p)}>
-                      {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                      {added[p.id] ? "Adicionado" : "Carrinho"}
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </section>
   );
 }
 
@@ -381,9 +222,6 @@ export function Home() {
 
       {!contentHidden && (
         <div className="animate-fade-in-up anim-delay-100">
-          {/* ===== SHOP ODONTUS ===== */}
-          <ShopPreview />
-
           {/* ===== PLANS SECTION ===== */}
           <section id="planos" className="scroll-mt-16 bg-background py-12">
             <div className="mx-auto max-w-7xl px-4 sm:px-6">

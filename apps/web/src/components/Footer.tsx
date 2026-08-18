@@ -44,7 +44,13 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <p className="mt-8 border-t border-slate-800 pt-6 text-xs">
+        <p className="mt-8 border-t border-slate-800 pt-6 text-xs leading-relaxed text-slate-500">
+          Disclaimer: melhoras de desempenho estão relacionadas a estudos diários e
+          comprometimento com as matérias do seu curso. O Front Odonto não realiza mágica. Os
+          recursos aqui apresentados não dão a garantia de melhorar sem estudar, foram criados
+          para te auxiliar a melhorar seu desempenho e métricas em seu curso.
+        </p>
+        <p className="mt-4 border-t border-slate-800 pt-4 text-xs">
           © {new Date().getFullYear()} FrontOdontus. Todos os direitos reservados.
         </p>
       </div>
