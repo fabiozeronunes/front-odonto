@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
-import { Trash2, Video, Lock } from "lucide-react";
+import { Trash2, Video, Lock, Type, Sparkles, RefreshCw, Wand2 } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { YouTubeImport } from "../../components/YouTubeImport";
 import { InfoPopover } from "../../components/ui/info-popover";
+
+interface HeroSuggestion {
+  trigger: string;
+  title: string;
+  subtitle: string;
+}
 
 export function AdminHome() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -12,6 +18,17 @@ export function AdminHome() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+
+  const [heroTitle, setHeroTitle] = useState("");
+  const [heroSubtitle, setHeroSubtitle] = useState("");
+  const [heroBusinessArea, setHeroBusinessArea] = useState("");
+  const [heroTags, setHeroTags] = useState("");
+  const [heroSaving, setHeroSaving] = useState(false);
+  const [heroNotice, setHeroNotice] = useState<string | null>(null);
+
+  const [generating, setGenerating] = useState(false);
+  const [suggestions, setSuggestions] = useState<HeroSuggestion[]>([]);
+  const [genNotice, setGenNotice] = useState<string | null>(null);
 
   const [lockEnabled, setLockEnabled] = useState(false);
   const [lockMinutes, setLockMinutes] = useState(0);
@@ -29,6 +46,20 @@ export function AdminHome() {
       setSavedUrl(null);
     }
     try {
+      const content = await api<{
+        data: { title: string; subtitle: string; businessArea: string; tags: string };
+      }>("/api/settings/hero-content", { skipAuth: true });
+      setHeroTitle(content.data?.title ?? "");
+      setHeroSubtitle(content.data?.subtitle ?? "");
+      setHeroBusinessArea(content.data?.businessArea ?? "");
+      setHeroTags(content.data?.tags ?? "");
+    } catch {
+      setHeroTitle("");
+      setHeroSubtitle("");
+      setHeroBusinessArea("");
+      setHeroTags("");
+    }
+    try {
       const lock = await api<{ data: { enabled: boolean; unlockMinutes: number } }>(
         "/api/settings/home-lock",
         { skipAuth: true }
@@ -41,6 +72,51 @@ export function AdminHome() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function saveHeroContent() {
+    setHeroSaving(true);
+    setHeroNotice(null);
+    try {
+      await api("/api/settings/hero-content", {
+        method: "POST",
+        body: JSON.stringify({
+          title: heroTitle,
+          subtitle: heroSubtitle,
+          businessArea: heroBusinessArea,
+          tags: heroTags,
+        }),
+      });
+      setHeroNotice("Título e subtítulo atualizados. A home já exibe o novo conteúdo.");
+    } catch {
+      setHeroNotice("Falha ao salvar o conteúdo. Tente novamente.");
+    } finally {
+      setHeroSaving(false);
+    }
+  }
+
+  async function generateHero() {
+    setGenerating(true);
+    setGenNotice(null);
+    setSuggestions([]);
+    try {
+      const res = await api<{ data: HeroSuggestion[] }>("/api/settings/hero-generate", {
+        method: "POST",
+        body: JSON.stringify({ businessArea: heroBusinessArea, tags: heroTags, count: 5 }),
+      });
+      setSuggestions(res.data ?? []);
+      if (!res.data?.length) setGenNotice("Nenhuma sugestão retornada. Tente novamente.");
+    } catch {
+      setGenNotice("Falha ao gerar sugestões. Confira se a chave Gemini está configurada no admin.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function applySuggestion(s: HeroSuggestion) {
+    setHeroTitle(s.title);
+    setHeroSubtitle(s.subtitle);
+    setGenNotice("Sugestão aplicada nos campos. Clique em Salvar para publicar.");
   }
 
   useEffect(() => {
@@ -125,6 +201,130 @@ export function AdminHome() {
       {notice && (
         <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{notice}</div>
       )}
+
+      <Card className="mt-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Type className="h-4 w-4" /> Título e subtítulo da hero
+            <InfoPopover
+              title="Conteúdo da hero"
+              text="Edite o título e o subtítulo exibidos na primeira dobra. Use o gerador com gatilhos mentais para criar variações baseadas no ramo de atividade e nas tags."
+            />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {heroNotice && (
+            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{heroNotice}</div>
+          )}
+
+          <div>
+            <label htmlFor="hero-title" className="text-sm font-medium text-slate-700">
+              Título
+            </label>
+            <textarea
+              id="hero-title"
+              rows={2}
+              value={heroTitle}
+              onChange={(e) => setHeroTitle(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="hero-subtitle" className="text-sm font-medium text-slate-700">
+              Subtítulo
+            </label>
+            <textarea
+              id="hero-subtitle"
+              rows={3}
+              value={heroSubtitle}
+              onChange={(e) => setHeroSubtitle(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+            />
+          </div>
+
+          <Button onClick={saveHeroContent} disabled={heroSaving}>
+            {heroSaving ? "Salvando..." : "Salvar título e subtítulo"}
+          </Button>
+
+          <div className="rounded-xl border border-teal-200 bg-teal-50/60 p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold text-teal-800">
+              <Sparkles className="h-4 w-4" /> Gerar com IA — gatilhos mentais
+            </p>
+            <p className="mt-1 text-xs text-teal-700">
+              Informe o ramo de atividade e tags relacionadas. A IA gera variações de título e
+              subtítulo usando gatilhos mentais de conversão.
+            </p>
+
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="hero-business" className="text-xs font-medium text-teal-900">
+                  Ramo de atividade
+                </label>
+                <input
+                  id="hero-business"
+                  value={heroBusinessArea}
+                  onChange={(e) => setHeroBusinessArea(e.target.value)}
+                  placeholder="ex.: odontologia / educação odontológica"
+                  className="mt-1 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+              <div>
+                <label htmlFor="hero-tags" className="text-xs font-medium text-teal-900">
+                  Tags relacionadas
+                </label>
+                <input
+                  id="hero-tags"
+                  value={heroTags}
+                  onChange={(e) => setHeroTags(e.target.value)}
+                  placeholder="ex.: concurso, residência, preparação"
+                  className="mt-1 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+            </div>
+
+            <Button
+              className="mt-3"
+              variant="premium"
+              onClick={generateHero}
+              disabled={generating}
+            >
+              {generating ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              {generating ? "Gerando..." : "Gerar sugestões"}
+            </Button>
+
+            {genNotice && (
+              <div className="mt-3 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">{genNotice}</div>
+            )}
+
+            {suggestions.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => applySuggestion(s)}
+                    className="w-full rounded-xl border border-teal-200 bg-white p-3 text-left transition hover:border-teal-400 hover:shadow-sm"
+                  >
+                    <span className="inline-block rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-800">
+                      {s.trigger}
+                    </span>
+                    <p className="mt-1.5 text-sm font-semibold text-slate-900">{s.title}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{s.subtitle}</p>
+                  </button>
+                ))}
+                <p className="text-xs text-teal-700">
+                  Clique em uma sugestão para preenchê-la nos campos acima e depois salve.
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mt-6">
         <CardHeader className="pb-3">

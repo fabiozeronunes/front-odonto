@@ -38,6 +38,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [started, setStarted] = useState(false);
   const [speed, setSpeed] = useState<number>(1);
   const onEndedRef = useRef(onEnded);
   onEndedRef.current = onEnded;
@@ -47,7 +48,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
     new window.YT.Player(containerRef.current, {
       videoId,
       playerVars: {
-        autoplay: 1,
+        autoplay: 0,
         mute: 1,
         controls: 0,
         disablekb: 1,
@@ -138,6 +139,16 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
     }
   }, []);
 
+  const startWithSound = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    player.unMute();
+    setMuted(false);
+    setStarted(true);
+    player.playVideo();
+    setPlaying(true);
+  }, []);
+
   const cycleSpeed = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
@@ -160,29 +171,33 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
 
       {ready && (
         <>
-          <button
-            type="button"
-            onClick={togglePlay}
-            className="absolute inset-0 z-10 flex items-center justify-center"
-            aria-label={playing ? "Pausar" : "Reproduzir"}
-          >
-            {!playing && (
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow">
-                <Play className="h-8 w-8 text-white" />
+          {!started ? (
+            <button
+              type="button"
+              onClick={startWithSound}
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/45 backdrop-blur-[2px] transition hover:bg-black/40"
+              aria-label="Ativar som e reproduzir"
+            >
+              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow transition group-hover:scale-105">
+                <Play className="ml-1 h-10 w-10 text-white" />
               </span>
-            )}
-          </button>
-
-          {muted && playing && (
-            <div className="absolute inset-x-0 bottom-16 z-20 flex justify-center">
-              <button
-                type="button"
-                onClick={toggleMute}
-                className="flex items-center gap-2 rounded-full bg-black/70 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/80"
-              >
-                <VolumeX className="h-4 w-4" /> Ativar som
-              </button>
-            </div>
+              <span className="flex items-center gap-2 rounded-full bg-black/60 px-5 py-2.5 text-base font-bold text-white backdrop-blur">
+                <VolumeX className="h-5 w-5" /> Ativar som
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={togglePlay}
+              className="absolute inset-0 z-10 flex items-center justify-center"
+              aria-label={playing ? "Pausar" : "Reproduzir"}
+            >
+              {!playing && (
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow">
+                  <Play className="h-8 w-8 text-white" />
+                </span>
+              )}
+            </button>
           )}
 
           <div className="absolute bottom-3 left-3 right-3 z-20 flex items-center justify-between opacity-100 transition md:opacity-0 md:group-hover:opacity-100">

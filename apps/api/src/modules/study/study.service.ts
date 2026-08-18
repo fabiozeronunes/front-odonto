@@ -7,7 +7,7 @@ import type { SaveResourceInput, GenerateResourceInput } from "./study.validator
 
 const ALGO = "aes-256-gcm";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 const GENERATABLE_TYPES = ["QUIZ", "FLASHCARDS", "QUESTIONARIO", "MIND_MAP", "INFOGRAPHIC", "RESUMO"] as const;
 type GeneratableType = (typeof GENERATABLE_TYPES)[number];
 
@@ -303,7 +303,7 @@ async function callGemini(apiKey: string, prompt: string, mediaUrl?: string | nu
   parts.push({ text: prompt });
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

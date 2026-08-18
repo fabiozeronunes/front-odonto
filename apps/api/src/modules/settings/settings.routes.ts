@@ -12,5 +12,8 @@ settingsRouter.post("/hero-video", authenticate, requireRole(Role.ADMIN), ctrl.h
 settingsRouter.delete("/hero-video", authenticate, requireRole(Role.ADMIN), ctrl.heroVideoDelete);
 settingsRouter.get("/home-lock", ctrl.homeLockGet);
 settingsRouter.post("/home-lock", authenticate, requireRole(Role.ADMIN), ctrl.homeLockPost);
+settingsRouter.get("/hero-content", ctrl.heroContentGet);
+settingsRouter.post("/hero-content", authenticate, requireRole(Role.ADMIN), ctrl.heroContentPost);
+settingsRouter.post("/hero-generate", authenticate, requireRole(Role.ADMIN), ctrl.heroGenerate);
 settingsRouter.get("/payment", ctrl.paymentGet);
 settingsRouter.post("/payment", authenticate, requireRole(Role.ADMIN), ctrl.paymentPost);

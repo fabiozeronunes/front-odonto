@@ -63,6 +63,30 @@ export const homeLockPost = asyncHandler(async (req: Request, res: Response) => 
   res.json({ data: { enabled, unlockMinutes } });
 });
 
+export const heroContentGet = asyncHandler(async (_req: Request, res: Response) => {
+  const data = await service.getHeroContent();
+  res.json({ data });
+});
+
+export const heroContentPost = asyncHandler(async (req: Request, res: Response) => {
+  const data = await service.saveHeroContent({
+    title: req.body?.title,
+    subtitle: req.body?.subtitle,
+    businessArea: req.body?.businessArea,
+    tags: req.body?.tags,
+  });
+  res.json({ data });
+});
+
+export const heroGenerate = asyncHandler(async (req: Request, res: Response) => {
+  const options = await service.generateHeroSuggestions({
+    businessArea: req.body?.businessArea,
+    tags: req.body?.tags,
+    count: req.body?.count,
+  });
+  res.json({ data: options });
+});
+
 export const paymentGet = asyncHandler(async (_req: Request, res: Response) => {
   const value = await service.getPaymentSettings();
   res.json({ data: value });

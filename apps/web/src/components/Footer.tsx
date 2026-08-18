@@ -5,7 +5,7 @@ export function Footer() {
   const logoUrl = useSiteLogo();
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
+    <footer className="border-t border-slate-800 bg-slate-950 pb-20 text-slate-400 lg:pb-0">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
