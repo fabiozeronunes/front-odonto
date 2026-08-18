@@ -1,0 +1,212 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Play, Volume2, VolumeX, Gauge } from "lucide-react";
+
+const YOUTUBE_ID_REGEX =
+  /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/;
+
+function getVideoId(url: string): string | null {
+  const match = url.match(YOUTUBE_ID_REGEX) ?? url.match(/^([\w-]{11})$/);
+  return match ? match[1] : null;
+}
+
+export interface YTPlayerLike {
+  playVideo(): void;
+  pauseVideo(): void;
+  getCurrentTime(): number;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
+  getPlayerState(): number;
+  getDuration(): number;
+  setPlaybackRate(rate: number): void;
+  getPlaybackRate(): number;
+  isMuted(): boolean;
+  mute(): void;
+  unMute(): void;
+}
+
+type Props = {
+  videoUrl: string;
+  onEnded?: () => void;
+};
+
+const TURBO_SPEEDS = [1, 1.25, 1.5, 1.75, 2] as const;
+
+export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
+  const videoId = getVideoId(videoUrl);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YTPlayerLike | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+  const [ready, setReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [speed, setSpeed] = useState<number>(1);
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
+
+  const createPlayer = useCallback(() => {
+    if (!window.YT || !window.YT.Player || !containerRef.current || !videoId) return;
+    new window.YT.Player(containerRef.current, {
+      videoId,
+      playerVars: {
+        autoplay: 1,
+        mute: 1,
+        controls: 0,
+        disablekb: 1,
+        rel: 0,
+        modestbranding: 1,
+        fs: 0,
+        playsinline: 1,
+        iv_load_policy: 3,
+      },
+      events: {
+        onReady: (e: { target: YTPlayerLike }) => {
+          playerRef.current = e.target;
+          setReady(true);
+          setMuted(e.target.isMuted());
+          setPlaying(e.target.getPlayerState() === 1);
+        },
+        onStateChange: (e: { data: number }) => {
+          setPlaying(e.data === 1);
+          if (e.data === 0) onEndedRef.current?.();
+        },
+      },
+    });
+  }, [videoId]);
+
+  useEffect(() => {
+    if (!videoId) return;
+    let cancelled = false;
+    const boot = () => {
+      if (!cancelled) createPlayer();
+    };
+    if (window.YT?.Player) {
+      boot();
+    } else {
+      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
+      window.onYouTubeIframeAPIReady = boot;
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [videoId, createPlayer]);
+
+  useEffect(() => {
+    if (!videoId) return;
+    const interval = setInterval(() => {
+      const player = playerRef.current;
+      if (!player) return;
+      const current = player.getCurrentTime();
+      const state = player.getPlayerState();
+      if (lastTimeRef.current === null) {
+        lastTimeRef.current = current;
+        return;
+      }
+      const delta = current - lastTimeRef.current;
+      if (state === 1 && delta > 1.5) {
+        player.seekTo(lastTimeRef.current, true);
+      } else {
+        lastTimeRef.current = current;
+      }
+    }, 400);
+    return () => clearInterval(interval);
+  }, [videoId]);
+
+  const togglePlay = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (player.getPlayerState() === 1) {
+      player.pauseVideo();
+      setPlaying(false);
+    } else {
+      player.playVideo();
+      setPlaying(true);
+    }
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (player.isMuted()) {
+      player.unMute();
+      setMuted(false);
+    } else {
+      player.mute();
+      setMuted(true);
+    }
+  }, []);
+
+  const cycleSpeed = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    const next = TURBO_SPEEDS[(TURBO_SPEEDS.indexOf(speed as (typeof TURBO_SPEEDS)[number]) + 1) % TURBO_SPEEDS.length] ?? 1;
+    player.setPlaybackRate(next);
+    setSpeed(next);
+  }, [speed]);
+
+  if (!videoId) {
+    return (
+      <div className="flex aspect-video w-full items-center justify-center bg-black text-sm text-white/60">
+        Vídeo inválido
+      </div>
+    );
+  }
+
+  return (
+    <div className="group relative aspect-video w-full overflow-hidden rounded-3xl border border-teal-400/30 bg-black shadow-lift">
+      <div ref={containerRef} className="h-full w-full" />
+
+      {ready && (
+        <>
+          <button
+            type="button"
+            onClick={togglePlay}
+            className="absolute inset-0 z-10 flex items-center justify-center"
+            aria-label={playing ? "Pausar" : "Reproduzir"}
+          >
+            {!playing && (
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shadow-glow">
+                <Play className="h-8 w-8 text-white" />
+              </span>
+            )}
+          </button>
+
+          {muted && playing && (
+            <div className="absolute inset-x-0 bottom-16 z-20 flex justify-center">
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="flex items-center gap-2 rounded-full bg-black/70 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/80"
+              >
+                <VolumeX className="h-4 w-4" /> Ativar som
+              </button>
+            </div>
+          )}
+
+          <div className="absolute bottom-3 left-3 right-3 z-20 flex items-center justify-between opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
+            <button
+              type="button"
+              onClick={toggleMute}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition hover:bg-black/80"
+              aria-label={muted ? "Ativar som" : "Silenciar"}
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={cycleSpeed}
+              className="flex h-9 items-center gap-1.5 rounded-full bg-black/60 px-3 text-xs font-bold text-white backdrop-blur transition hover:bg-black/80"
+              aria-label="Velocidade de reprodução"
+            >
+              <Gauge className="h-4 w-4" />
+              {speed.toLocaleString("pt-BR")}x
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

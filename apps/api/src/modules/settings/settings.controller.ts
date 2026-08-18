@@ -38,6 +38,31 @@ export const heroVideoDelete = asyncHandler(async (_req: Request, res: Response)
   res.json({ data: null });
 });
 
+export const homeLockGet = asyncHandler(async (_req: Request, res: Response) => {
+  const value = await service.getSiteSetting("homeLock");
+  let enabled = false;
+  let unlockMinutes = 0;
+  if (value) {
+    try {
+      const raw = typeof value === "string" ? JSON.parse(value) : value;
+      const parsed = raw as Record<string, unknown>;
+      enabled = parsed.enabled === true || parsed.enabled === "true";
+      unlockMinutes = Number(parsed.unlockMinutes) > 0 ? Number(parsed.unlockMinutes) : 0;
+    } catch {
+      enabled = false;
+      unlockMinutes = 0;
+    }
+  }
+  res.json({ data: { enabled, unlockMinutes } });
+});
+
+export const homeLockPost = asyncHandler(async (req: Request, res: Response) => {
+  const enabled = req.body?.enabled === true || req.body?.enabled === "true";
+  const unlockMinutes = Math.max(0, Number(req.body?.unlockMinutes) || 0);
+  await service.upsertSiteSetting("homeLock", JSON.stringify({ enabled, unlockMinutes }));
+  res.json({ data: { enabled, unlockMinutes } });
+});
+
 export const paymentGet = asyncHandler(async (_req: Request, res: Response) => {
   const value = await service.getPaymentSettings();
   res.json({ data: value });

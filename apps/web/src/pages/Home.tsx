@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, ShoppingBag, Package, Check, PlayCircle } from "lucide-react";
 import { Plans } from "./Plans";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
-import { cn, cleanYoutubeEmbedUrl, formatPrice, resolveImageUrl } from "../lib/utils";
+import { useAuth } from "../lib/auth";
+import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
 import { useMediaQuery } from "../lib/useMediaQuery";
 import type { Product } from "../types";
 
@@ -167,7 +169,11 @@ function ShopPreview() {
 }
 
 export function Home() {
+  const { isAuthenticated } = useAuth();
   const [heroVideo, setHeroVideo] = useState<string | null>(null);
+  const [lockEnabled, setLockEnabled] = useState(false);
+  const [unlockMinutes, setUnlockMinutes] = useState(0);
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -178,10 +184,35 @@ export function Home() {
       .catch(() => {
         if (active) setHeroVideo(null);
       });
+    api<{ data: { enabled: boolean; unlockMinutes: number } }>("/api/settings/home-lock", {
+      skipAuth: true,
+    })
+      .then((res) => {
+        if (!active) return;
+        setLockEnabled(!!res.data?.enabled);
+        setUnlockMinutes(Number(res.data?.unlockMinutes) || 0);
+        setLocked(!!res.data?.enabled && !isAuthenticated && !!heroVideo);
+      })
+      .catch(() => {
+        if (!active) return;
+        setLocked(false);
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [isAuthenticated, heroVideo]);
+
+  const lockActive = lockEnabled && !isAuthenticated && !!heroVideo;
+
+  useEffect(() => {
+    if (!locked) return;
+    const timer = setTimeout(() => {
+      setLocked(false);
+    }, Math.max(unlockMinutes, 0) * 60_000);
+    return () => clearTimeout(timer);
+  }, [locked, unlockMinutes]);
+
+  const contentHidden = useMemo(() => lockActive && locked, [lockActive, locked]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -207,15 +238,16 @@ export function Home() {
             {/* Bloco de vídeo da hero (configurável no admin) */}
             <div className="relative mx-auto mt-8 max-w-3xl animate-fade-in-up anim-delay-200">
               {heroVideo ? (
-                <div className="overflow-hidden rounded-3xl border border-teal-400/30 shadow-lift">
-                  <iframe
-                    src={cleanYoutubeEmbedUrl(heroVideo) ?? heroVideo}
-                    title="Vídeo da Front Odontus"
-                    className="aspect-video w-full bg-black"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen={false}
+                lockActive && locked ? (
+                  <HeroVideoPlayer
+                    videoUrl={heroVideo}
+                    onEnded={() => {
+                      setLocked(false);
+                    }}
                   />
-                </div>
+                ) : (
+                  <HeroVideoPlayer videoUrl={heroVideo} />
+                )
               ) : (
                 <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
                   <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
@@ -242,7 +274,13 @@ export function Home() {
                   <PlayCircle className="h-5 w-5" /> Começar a estudar grátis
                 </Button>
               </Link>
-              <a href="#planos">
+              <a
+                href="#planos"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("planos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
                 <Button
                   size="lg"
                   variant="outline"
@@ -273,15 +311,29 @@ export function Home() {
         <div className="pointer-events-none absolute -right-6 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-teal-400/10 blur-3xl animate-float-slow" />
       </section>
 
-      {/* ===== SHOP ODONTUS ===== */}
-      <ShopPreview />
-
-      {/* ===== PLANS SECTION ===== */}
-      <section id="planos" className="scroll-mt-16 bg-background py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Plans />
+      {contentHidden ? (
+        <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+          <div className="h-1.5 w-32 overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-primary-600" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Assista ao vídeo acima para desbloquear o restante da página
+            {unlockMinutes > 0 ? ` (ou aguarde até ${unlockMinutes} min)` : ""}.
+          </p>
         </div>
-      </section>
+      ) : (
+        <div className="animate-fade-in-up anim-delay-100">
+          {/* ===== SHOP ODONTUS ===== */}
+          <ShopPreview />
+
+          {/* ===== PLANS SECTION ===== */}
+          <section id="planos" className="scroll-mt-16 bg-background py-12">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6">
+              <Plans />
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

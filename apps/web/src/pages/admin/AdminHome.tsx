@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trash2, Video } from "lucide-react";
+import { Trash2, Video, Lock } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -13,6 +13,11 @@ export function AdminHome() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const [lockEnabled, setLockEnabled] = useState(false);
+  const [lockMinutes, setLockMinutes] = useState(0);
+  const [lockSaving, setLockSaving] = useState(false);
+  const [lockNotice, setLockNotice] = useState<string | null>(null);
+
   async function load() {
     setLoading(true);
     try {
@@ -22,6 +27,17 @@ export function AdminHome() {
     } catch {
       setPreviewUrl(null);
       setSavedUrl(null);
+    }
+    try {
+      const lock = await api<{ data: { enabled: boolean; unlockMinutes: number } }>(
+        "/api/settings/home-lock",
+        { skipAuth: true }
+      );
+      setLockEnabled(lock.data?.enabled ?? false);
+      setLockMinutes(lock.data?.unlockMinutes ?? 0);
+    } catch {
+      setLockEnabled(false);
+      setLockMinutes(0);
     } finally {
       setLoading(false);
     }
@@ -61,6 +77,31 @@ export function AdminHome() {
       setNotice("Falha ao remover o vídeo.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function saveLock() {
+    setLockSaving(true);
+    setLockNotice(null);
+    try {
+      const res = await api<{ data: { enabled: boolean; unlockMinutes: number } }>(
+        "/api/settings/home-lock",
+        {
+          method: "POST",
+          body: JSON.stringify({ enabled: lockEnabled, unlockMinutes: lockMinutes }),
+        }
+      );
+      setLockEnabled(res.data.enabled);
+      setLockMinutes(res.data.unlockMinutes);
+      setLockNotice(
+        res.data.enabled
+          ? `Trava ativada. Visitantes anônimos verão apenas a primeira dobra até o vídeo terminar${res.data.unlockMinutes > 0 ? ` ou ${res.data.unlockMinutes} min` : ""}.`
+          : "Trava desativada. Todos veem a página completa."
+      );
+    } catch {
+      setLockNotice("Falha ao salvar a configuração.");
+    } finally {
+      setLockSaving(false);
     }
   }
 
@@ -125,6 +166,58 @@ export function AdminHome() {
           <p className="text-xs text-slate-400">
             Ao importar, o vídeo aparece acima para conferência antes de salvar.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Lock className="h-4 w-4" /> Bloqueio da página inicial (VSL)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <InfoPopover
+            title="Bloqueio VSL"
+            text="Com o vídeo da hero configurado, visitantes anônimos veem apenas a primeira dobra (hero + vídeo + rodapé). A página completa é liberada quando o vídeo termina (ou após os minutos definidos). Usuários logados veem tudo normalmente."
+          />
+
+          {lockNotice && (
+            <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{lockNotice}</div>
+          )}
+
+          <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-slate-50 px-4 py-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Ativar bloqueio para anônimos</p>
+              <p className="text-xs text-slate-500">Requere um vídeo configurado na hero.</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={lockEnabled}
+              onChange={(e) => setLockEnabled(e.target.checked)}
+              className="h-5 w-5 accent-teal-600"
+            />
+          </label>
+
+          <div>
+            <label htmlFor="lock-minutes" className="text-sm font-medium text-slate-700">
+              Liberar automaticamente após (minutos)
+            </label>
+            <input
+              id="lock-minutes"
+              type="number"
+              min={0}
+              value={lockMinutes}
+              onChange={(e) => setLockMinutes(Math.max(0, Number(e.target.value) || 0))}
+              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+            />
+            <p className="mt-1 text-xs text-slate-400">
+              0 = só libera quando o vídeo terminar.
+            </p>
+          </div>
+
+          <Button onClick={saveLock} disabled={lockSaving}>
+            <Lock className="h-4 w-4" /> {lockSaving ? "Salvando..." : "Salvar configuração"}
+          </Button>
         </CardContent>
       </Card>
     </div>
