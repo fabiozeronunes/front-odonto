@@ -201,7 +201,7 @@ export function Home() {
               )}
             </div>
 
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/80 animate-fade-in-up anim-delay-200 sm:text-xl">
+            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/80 animate-fade-in-up anim-delay-200 sm:text-xl">
               {heroSubtitle
                 ? renderGradientText(heroSubtitle)
                 : "Aprenda por especialidades, estude casos reais e evolua com Quizz, Flashcards e Questionários que vão ajudar na sua formação e aprendizado."}
