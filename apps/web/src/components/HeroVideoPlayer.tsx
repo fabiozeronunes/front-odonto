@@ -26,11 +26,12 @@ export interface YTPlayerLike {
 type Props = {
   videoUrl: string;
   onEnded?: () => void;
+  onStart?: () => void;
 };
 
 const TURBO_SPEEDS = [1, 1.25, 1.5, 1.75, 2] as const;
 
-export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
+export function HeroVideoPlayer({ videoUrl, onEnded, onStart }: Props) {
   const videoId = getVideoId(videoUrl);
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayerLike | null>(null);
@@ -42,6 +43,8 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
   const [speed, setSpeed] = useState<number>(1);
   const onEndedRef = useRef(onEnded);
   onEndedRef.current = onEnded;
+  const onStartRef = useRef(onStart);
+  onStartRef.current = onStart;
 
   const createPlayer = useCallback(() => {
     if (!window.YT || !window.YT.Player || !containerRef.current || !videoId) return;
@@ -147,6 +150,7 @@ export function HeroVideoPlayer({ videoUrl, onEnded }: Props) {
     setStarted(true);
     player.playVideo();
     setPlaying(true);
+    onStartRef.current?.();
   }, []);
 
   const cycleSpeed = useCallback(() => {

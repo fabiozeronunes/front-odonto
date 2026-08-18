@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, PlayCircle } from "lucide-react";
 import { Plans } from "./Plans";
@@ -11,6 +11,16 @@ import { useHomeLock } from "../lib/homeLock";
 import { cn } from "../lib/utils";
 
 const GRADIENT_CLASS = "bg-gradient-to-r from-teal-300 to-amber-400 bg-clip-text text-transparent";
+
+const HOME_UNLOCK_KEY = "odonto_home_unlocked";
+
+function isHomeUnlocked(): boolean {
+  try {
+    return sessionStorage.getItem(HOME_UNLOCK_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 function renderGradientText(text: string) {
   return text.split(/(\*[^*]+\*)/g).map((part, i) =>
@@ -33,6 +43,7 @@ export function Home() {
   const [unlockMinutes, setUnlockMinutes] = useState(0);
   const [locked, setLocked] = useState(false);
   const [lockChecked, setLockChecked] = useState(false);
+  const [videoStarted, setVideoStarted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -61,7 +72,8 @@ export function Home() {
         if (!active) return;
         setLockEnabled(!!res.data?.enabled);
         setUnlockMinutes(Number(res.data?.unlockMinutes) || 0);
-        setLocked(!!res.data?.enabled && !isAuthenticated && !!heroVideo);
+        const alreadyUnlocked = isHomeUnlocked();
+        setLocked(!!res.data?.enabled && !isAuthenticated && !!heroVideo && !alreadyUnlocked);
         setLockChecked(true);
       })
       .catch(() => {
@@ -76,14 +88,22 @@ export function Home() {
 
   const lockActive = lockEnabled && !isAuthenticated && !!heroVideo;
 
+  const unlockHome = useCallback(() => {
+    try {
+      sessionStorage.setItem(HOME_UNLOCK_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setLocked(false);
+  }, []);
+
   useEffect(() => {
     if (!locked) return;
     if (!unlockMinutes) return;
-    const timer = setTimeout(() => {
-      setLocked(false);
-    }, unlockMinutes * 60_000);
+    if (!videoStarted) return;
+    const timer = setTimeout(unlockHome, unlockMinutes * 60_000);
     return () => clearTimeout(timer);
-  }, [locked, unlockMinutes]);
+  }, [locked, unlockMinutes, videoStarted, unlockHome]);
 
   const contentHidden = useMemo(
     () => (lockChecked ? lockActive && locked : true),    [lockChecked, lockActive, locked]
@@ -143,12 +163,13 @@ export function Home() {
                 lockActive && locked ? (
                   <HeroVideoPlayer
                     videoUrl={heroVideo}
+                    onStart={() => setVideoStarted(true)}
                     onEnded={() => {
-                      if (!unlockMinutes) setLocked(false);
+                      if (!unlockMinutes) unlockHome();
                     }}
                   />
                 ) : (
-                  <HeroVideoPlayer videoUrl={heroVideo} />
+                  <HeroVideoPlayer videoUrl={heroVideo} onStart={() => setVideoStarted(true)} />
                 )
               ) : (
                 <div className="overflow-hidden rounded-3xl border border-teal-400/30 bg-primary-950/60 shadow-lift backdrop-blur">
