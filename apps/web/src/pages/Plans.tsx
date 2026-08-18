@@ -20,22 +20,19 @@ const PLAN_TITLE: Record<string, string> = {
   gratuito: "Gratuito",
 };
 
-function Price({ plan }: { plan: MembershipPlan }) {
+function Price({ plan, variant = "default" }: { plan: MembershipPlan; variant?: "default" | "featured" }) {
+  const subtle = variant === "featured" ? "text-teal-300" : "text-muted-foreground";
+  const accent = variant === "featured" ? "text-white" : "text-foreground";
   if (plan.billing === "YEARLY") {
     return (
       <div>
-        <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground dark:text-white/70">
-          Anual
-        </p>
+        <p className={cn("text-sm font-medium uppercase tracking-wide", subtle)}>Anual</p>
         <div className="mt-1 flex items-baseline gap-1">
           <span className="font-display text-4xl font-bold">{formatPrice(plan.price)}</span>
-          <span className="text-sm text-muted-foreground dark:text-white/70">/ ano</span>
+          <span className={cn("text-sm", subtle)}>/ ano</span>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground dark:text-white/70">
-          sai a{" "}
-          <span className="font-semibold text-foreground dark:text-teal-300">
-            {formatPrice(Number(plan.price) / 12)}
-          </span>{" "}
+        <p className={cn("mt-1 text-xs", subtle)}>
+          sai a <span className={cn("font-semibold", accent)}>{formatPrice(Number(plan.price) / 12)}</span>{" "}
           mensal
         </p>
       </div>
@@ -44,7 +41,7 @@ function Price({ plan }: { plan: MembershipPlan }) {
   return (
     <div className="flex items-baseline gap-1">
       <span className="font-display text-3xl font-bold">{formatPrice(plan.price)}</span>
-      <span className="text-sm text-muted-foreground">/ mês</span>
+      <span className={cn("text-sm", subtle)}>/ mês</span>
     </div>
   );
 }
@@ -65,7 +62,7 @@ function FeaturedPlan({ plan, isAuthenticated }: { plan: MembershipPlan; isAuthe
         </div>
         {plan.description && <p className="mt-2 text-sm text-white/70">{plan.description}</p>}
         <div className="mt-5">
-          <Price plan={plan} />
+          <Price plan={plan} variant="featured" />
         </div>
         <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-2">
           {benefits.map((b, i) => (
@@ -156,14 +153,14 @@ function InfoCard({
 }) {
   return (
     <div
-      className="flex flex-col justify-center rounded-2xl border border-dashed border-teal-300 bg-surface/70 p-6 animate-fade-in-up dark:border-primary-700"
+      className="flex flex-col justify-center rounded-2xl border border-dashed border-teal-400/40 bg-gradient-to-br from-primary-800 to-primary-950 p-6 animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100 text-teal-600 dark:bg-primary-900/60 dark:text-teal-300">
+      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-teal-300 backdrop-blur">
         <Icon className="h-5 w-5" />
       </span>
-      <p className="mt-3 font-display text-base font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{text}</p>
+      <p className="mt-3 font-display text-base font-bold text-white">{title}</p>
+      <p className="mt-1 text-xs text-white/70">{text}</p>
     </div>
   );
 }
@@ -215,7 +212,7 @@ export function Plans() {
           ))}
         </div>
       ) : (
-        <div className="mt-10 grid gap-4 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {featured && <FeaturedPlan plan={featured} isAuthenticated={isAuthenticated} />}
           {grid.map((plan) => (
             <GridPlan key={plan.id} plan={plan} isAuthenticated={isAuthenticated} />
