@@ -79,7 +79,7 @@ export function RecursosSection() {
   return (
     <section
       id="recursos"
-      className="scroll-mt-16 bg-gradient-to-b from-teal-50/70 via-background to-background py-14 lg:py-20 dark:from-primary-950/50 dark:via-background dark:to-background"
+      className="scroll-mt-16 border-y border-teal-200/60 bg-teal-50/80 py-14 lg:py-20 dark:border-primary-800/40 dark:bg-primary-950/40"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
