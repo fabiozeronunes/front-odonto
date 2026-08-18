@@ -136,27 +136,35 @@ function GridPlan({ plan, isAuthenticated }: { plan: MembershipPlan; isAuthentic
   );
 }
 
-function InfoCard({
-  icon: Icon,
-  title,
-  text,
-  delay,
-}: {
-  icon: typeof ShieldCheck;
-  title: string;
-  text: string;
-  delay: number;
-}) {
+function InfoCard({ delay }: { delay: number }) {
   return (
     <div
-      className="flex flex-col justify-center rounded-2xl border border-dashed border-teal-400/40 bg-gradient-to-br from-primary-800 to-primary-950 p-6 animate-fade-in-up"
+      className="flex flex-col justify-center gap-6 rounded-2xl border border-dashed border-teal-400/40 bg-gradient-to-br from-primary-800 to-primary-950 p-6 animate-fade-in-up sm:flex-row lg:col-span-2"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-teal-300 backdrop-blur">
-        <Icon className="h-5 w-5" />
-      </span>
-      <p className="mt-3 font-display text-base font-bold text-white">{title}</p>
-      <p className="mt-1 text-xs text-white/70">{text}</p>
+      <div className="flex flex-1 items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-teal-300 backdrop-blur">
+          <ShieldCheck className="h-5 w-5" />
+        </span>
+        <div>
+          <p className="font-display text-base font-bold text-white">Garantia e suporte</p>
+          <p className="mt-1 text-xs text-white/70">
+            Acesso liberado imediatamente após a confirmação do pagamento, com suporte para sua jornada.
+          </p>
+        </div>
+      </div>
+      <div className="hidden w-px self-stretch bg-white/15 sm:block" />
+      <div className="flex flex-1 items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-teal-300 backdrop-blur">
+          <CreditCard className="h-5 w-5" />
+        </span>
+        <div>
+          <p className="font-display text-base font-bold text-white">Pagamento seguro</p>
+          <p className="mt-1 text-xs text-white/70">
+            Pague com Pix, cartão de crédito ou boleto e desbloqueie seu plano na hora.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -213,18 +221,7 @@ export function Plans() {
           {grid.map((plan) => (
             <GridPlan key={plan.id} plan={plan} isAuthenticated={isAuthenticated} />
           ))}
-          <InfoCard
-            icon={ShieldCheck}
-            title="Garantia e suporte"
-            text="Acesso liberado imediatamente após a confirmação do pagamento, com suporte para sua jornada."
-            delay={300}
-          />
-          <InfoCard
-            icon={CreditCard}
-            title="Pagamento seguro"
-            text="Pague com Pix, cartão de crédito ou boleto e desbloqueie seu plano na hora."
-            delay={400}
-          />
+          <InfoCard delay={300} />
         </div>
       )}
 
