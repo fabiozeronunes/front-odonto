@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { AlertCircle, Phone, Mail, User } from "lucide-react";
+import { AlertCircle, GraduationCap, Phone, Mail, User } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { ApiRequestError } from "../lib/api";
-import { useSiteLogo } from "../lib/useSiteLogo";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -12,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../co
 export function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const logoUrl = useSiteLogo();
   const [searchParams] = useSearchParams();
   const ref = searchParams.get("ref") ?? undefined;
   const [name, setName] = useState("");
@@ -37,40 +35,39 @@ export function Register() {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col px-4 py-16">
-      <div className="mb-8 text-center">
-        <Link to="/" className="mx-auto flex justify-center">
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt="OdontoStudy"
-              className="h-auto w-[70vw] max-w-full object-contain md:max-w-[240px] lg:max-w-[220px]"
-            />
-          ) : (
-            <span className="font-display text-2xl font-bold text-primary-700 dark:text-primary-400">
-              Odontus
+    <div className="border-y border-teal-200/60 bg-teal-50/80 py-14 lg:py-20 dark:border-primary-800/40 dark:bg-primary-950/40">
+      <div className="mx-auto max-w-md px-4">
+        <div className="mb-8 text-center animate-fade-in-up">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 dark:border-primary-700 dark:bg-primary-900/40 dark:text-teal-300"
+          >
+            <GraduationCap className="h-3.5 w-3.5" /> Odontus
+          </Link>
+          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Crie sua{" "}
+            <span className="bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">
+              conta grátis
             </span>
-          )}
-        </Link>
-        <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Crie sua conta</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Preencha seus dados e depois escolha seu plano
-        </p>
-      </div>
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-muted-foreground">
+            Preencha seus dados e depois escolha seu plano
+          </p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Cadastro</CardTitle>
-          <CardDescription>Preencha seus dados para começar</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                {error}
-              </div>
-            )}
+        <Card className="rounded-2xl border border-teal-200 bg-white shadow-card animate-fade-in-up dark:border-primary-800/50">
+          <CardHeader>
+            <CardTitle className="text-lg">Cadastro</CardTitle>
+            <CardDescription>Preencha seus dados para começar</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  {error}
+                </div>
+              )}
 
             <div className="space-y-2">
               <Label htmlFor="name">Nome completo</Label>
@@ -129,7 +126,7 @@ export function Register() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full rounded-full" disabled={loading}>
               {loading ? "Criando conta..." : "Salvar e escolher plano"}
             </Button>
           </form>
@@ -142,6 +139,7 @@ export function Register() {
           </p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
