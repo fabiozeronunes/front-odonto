@@ -109,7 +109,7 @@ export function VideoDetail() {
 
       {isPremiumLocked ? (
         <div className="flex flex-col items-center rounded-2xl border border-amber-200 bg-amber-50 px-6 py-20 text-center dark:border-amber-900/60 dark:bg-amber-950/40">
-          <Badge variant="premium" className="mb-4">CONTEÚDO PREMIUM</Badge>
+          <span className="mb-4 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">CONTEÚDO PREMIUM</span>
           <h1 className="text-2xl font-bold text-foreground">{video.title}</h1>
           <p className="mt-2 max-w-md text-muted-foreground">
             {isAuthenticated
@@ -147,18 +147,22 @@ export function VideoDetail() {
           <div className="p-6">
             <div className="flex flex-wrap items-center gap-2">
               {video.isFree ? (
-                <Badge variant="free">GRATUITO</Badge>
+                <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+                  GRATUITO
+                </span>
               ) : (
-                <Badge variant="premium">PREMIUM</Badge>
+                <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+                  PREMIUM
+                </span>
               )}
-              <Badge variant="info" className="capitalize">
+              <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
                 {video.difficulty.toLowerCase()}
-              </Badge>
+              </span>
               {video.specialty && (
                 <Link to={`/catalogo?specialty=${video.specialty.slug}`}>
-                  <Badge variant="outline" className="hover:bg-muted">
+                  <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 transition-colors hover:bg-accent-100 dark:bg-accent-900 dark:text-accent-200 dark:hover:bg-accent-800">
                     {video.specialty.name}
-                  </Badge>
+                  </span>
                 </Link>
               )}
             </div>
