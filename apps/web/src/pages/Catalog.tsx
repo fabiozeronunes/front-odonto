@@ -438,7 +438,7 @@ export function Catalog() {
             <>
               <div className={gridClass}>
                 {videos.map((video) => (
-                  <VideoCard key={video.id} video={video} />
+                  <VideoCard key={video.id} video={video} typeBadge="VIDEO" />
                 ))}
               </div>
               {videos.length < total && (

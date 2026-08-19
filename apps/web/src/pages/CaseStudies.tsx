@@ -70,6 +70,7 @@ export function CaseStudies() {
                       <Badge variant="info">
                         <PlayCircle className="mr-0.5 inline h-3 w-3" /> Vídeo
                       </Badge>
+                      <Badge variant="info" className="bg-slate-900">Estudo de caso</Badge>
                     </div>
                     {video.durationSeconds ? (
                       <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">

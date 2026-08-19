@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { formatDuration, resolveImageUrl } from "../lib/utils";
 
-export function VideoCard({ video }: { video: Video }) {
+export function VideoCard({ video, typeBadge }: { video: Video; typeBadge?: string }) {
   return (
     <Link to={`/video/${video.slug}`} className="group block">
       <Card className="overflow-hidden transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
@@ -39,6 +39,11 @@ export function VideoCard({ video }: { video: Video }) {
             ) : video.source === "STUDENT" ? (
               <Badge variant="info" className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
                 Estudante
+              </Badge>
+            ) : null}
+            {typeBadge ? (
+              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1 sm:text-[11px]">
+                {typeBadge}
               </Badge>
             ) : null}
           </div>

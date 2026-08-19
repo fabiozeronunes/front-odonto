@@ -53,11 +53,12 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
     setDownloading(true);
     setMessage(null);
     const instances = [
+      "https://cobaltapi.cjs.nz",
+      "https://api.cobalt.liubquanti.click",
       ((import.meta.env.VITE_COBALT_API_URL as string | undefined) ||
-        "https://api.cobalt.tools").replace(/\/+$/, "").replace(/\/api\/json$/, ""),
+        "").replace(/\/+$/, "").replace(/\/api\/json$/, ""),
       "https://cobaltapi.kittycat.boo",
       "https://dog.kittycat.boo",
-      "https://cobaltapi.cjs.nz",
     ].filter(Boolean) as string[];
 
     for (const instance of instances) {
@@ -113,6 +114,7 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
       const res = await fetch(url);
       if (!res.ok) return false;
       const blob = await res.blob();
+      if (blob.size === 0) return false;
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = objectUrl;
