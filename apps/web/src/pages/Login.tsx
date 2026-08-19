@@ -101,10 +101,6 @@ export function Login() {
             </p>
           </CardContent>
         </Card>
-
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Demo: admin@odonto.study / Admin@123 · aluno@odonto.study / Usuario@123
-        </p>
       </div>
     </div>
   );
