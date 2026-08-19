@@ -234,10 +234,12 @@ export function VideoDetail() {
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <TagIcon className="h-4 w-4 text-muted-foreground" />
                 {video.tags.map(({ tag }) => (
-                  <Link key={tag.id} to={`/catalogo?tag=${tag.slug}`}>
-                    <Badge variant="outline" className="px-2 py-0.5 text-[10px] uppercase hover:bg-muted">
-                      #{tag.name}
-                    </Badge>
+                  <Link
+                    key={tag.id}
+                    to={`/catalogo?tag=${tag.slug}`}
+                    className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 transition-colors hover:bg-accent-100 dark:bg-accent-900 dark:text-accent-200 dark:hover:bg-accent-800"
+                  >
+                    #{tag.name}
                   </Link>
                 ))}
               </div>
