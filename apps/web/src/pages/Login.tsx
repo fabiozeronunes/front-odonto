@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AlertCircle, GraduationCap } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { ApiRequestError } from "../lib/api";
 import { Button } from "../components/ui/button";
@@ -37,13 +37,7 @@ export function Login() {
     <div className="border-y border-teal-200/60 bg-teal-50/80 py-14 lg:py-20 dark:border-primary-800/40 dark:bg-primary-950/40">
       <div className="mx-auto max-w-md px-4">
         <div className="mb-8 text-center animate-fade-in-up">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 dark:border-primary-700 dark:bg-primary-900/40 dark:text-teal-300"
-          >
-            <GraduationCap className="h-3.5 w-3.5" /> Odontus
-          </Link>
-          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Bem-vindo de{" "}
             <span className="bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">
               volta
