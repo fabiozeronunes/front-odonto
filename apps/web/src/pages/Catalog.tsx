@@ -368,7 +368,7 @@ export function Catalog() {
                       {(img.tags ?? []).map(({ tag }) => (
                         <span
                           key={tag.id}
-                          className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                          className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700"
                         >
                           #{tag.name}
                         </span>
@@ -422,7 +422,7 @@ export function Catalog() {
                         {img.tags.map(({ tag }) => (
                           <span
                             key={tag.id}
-                            className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                            className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700"
                           >
                             #{tag.name}
                           </span>

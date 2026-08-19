@@ -24,20 +24,20 @@ export function VideoCard({ video }: { video: Video }) {
           )}
           <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
             {video.isFree ? (
-              <Badge variant="free" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+              <Badge variant="free" className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
                 GRATUITO
               </Badge>
             ) : (
-              <Badge variant="premium" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+              <Badge variant="premium" className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
                 Pago
               </Badge>
             )}
             {video.source === "FRONTODONTUS" ? (
-              <Badge variant="default" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+              <Badge variant="default" className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
                 Front Odontus
               </Badge>
             ) : video.source === "STUDENT" ? (
-              <Badge variant="info" className="rounded-md px-1.5 py-0.5 text-[10px] leading-none sm:px-2 sm:py-1 sm:text-xs">
+              <Badge variant="info" className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
                 Estudante
               </Badge>
             ) : null}
