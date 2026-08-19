@@ -193,6 +193,7 @@ model Tag {
   updatedAt   DateTime @updatedAt
 
   videos          VideoTag[]
+  videoAudios     VideoAudioTag[]
   caseStudies     CaseStudyTag[]
   products        ProductTag[]
   media           MediaTag[]
@@ -219,6 +220,8 @@ model Video {
   publishedAt     DateTime?
   viewCount       Int           @default(0)
   observations    String?
+  audioUrl        String?
+  audioTitle      String?
   specialty       Specialty?    @relation(fields: [specialtyId], references: [id])
   specialtyId     String?
   createdBy       User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
@@ -227,6 +230,7 @@ model Video {
   updatedAt       DateTime      @updatedAt
 
   tags           VideoTag[]
+  audioTags      VideoAudioTag[]
   caseStudies    VideoCaseStudy[]
   watchHistory   WatchHistory[]
   favorites      Favorite[]
@@ -241,6 +245,16 @@ model Video {
 }
 
 model VideoTag {
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId String
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId   String
+
+  @@id([videoId, tagId])
+  @@index([tagId])
+}
+
+model VideoAudioTag {
   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
   videoId String
   tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)

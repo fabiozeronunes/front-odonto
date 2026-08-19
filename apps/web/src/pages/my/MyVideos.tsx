@@ -13,6 +13,7 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
 import { YouTubeImport } from "../../components/YouTubeImport";
+import { AudioRecorder } from "../../components/AudioRecorder";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
@@ -46,6 +47,9 @@ interface VideoFormState {
   author: string;
   institution: string;
   observations: string;
+  audioUrl: string;
+  audioTitle: string;
+  audioTagIds: string[];
   tagIds: string[];
   images: ImageDraft[];
 }
@@ -63,6 +67,9 @@ const emptyForm: VideoFormState = {
   author: "",
   institution: "",
   observations: "",
+  audioUrl: "",
+  audioTitle: "",
+  audioTagIds: [],
   tagIds: [],
   images: [],
 };
@@ -127,6 +134,9 @@ export function MyVideos() {
       author: video.author ?? "",
       institution: video.institution ?? "",
       observations: video.observations ?? "",
+      audioUrl: video.audioUrl ?? "",
+      audioTitle: video.audioTitle ?? "",
+      audioTagIds: video.audioTags?.map((t) => t.tag.id) ?? [],
       tagIds: video.tags.map((t) => t.tag.id),
       images: video.images?.slice(0, 5).map((i) => ({
         id: i.id,
@@ -172,6 +182,9 @@ export function MyVideos() {
       author: editing.author || undefined,
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
+      audioUrl: editing.audioUrl || undefined,
+      audioTitle: editing.audioTitle || undefined,
+      audioTagIds: editing.audioTagIds,
       tagIds: editing.tagIds,
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
@@ -248,6 +261,40 @@ export function MyVideos() {
       });
       setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
       setEditing({ ...editing, tagIds: [...editing.tagIds, res.data.id] });
+      return res.data.id;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao criar tag");
+      return null;
+    }
+  }
+
+  function toggleAudioTag(id: string) {
+    if (!editing) return;
+    setEditing({
+      ...editing,
+      audioTagIds: editing.audioTagIds.includes(id)
+        ? editing.audioTagIds.filter((t) => t !== id)
+        : [...editing.audioTagIds, id],
+    });
+  }
+
+  async function createAudioTag(name: string) {
+    if (!editing || !name.trim()) return null;
+    const trimmed = name.trim();
+    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing) {
+      if (!editing.audioTagIds.includes(existing.id)) {
+        setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, existing.id] });
+      }
+      return existing.id;
+    }
+    try {
+      const res = await api<{ data: Tag }>("/api/tags", {
+        method: "POST",
+        body: JSON.stringify({ name: trimmed }),
+      });
+      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
+      setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, res.data.id] });
       return res.data.id;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao criar tag");
@@ -345,6 +392,63 @@ export function MyVideos() {
             </div>
 
             <YouTubeImport onInfo={applyYouTube} />
+
+            <AudioRecorder
+              value={editing.audioUrl}
+              onChange={(audioUrl) =>
+                setEditing({
+                  ...editing,
+                  audioUrl,
+                  ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }),
+                })
+              }
+              label="Áudio (gravar ou importar)"
+            />
+
+            {editing.audioUrl && (
+              <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 p-4">
+                <p className="text-sm font-semibold text-foreground">Detalhes do áudio</p>
+                <div className="space-y-2">
+                  <Label>Título do áudio</Label>
+                  <Input
+                    value={editing.audioTitle}
+                    onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })}
+                    placeholder="Ex.: Explicação do vídeo"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tags do áudio</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Tags específicas para o áudio, independentes das tags do vídeo.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => {
+                      const selected = editing.audioTagIds.includes(tag.id);
+                      return (
+                        <span
+                          key={tag.id}
+                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                            selected
+                              ? "bg-accent-600 text-white"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => toggleAudioTag(tag.id)}
+                            className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
+                            title={selected ? "Remover tag do áudio" : "Adicionar tag ao áudio"}
+                          >
+                            #{tag.name}
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <TagCreator onCreate={createAudioTag} />
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">

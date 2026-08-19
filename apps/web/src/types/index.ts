@@ -93,6 +93,9 @@ export interface Video {
   author?: string | null;
   institution?: string | null;
   observations?: string | null;
+  audioUrl?: string | null;
+  audioTitle?: string | null;
+  audioTags?: VideoTag[];
   status: ContentStatus;
   publishedAt?: string | null;
   viewCount: number;

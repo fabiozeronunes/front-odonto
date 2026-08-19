@@ -106,8 +106,13 @@ const videoSelect = {
   status: true,
   publishedAt: true,
   viewCount: true,
+  audioUrl: true,
+  audioTitle: true,
   specialty: { select: { id: true, name: true, slug: true } },
   tags: {
+    select: { tag: { select: { id: true, name: true, slug: true } } },
+  },
+  audioTags: {
     select: { tag: { select: { id: true, name: true, slug: true } } },
   },
   images: {
@@ -368,6 +373,8 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
     author: input.author,
     institution: input.institution,
     observations: input.observations,
+    audioUrl: input.audioUrl || null,
+    audioTitle: input.audioTitle || null,
     status: isAdmin ? input.status : input.status ?? ContentStatus.DRAFT,
     specialty: input.specialtyId ? { connect: { id: input.specialtyId } } : undefined,
     createdBy: { connect: { id: createdById } },
@@ -379,6 +386,9 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
 
   if (input.tagIds.length > 0) {
     data.tags = { create: input.tagIds.map((tagId) => ({ tagId })) };
+  }
+  if (input.audioTagIds.length > 0) {
+    data.audioTags = { create: input.audioTagIds.map((tagId) => ({ tagId })) };
   }
   if (input.caseStudyIds.length > 0) {
     data.caseStudies = {
@@ -423,6 +433,8 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "author",
     "institution",
     "observations",
+    "audioUrl",
+    "audioTitle",
     "status",
   ] as const;
 
@@ -446,6 +458,9 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
 
   if (input.tagIds !== undefined) {
     data.tags = { deleteMany: {}, create: input.tagIds.map((tagId) => ({ tagId })) };
+  }
+  if (input.audioTagIds !== undefined) {
+    data.audioTags = { deleteMany: {}, create: input.audioTagIds.map((tagId) => ({ tagId })) };
   }
   if (input.caseStudyIds !== undefined) {
     data.caseStudies = {
