@@ -102,7 +102,7 @@ export function VideoDetail() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-4">
-        <Link to="/catalogo" className="text-sm font-medium text-primary-700 hover:text-primary-800">
+        <Link to="/catalogo" className="text-sm font-medium bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">
           ← Voltar ao catálogo
         </Link>
       </div>
@@ -135,7 +135,7 @@ export function VideoDetail() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-          <div className="aspect-video bg-black">
+          <div className="aspect-video bg-gradient-to-br from-teal-500 to-amber-500">
             <iframe
               src={video.videoUrl}
               title={video.title}
@@ -250,7 +250,11 @@ export function VideoDetail() {
             )}
 
             <div className="mt-6 flex gap-3 border-t border-border pt-5">
-              <Button variant="outline" onClick={toggleFavorite}>
+              <Button
+                variant="premium"
+                className="rounded-full"
+                onClick={toggleFavorite}
+              >
                 <Heart className={favorited ? "fill-red-500 text-red-500" : ""} />
                 {favorited ? "Favoritado" : "Favoritar"}
               </Button>
@@ -296,12 +300,16 @@ export function VideoDetail() {
 className="group flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
                   <div>
-                    <p className="font-medium text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">{cs.title}</p>
+                    <p className="font-medium text-foreground group-hover:text-amber-600">{cs.title}</p>
                     <p className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</p>
                 </div>
-                <Badge variant={cs.isFree ? "free" : "premium"}>
-                  {cs.isFree ? "GRATUITO" : "PREMIUM"}
-                </Badge>
+                {cs.isFree ? (
+                  <Badge variant="free" className="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-2.5 py-1 text-white">
+                    GRATUITO
+                  </Badge>
+                ) : (
+                  <Badge variant="premium">PREMIUM</Badge>
+                )}
               </Link>
             ))}
           </div>
@@ -325,7 +333,7 @@ className="group flex items-center justify-between rounded-xl border border-bord
                     className={cn(
                       "px-3 py-1 font-semibold transition-colors",
                       rows === value
-                        ? "bg-primary-700 text-primary-foreground"
+                        ? "bg-gradient-to-r from-teal-500 to-amber-500 text-white"
                         : "bg-surface text-muted-foreground hover:bg-muted"
                     )}
                   >
