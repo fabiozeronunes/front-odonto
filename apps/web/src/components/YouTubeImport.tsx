@@ -82,12 +82,19 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
           error?: { code?: string };
         } | null;
         if (data && (data.status === "redirect" || data.status === "tunnel") && data.url) {
-          window.open(data.url, "_blank", "noopener");
-          setMessage("Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.");
+          const saved = await saveToDownloads(data.url, data.filename);
+          if (saved) {
+            setMessage("Download salvo na pasta de downloads do navegador.");
+          } else {
+            window.open(data.url, "_blank", "noopener");
+            setMessage("Não foi possível baixar direto; abri a URL do arquivo em uma nova aba.");
+          }
+          setDownloading(false);
           return;
         }
         if (data?.status === "picker") {
           setMessage("O YouTube exige escolher entre vídeo/áudio. Use \"Usar link do vídeo\".");
+          setDownloading(false);
           return;
         }
         if (data?.status === "error") {
@@ -99,6 +106,25 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
     }
     setMessage("Nenhum serviço de download respondeu. Use \"Usar link do vídeo\".");
     setDownloading(false);
+  }
+
+  async function saveToDownloads(url: string, filename?: string): Promise<boolean> {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return false;
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename || `video-${info?.id ?? Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   return (

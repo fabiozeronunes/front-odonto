@@ -157,9 +157,13 @@ export function MyCases() {
       if (editing.id) {
         await api(`/api/case-studies/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
       } else {
-        await api("/api/case-studies", { method: "POST", body: JSON.stringify(body) });
+        const res = await api<{ data: CaseStudy }>("/api/case-studies", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        setEditing((prev) => (prev ? { ...prev, id: res.data.id } : prev));
       }
-      setEditing(null);
+      setError(null);
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao salvar");
@@ -210,6 +214,19 @@ export function MyCases() {
     if (!editing) return;
     setError(null);
     try {
+      const existing = myVideos.find((v) => v.videoUrl === info.videoUrl);
+      if (existing) {
+        setEditing((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            videoIds: prev.videoIds.includes(existing.id)
+              ? prev.videoIds
+              : [...prev.videoIds, existing.id],
+          };
+        });
+        return;
+      }
       const res = await api<{ data: Video }>("/api/videos", {
         method: "POST",
         body: JSON.stringify({

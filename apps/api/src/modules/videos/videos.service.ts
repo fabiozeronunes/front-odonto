@@ -310,10 +310,23 @@ export async function getVideoRelatedContent(videoId: string) {
   return { videos, images };
 }
 
+async function ensureUniqueVideoSlug(title: string, excludeId?: string): Promise<string> {
+  const base = slugify(title) || "video";
+  let slug = base;
+  let i = 2;
+  while (
+    await prisma.video.findFirst({ where: { slug, ...(excludeId ? { id: { not: excludeId } } : {}) } })
+  ) {
+    slug = `${base}-${i}`;
+    i++;
+  }
+  return slug;
+}
+
 export async function createVideo(input: CreateVideoInput, createdById: string, isAdmin = false) {
   const data: Prisma.VideoCreateInput = {
     title: input.title,
-    slug: slugify(input.title),
+    slug: await ensureUniqueVideoSlug(input.title),
     description: input.description,
     thumbnailUrl: input.thumbnailUrl || null,
     videoType: input.videoType,
@@ -390,7 +403,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
   }
 
   if (input.title) {
-    data.slug = slugify(input.title);
+    data.slug = await ensureUniqueVideoSlug(input.title, video.id);
   }
   if (input.status === ContentStatus.PUBLISHED) {
     data.publishedAt = new Date();
