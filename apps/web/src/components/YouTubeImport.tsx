@@ -52,50 +52,53 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
     if (!info) return;
     setDownloading(true);
     setMessage(null);
-    try {
-      const cobaltUrl =
-        (import.meta.env.VITE_COBALT_API_URL as string | undefined) ??
-        "https://api.cobalt.tools/api/json";
-      const res = await fetch(cobaltUrl, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url: info.watchUrl,
-          downloadMode: "auto",
-          videoQuality: "720",
-        }),
-      });
-      const data = (await res.json().catch(() => null)) as {
-        status?: string;
-        url?: string;
-        filename?: string;
-        text?: string;
-        error?: { code?: string };
-      } | null;
-      if (!data || !res.ok) {
-        setMessage("O serviço de download externo falhou. Use \"Usar link do vídeo\".");
-        return;
+    const instances = [
+      ((import.meta.env.VITE_COBALT_API_URL as string | undefined) ||
+        "https://api.cobalt.tools").replace(/\/+$/, "").replace(/\/api\/json$/, ""),
+      "https://cobaltapi.kittycat.boo",
+      "https://dog.kittycat.boo",
+      "https://cobaltapi.cjs.nz",
+    ].filter(Boolean) as string[];
+
+    for (const instance of instances) {
+      try {
+        const res = await fetch(instance, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: info.watchUrl,
+            downloadMode: "auto",
+            videoQuality: "720",
+          }),
+        });
+        const data = (await res.json().catch(() => null)) as {
+          status?: string;
+          url?: string;
+          filename?: string;
+          text?: string;
+          error?: { code?: string };
+        } | null;
+        if (data && (data.status === "redirect" || data.status === "tunnel") && data.url) {
+          window.open(data.url, "_blank", "noopener");
+          setMessage("Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.");
+          return;
+        }
+        if (data?.status === "picker") {
+          setMessage("O YouTube exige escolher entre vídeo/áudio. Use \"Usar link do vídeo\".");
+          return;
+        }
+        if (data?.status === "error") {
+          continue;
+        }
+      } catch {
+        continue;
       }
-      if (data.status === "redirect" || data.status === "tunnel") {
-        window.open(data.url, "_blank", "noopener");
-        setMessage("Download iniciado! Salve o arquivo e, se quiser hospedar aqui, informe a URL do arquivo no campo do vídeo.");
-        return;
-      }
-      if (data.status === "picker") {
-        setMessage("O YouTube exige escolher entre vídeo/áudio. Use \"Usar link do vídeo\".");
-        return;
-      }
-      setMessage(
-        data.text ?? data.error?.code ?? "Falha no download do vídeo. Use \"Usar link do vídeo\"."
-      );
-    } catch {
-      setMessage("Falha ao baixar no navegador. Use \"Usar link do vídeo\".");
-    } finally {
-      setDownloading(false);
     }
+    setMessage("Nenhum serviço de download respondeu. Use \"Usar link do vídeo\".");
+    setDownloading(false);
   }
 
   return (

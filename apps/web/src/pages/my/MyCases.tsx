@@ -218,7 +218,7 @@ export function MyCases() {
           thumbnailUrl: info.thumbnailUrl || undefined,
           author: info.author || undefined,
           isFree: true,
-          status: "DRAFT",
+          status: "PUBLISHED",
         }),
       });
       setMyVideos((prev) =>

@@ -187,7 +187,7 @@ export async function getVideo(slugOrId: string, opts: { admin?: boolean } = {})
 
   const related = await getRelatedVideos(video.id, video.specialty?.id ?? null, video.tags.map((t) => t.tag.id));
   const relatedImages = await getRelatedImages(video.id, video.tags.map((t) => t.tag.id));
-  const relatedCaseStudies = await getRelatedCaseStudies(video.tags.map((t) => t.tag.id));
+  const relatedCaseStudies = await getRelatedCaseStudies(video.id, video.tags.map((t) => t.tag.id));
 
   return {
     video: opts.admin ? video : stripPrivateFields(video),
@@ -221,13 +221,16 @@ export async function getRelatedImages(videoId: string, tagIds: string[]) {
   });
 }
 
-export async function getRelatedCaseStudies(tagIds: string[]) {
-  if (tagIds.length === 0) return [];
+export async function getRelatedCaseStudies(videoId: string, tagIds: string[]) {
+  const or: Prisma.CaseStudyWhereInput["OR"] = [{ videoCases: { some: { videoId } } }];
+  if (tagIds.length > 0) {
+    or.push({ tags: { some: { tagId: { in: tagIds } } } });
+  }
 
   return prisma.caseStudy.findMany({
     where: {
       status: "PUBLISHED",
-      tags: { some: { tagId: { in: tagIds } } },
+      OR: or,
     },
     orderBy: { publishedAt: "desc" },
     take: 4,
