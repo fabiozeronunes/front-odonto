@@ -17,6 +17,155 @@ export async function upsertSiteSetting(key: string, value: string) {
   return row.value;
 }
 
+export interface FaqItem {
+  id: string;
+  groupId: string;
+  question: string;
+  answer: string;
+}
+
+export interface FaqGroup {
+  id: string;
+  title: string;
+  tag: string;
+  featured: boolean;
+}
+
+export interface Faq {
+  dicaTitle: string;
+  dicaText: string;
+  dicaCta: string;
+  dicaLink: string;
+  groups: FaqGroup[];
+  items: FaqItem[];
+}
+
+export const FAQ_DEFAULT: Faq = {
+  dicaTitle: "Dica de ouro",
+  dicaText:
+    "Assine o PREMIUM para ter todos os recursos de IA e os estudos personalizados para prova e teste — o plano que libera todo o conteúdo do site.",
+  dicaCta: "Ver planos",
+  dicaLink: "#planos",
+  groups: [
+    { id: "planos-acesso", title: "Escolha o plano ideal", tag: "Planos de assinatura", featured: true },
+    { id: "recursos-ia", title: "Recursos com inteligência", tag: "IA", featured: false },
+    { id: "planos-extra", title: "Planos de assinatura", tag: "Planos", featured: false },
+    { id: "pagamento", title: "Pagamento", tag: "Pagamento", featured: false },
+  ],
+  items: [
+    {
+      id: "i1",
+      groupId: "planos-acesso",
+      question: "Como funciona o plano gratuito?",
+      answer:
+        "O plano gratuito dá acesso a vídeos, imagens, áudios e estudos de caso gratuitos, além de busca, tags e área de membros básica. Sem cartão de crédito.",
+    },
+    {
+      id: "i2",
+      groupId: "planos-acesso",
+      question: "Quais as diferenças entre os planos VIP e PREMIUM?",
+      answer:
+        "O PREMIUM libera todo o conteúdo do site, com todos os recursos de IA (quizz, flashcards, infográficos, questionários, resumos), download de vídeos e criação de estudos personalizados para provas e testes. O VIP tem acesso total aos conteúdos VIP e a parte dos recursos de IA.",
+    },
+    {
+      id: "i3",
+      groupId: "planos-acesso",
+      question: "O acesso é liberado na hora?",
+      answer:
+        "Sim. Assim que o pagamento é confirmado via Pix ou cartão de crédito, o acesso ao plano é liberado imediatamente.",
+    },
+    {
+      id: "i4",
+      groupId: "recursos-ia",
+      question: "Quais recursos de IA estão incluídos em cada plano?",
+      answer:
+        "No PREMIUM: resumos em vídeo e áudio, quizz, flashcards, questionários, infográficos e mapas mentais. No VIP: mapas mentais e resumos em áudio.",
+    },
+    {
+      id: "i5",
+      groupId: "recursos-ia",
+      question: "Como a IA ajuda na revisão?",
+      answer:
+        "A IA organiza o conteúdo, gera materiais de revisão (flashcards, quizz, resumos e mapas mentais) e acompanha seu desempenho para acelerar o aprendizado.",
+    },
+    {
+      id: "i6",
+      groupId: "planos-extra",
+      question: "Posso baixar os vídeos para estudar offline?",
+      answer:
+        "Sim. O download de vídeos está disponível no plano PREMIUM. Também é possível gravar aulas em áudio e vídeo para revisar quando quiser.",
+    },
+    {
+      id: "i7",
+      groupId: "planos-extra",
+      question: "O que é o Shop Odontus?",
+      answer:
+        "É a loja de produtos odontológicos da plataforma. Assinantes VIP e PREMIUM têm descontos exclusivos em produtos odontológicos selecionados.",
+    },
+    {
+      id: "i8",
+      groupId: "pagamento",
+      question: "O pagamento é anual?",
+      answer: "Sim, o pagamento é anual, expira anualmente e precisa ser renovado.",
+    },
+  ],
+};
+
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" && v.trim() ? v.trim() : fallback;
+}
+
+function normalizeFaq(input: unknown): Faq {
+  const raw = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+  const source = FAQ_DEFAULT;
+  const rawGroups = Array.isArray(raw.groups) ? raw.groups : source.groups;
+  const rawItems = Array.isArray(raw.items) ? raw.items : source.items;
+
+  const groups: FaqGroup[] = rawGroups
+    .map((g) => (g && typeof g === "object" ? (g as Record<string, unknown>) : {}))
+    .map((g) => ({
+      id: str(g.id, crypto.randomUUID()),
+      title: str(g.title, "Grupo"),
+      tag: str(g.tag, ""),
+      featured: g.featured === true || g.featured === "true",
+    }));
+
+  const items: FaqItem[] = rawItems
+    .map((it) => (it && typeof it === "object" ? (it as Record<string, unknown>) : {}))
+    .map((it) => ({
+      id: str(it.id, crypto.randomUUID()),
+      groupId: str(it.groupId, groups[0]?.id ?? ""),
+      question: str(it.question, "Pergunta"),
+      answer: str(it.answer, ""),
+    }));
+
+  return {
+    dicaTitle: str(raw.dicaTitle, source.dicaTitle),
+    dicaText: str(raw.dicaText, source.dicaText),
+    dicaCta: str(raw.dicaCta, source.dicaCta),
+    dicaLink: str(raw.dicaLink, source.dicaLink),
+    groups,
+    items,
+  };
+}
+
+export async function getFaq(): Promise<Faq> {
+  const value = await getSiteSetting("faq");
+  if (!value) return normalizeFaq(FAQ_DEFAULT);
+  try {
+    const raw = typeof value === "string" ? JSON.parse(value) : value;
+    return normalizeFaq({ ...FAQ_DEFAULT, ...(raw as Record<string, unknown>) });
+  } catch {
+    return normalizeFaq(FAQ_DEFAULT);
+  }
+}
+
+export async function saveFaq(input: unknown): Promise<Faq> {
+  const next = normalizeFaq(input);
+  await upsertSiteSetting("faq", JSON.stringify(next));
+  return next;
+}
+
 export async function getPaymentSettings() {
   const row = await prisma.siteSetting.findUnique({ where: { key: "payment" } });
   return (row?.value as Record<string, unknown> | null) ?? null;

@@ -24,3 +24,5 @@ settingsRouter.post("/hero-content", authenticate, requireRole(Role.ADMIN), ctrl
 settingsRouter.post("/hero-generate", authenticate, requireRole(Role.ADMIN), ctrl.heroGenerate);
 settingsRouter.get("/payment", ctrl.paymentGet);
 settingsRouter.post("/payment", authenticate, requireRole(Role.ADMIN), ctrl.paymentPost);
+settingsRouter.get("/faq", ctrl.faqGet);
+settingsRouter.post("/faq", authenticate, requireRole(Role.ADMIN), ctrl.faqPost);

@@ -123,3 +123,13 @@ export const paymentPost = asyncHandler(async (req: Request, res: Response) => {
   const value = await service.upsertPaymentSettings(data);
   res.json({ data: value });
 });
+
+export const faqGet = asyncHandler(async (_req: Request, res: Response) => {
+  const data = await service.getFaq();
+  res.json({ data });
+});
+
+export const faqPost = asyncHandler(async (req: Request, res: Response) => {
+  const data = await service.saveFaq(req.body);
+  res.json({ data });
+});

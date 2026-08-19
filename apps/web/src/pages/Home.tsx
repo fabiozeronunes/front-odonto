@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { HeroVideoPlayer } from "../components/HeroVideoPlayer";
 import { RecursosSection } from "../components/RecursosSection";
 import { TestimonialsSection } from "../components/TestimonialsSection";
+import { FaqSection } from "../components/FaqSection";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useHomeLock } from "../lib/homeLock";
@@ -255,6 +256,9 @@ export function Home() {
           <section id="planos" className="scroll-mt-16">
             <Plans />
           </section>
+
+          {/* ===== PERGUNTAS FREQUENTES ===== */}
+          <FaqSection />
         </div>
       )}
     </div>
