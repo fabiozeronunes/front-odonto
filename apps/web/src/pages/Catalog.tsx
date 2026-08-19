@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame } from "lucide-react";
+import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame, Video as VideoIcon } from "lucide-react";
 import { api } from "../lib/api";
 import type { Paginated, Specialty, Tag, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
@@ -438,7 +438,7 @@ export function Catalog() {
             <>
               <div className={gridClass}>
                 {videos.map((video) => (
-                  <VideoCard key={video.id} video={video} typeBadge="VIDEO" />
+                  <VideoCard key={video.id} video={video} typeIcon={<VideoIcon className="h-3 w-3" />} />
                 ))}
               </div>
               {videos.length < total && (

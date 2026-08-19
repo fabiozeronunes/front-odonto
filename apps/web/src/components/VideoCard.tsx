@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { PlayCircle, Clock } from "lucide-react";
+import type { ReactNode } from "react";
 import type { Video } from "../types";
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { formatDuration, resolveImageUrl } from "../lib/utils";
 
-export function VideoCard({ video, typeBadge }: { video: Video; typeBadge?: string }) {
+export function VideoCard({ video, typeIcon }: { video: Video; typeIcon?: ReactNode }) {
   return (
     <Link to={`/video/${video.slug}`} className="group block">
       <Card className="overflow-hidden transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
@@ -41,9 +42,9 @@ export function VideoCard({ video, typeBadge }: { video: Video; typeBadge?: stri
                 Estudante
               </Badge>
             ) : null}
-            {typeBadge ? (
-              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1 sm:text-[11px]">
-                {typeBadge}
+            {typeIcon ? (
+              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 leading-none text-white sm:px-2 sm:py-1">
+                {typeIcon}
               </Badge>
             ) : null}
           </div>

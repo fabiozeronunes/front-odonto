@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { PlayCircle, Clock } from "lucide-react";
+import { PlayCircle, Clock, BookOpen } from "lucide-react";
 import { api } from "../lib/api";
 import type { Paginated, CaseStudy } from "../types";
 import { Badge } from "../components/ui/badge";
@@ -67,10 +67,9 @@ export function CaseStudies() {
                       ) : (
                         <Badge variant="premium">Pago</Badge>
                       )}
-                      <Badge variant="info">
-                        <PlayCircle className="mr-0.5 inline h-3 w-3" /> Vídeo
+                      <Badge variant="info" className="bg-slate-900">
+                        <BookOpen className="h-3 w-3" />
                       </Badge>
-                      <Badge variant="info" className="bg-slate-900">Estudo de caso</Badge>
                     </div>
                     {video.durationSeconds ? (
                       <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">
