@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: Página de vídeo com fonte padronizada (Inter)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:"#f0fdfa",100:"#ccfbf1",200:"#99f6e4",300:"#5eead4",400:"#2dd4bf",500:"#14b8a6",600:"#0d9488",700:"#0f766e",800:"#115e59",900:"#134e4a",950:"#042f2e",
+        },
+        accent: {
+          50:"#f0f9ff",100:"#e0f2fe",200:"#bae6fd",300:"#7dd3fc",400:"#38bdf8",500:"#0ea5e9",600:"#0284c7",700:"#0369a1",800:"#075985",900:"#0c4a6e",
+        },
+      },
+      fontFamily: { sans:["Inter","system-ui","sans-serif"], display:["Space Grotesk","Inter","system-ui","sans-serif"] },
+      boxShadow: {
+        lift:"0 8px 24px -6px rgb(15 118 110 / .15)",
+        glow:"0 0 30px -6px rgb(245 158 11 / .4)",
+        card:"0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .08)",
+      },
+    },
+  },
+};
+</script>
+<style>
+  body { background:#fafafa; color:#0f172a; font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .badge-chip { @apply inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700; }
+</style>
+</head>
+<body>
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+
+  <!-- breadcrumb -->
+  <div class="mb-4">
+    <a href="#" class="text-sm font-medium bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">← Voltar ao catálogo</a>
+  </div>
+
+  <!-- player card -->
+  <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+    <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500 flex items-center justify-center">
+      <div class="flex h-24 w-24 items-center justify-center rounded-full bg-white/20 text-white">
+        <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"/></svg>
+      </div>
+    </div>
+    <div class="p-6">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">Premium</span>
+        <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">Intermediário</span>
+        <a href="#" class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700 hover:bg-sky-100">Endodontia</a>
+      </div>
+
+      <!-- TÍTULO: sem font-display, fonte padrão (Inter) -->
+      <h1 class="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">
+        Tratamento Endodôntico: Abertura coronária e localização dos canais
+      </h1>
+
+      <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
+        <span class="flex items-center gap-1.5">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          18:42
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          1.240 visualizações
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          12/08/2026
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          Prof. Ana Beatriz
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+          UNIFESP
+        </span>
+      </div>
+
+      <!-- descrição: fonte padrão -->
+      <p class="mt-5 whitespace-pre-line text-slate-500">
+        Aula completa sobre abertura coronária, localização e exploração dos canais radiculares em dentes anteriores e posteriores. Inclui protocolo clínico passo a passo e os erros mais comuns.
+      </p>
+
+      <!-- imagens relacionadas ao assunto -->
+      <div class="mt-6">
+        <h2 class="text-xl font-bold text-slate-900">Imagens relacionadas ao assunto</h2>
+        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <button class="group overflow-hidden rounded-xl border border-slate-200 text-left">
+            <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500"></div>
+            <span class="flex flex-wrap gap-1 p-2">
+              <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#endodontia</span>
+              <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#canais</span>
+            </span>
+          </button>
+          <button class="group overflow-hidden rounded-xl border border-slate-200 text-left">
+            <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500"></div>
+            <span class="flex flex-wrap gap-1 p-2">
+              <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#abertura</span>
+            </span>
+          </button>
+          <button class="group overflow-hidden rounded-xl border border-slate-200 text-left">
+            <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500"></div>
+            <span class="flex flex-wrap gap-1 p-2">
+              <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#localização</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- tags -->
+      <div class="mt-5 flex flex-wrap items-center gap-2">
+        <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+        <a href="#" class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700 transition-colors hover:bg-sky-100">#endodontia</a>
+        <a href="#" class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700 transition-colors hover:bg-sky-100">#tratamento-canal</a>
+        <a href="#" class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700 transition-colors hover:bg-sky-100">#periodontia</a>
+      </div>
+
+      <div class="mt-6 flex gap-3 border-t border-slate-200 pt-5">
+        <button class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-amber-500 px-4 py-2 text-sm font-medium text-white hover:from-teal-600 hover:to-amber-600 active:scale-[0.97]">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+          Favoritar
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.97]">
+          Registrar visualização
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estudos de caso relacionados (fonte de referência) -->
+  <section class="mt-12">
+    <h2 class="mb-5 text-xl font-bold text-slate-900">Estudos de caso relacionados</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <a href="#" class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift">
+        <div>
+          <p class="font-medium text-slate-900 group-hover:text-amber-600">Retratamento endodôntico em molar superior</p>
+          <p class="text-xs capitalize text-slate-500">intermediário</p>
+        </div>
+        <span class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-teal-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white">GRATUITO</span>
+      </a>
+      <a href="#" class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift">
+        <div>
+          <p class="font-medium text-slate-900 group-hover:text-amber-600">Fraturas radiculares verticais: diagnóstico</p>
+          <p class="text-xs capitalize text-slate-500">avançado</p>
+        </div>
+        <span class="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800">PREMIUM</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Vídeos relacionados (título padronizado igual aos estudos de caso) -->
+  <section class="mt-12">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-xl font-bold text-slate-900">Vídeos relacionados</h2>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="text-slate-500">Vídeos por linha:</span>
+        <div class="inline-flex overflow-hidden rounded-lg border border-slate-200">
+          <button class="px-3 py-1 font-semibold text-white bg-gradient-to-r from-teal-500 to-amber-500">1</button>
+          <button class="px-3 py-1 font-semibold text-slate-500 bg-white hover:bg-slate-50">2</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid gap-4 sm:gap-6 grid-cols-2 md:grid-cols-4">
+      <!-- cards de vídeo: fonte padrão Inter -->
+      <a href="#" class="group block">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+          <div class="relative aspect-video overflow-hidden bg-gradient-to-br from-teal-500 to-amber-500">
+            <div class="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+              <span class="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1 sm:text-[11px]">GRATUITO</span>
+              <span class="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1 sm:text-[11px]">FRONT ODONTUS</span>
+            </div>
+            <div class="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">12:05</div>
+          </div>
+          <div class="p-4">
+            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-amber-600">Acesso endodôntico em dentes anteriores</h3>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>Endodontia</span>
+              <span class="capitalize">intermediário</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="#" class="group block">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+          <div class="relative aspect-video overflow-hidden bg-gradient-to-br from-teal-500 to-amber-500">
+            <div class="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+              <span class="rounded-md bg-amber-100 px-1.5 py-0.5 text-[9px] uppercase leading-none text-amber-800 sm:px-2 sm:py-1 sm:text-[11px]">PAGO</span>
+            </div>
+            <div class="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">22:31</div>
+          </div>
+          <div class="p-4">
+            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-amber-600">Irrigação e medicação intracanal</h3>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>Endodontia</span>
+              <span class="capitalize">avançado</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="#" class="group block">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+          <div class="relative aspect-video overflow-hidden bg-gradient-to-br from-teal-500 to-amber-500">
+            <div class="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+              <span class="rounded-md bg-sky-100 px-1.5 py-0.5 text-[9px] uppercase leading-none text-sky-800 sm:px-2 sm:py-1 sm:text-[11px]">ESTUDANTE</span>
+            </div>
+            <div class="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">09:48</div>
+          </div>
+          <div class="p-4">
+            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-amber-600">Instrumentação mecanizada: passo a passo</h3>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>Geral</span>
+              <span class="capitalize">intermediário</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a href="#" class="group block">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+          <div class="relative aspect-video overflow-hidden bg-gradient-to-br from-teal-500 to-amber-500">
+            <div class="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+              <span class="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[9px] uppercase leading-none text-emerald-800 sm:px-2 sm:py-1 sm:text-[11px]">GRATUITO</span>
+            </div>
+            <div class="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">15:22</div>
+          </div>
+          <div class="p-4">
+            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-amber-600">Emergências endodônticas: manejo clínico</h3>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>Endodontia</span>
+              <span class="capitalize">básico</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Imagens relacionadas (título padronizado) -->
+  <section class="mt-12">
+    <h2 class="mb-5 text-xl font-bold text-slate-900">Imagens relacionadas</h2>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <button class="group overflow-hidden rounded-xl border border-slate-200 text-left">
+        <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500"></div>
+        <span class="flex flex-wrap gap-1 p-2">
+          <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#raio-x</span>
+        </span>
+      </button>
+      <button class="group overflow-hidden rounded-xl border border-slate-200 text-left">
+        <div class="aspect-video bg-gradient-to-br from-teal-500 to-amber-500"></div>
+        <span class="flex flex-wrap gap-1 p-2">
+          <span class="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium uppercase text-sky-700">#instrumentação</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
