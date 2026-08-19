@@ -161,13 +161,15 @@ export function Catalog() {
 
       <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-sm font-semibold text-foreground">Conteúdo:</span>
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Conteúdo:
+          </span>
           <button
             type="button"
             onClick={() =>
               updateParam("source", source === "FRONTODONTUS" ? "" : "FRONTODONTUS")
             }
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               source === "FRONTODONTUS"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -181,7 +183,7 @@ export function Catalog() {
           <button
             type="button"
             onClick={() => updateParam("source", source === "STUDENT" ? "" : "STUDENT")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               source === "STUDENT"
                 ? "bg-sky-700 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -195,11 +197,13 @@ export function Catalog() {
         </div>
 
         <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
-          <span className="mr-1 text-sm font-semibold text-foreground">Ordenar:</span>
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Ordenar:
+          </span>
           <button
             type="button"
             onClick={() => updateParam("sort", "recent")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "recent"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -211,7 +215,7 @@ export function Catalog() {
           <button
             type="button"
             onClick={() => updateParam("sort", "popular")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "popular"
                 ? "bg-accent-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -223,7 +227,9 @@ export function Catalog() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
-          <span className="mr-1 text-sm font-semibold text-foreground">Vídeos por linha:</span>
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Vídeos por linha:
+          </span>
           <div className="inline-flex overflow-hidden rounded-lg border border-border">
             {(["1", "2"] as const).map((value) => (
               <button
@@ -231,7 +237,7 @@ export function Catalog() {
                 type="button"
                 onClick={() => changeRows(value)}
                 className={cn(
-                  "px-4 py-1.5 font-semibold transition-colors",
+                  "px-4 py-1.5 text-[9px] font-medium uppercase tracking-wide transition-colors",
                   rows === value
                     ? "bg-primary-700 text-primary-foreground"
                     : "bg-surface text-muted-foreground hover:bg-muted"
@@ -324,7 +330,9 @@ export function Catalog() {
 
       {activeFilterCount > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="text-sm text-muted-foreground">Filtros ativos:</span>
+          <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Filtros ativos:
+          </span>
           <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>
             Limpar filtros
           </Button>
