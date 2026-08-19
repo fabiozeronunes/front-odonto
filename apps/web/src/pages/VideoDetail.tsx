@@ -167,7 +167,7 @@ export function VideoDetail() {
               )}
             </div>
 
-            <h1 className="mt-3 font-display text-2xl font-bold text-foreground sm:text-3xl">{video.title}</h1>
+            <h1 className="mt-3 text-2xl font-bold text-foreground sm:text-3xl">{video.title}</h1>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               {video.durationSeconds ? (
@@ -199,7 +199,7 @@ export function VideoDetail() {
 
             {video.images && video.images.length > 0 && (
               <div className="mt-6">
-                <h2 className="flex items-center gap-2 text-base font-bold text-foreground">
+                <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
                   <ImagesIcon className="h-5 w-5 text-primary-700" /> Imagens relacionadas ao assunto
                 </h2>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
