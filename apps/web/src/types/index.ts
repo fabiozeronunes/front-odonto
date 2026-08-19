@@ -63,6 +63,7 @@ export interface Tag {
   name: string;
   slug: string;
   isActive: boolean;
+  createdById?: string | null;
   _count?: { videos: number; caseStudies: number };
 }
 

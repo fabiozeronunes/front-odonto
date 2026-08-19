@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
 import { api } from "../../lib/api";
+import { useAuth } from "../../lib/auth";
 import type { Paginated, Specialty, Tag, Video } from "../../types";
 import { VideoCard } from "../../components/VideoCard";
 import { Button } from "../../components/ui/button";
@@ -67,6 +68,7 @@ const emptyForm: VideoFormState = {
 };
 
 export function MyVideos() {
+  const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -285,10 +287,15 @@ export function MyVideos() {
     return tagId;
   }
 
+  function canDeleteTag(tag: Tag): boolean {
+    return user?.role === "ADMIN" || (tag.createdById != null && tag.createdById === user?.id);
+  }
+
   async function deleteTag(tagId: string) {
     if (!editing) return;
     const tag = tags.find((t) => t.id === tagId);
     if (!tag) return;
+    if (!canDeleteTag(tag)) return;
     if (!confirm(`Excluir a tag #${tag.name} definitivamente? Ela será removida de todos os vídeos.`)) return;
     try {
       await api(`/api/tags/${tagId}`, { method: "DELETE" });
@@ -452,15 +459,17 @@ export function MyVideos() {
                               className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
                             >
                               #{tag.name}
-                              <button
-                                type="button"
-                                onClick={() => deleteTag(tag.id)}
-                                className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                                title="Excluir tag"
-                                aria-label={`Excluir tag ${tag.name}`}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
+                              {canDeleteTag(tag) && (
+                                <button
+                                  type="button"
+                                  onClick={() => deleteTag(tag.id)}
+                                  className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                                  title="Excluir tag"
+                                  aria-label={`Excluir tag ${tag.name}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              )}
                             </span>
                           ))}
                           {imageTags.length === 0 && (
@@ -524,19 +533,21 @@ export function MyVideos() {
                       >
                         #{tag.name}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteTag(tag.id)}
-                        className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
-                          selected
-                            ? "bg-white/25 text-white hover:bg-white/40"
-                            : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
-                        }`}
-                        title="Excluir tag"
-                        aria-label={`Excluir tag ${tag.name}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                      {canDeleteTag(tag) && (
+                        <button
+                          type="button"
+                          onClick={() => deleteTag(tag.id)}
+                          className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
+                            selected
+                              ? "bg-white/25 text-white hover:bg-white/40"
+                              : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
+                          }`}
+                          title="Excluir tag"
+                          aria-label={`Excluir tag ${tag.name}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
                     </span>
                   );
                 })}
