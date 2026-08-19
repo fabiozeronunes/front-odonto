@@ -59,6 +59,21 @@ function buildWhere(query: VideoQueryInput, opts: { admin?: boolean } = {}) {
     where.source = query.source;
   }
 
+  const hasActiveFilter = Boolean(
+    query.search ||
+      query.specialty ||
+      query.tag ||
+      query.caseStudy ||
+      query.imageTag ||
+      query.difficulty ||
+      query.isFree ||
+      query.source
+  );
+
+  if (!opts.admin && !hasActiveFilter) {
+    where.caseStudies = { none: {} };
+  }
+
   return where;
 }
 
@@ -240,6 +255,20 @@ export async function getRelatedCaseStudies(videoId: string, tagIds: string[]) {
       slug: true,
       difficulty: true,
       isFree: true,
+      videoCases: {
+        take: 1,
+        select: {
+          video: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              thumbnailUrl: true,
+              isFree: true,
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -255,6 +284,7 @@ export async function getRelatedVideos(
     where: {
       id: { not: videoId },
       status: "PUBLISHED",
+      caseStudies: { none: {} },
       OR: [
         ...(specialtyId ? [{ specialtyId }] : []),
         ...(tagIds.length > 0 ? [{ tags: { some: { tagId: { in: tagIds } } } }] : []),

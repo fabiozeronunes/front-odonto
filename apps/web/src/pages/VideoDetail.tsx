@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
-import { Heart, Eye, Clock, User, Building2, Calendar, Images as ImagesIcon, Tag as TagIcon, X } from "lucide-react";
+import { Heart, Eye, Clock, User, Building2, Calendar, Images as ImagesIcon, Tag as TagIcon, X, PlayCircle } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { VideoDetail } from "../types";
@@ -292,26 +292,46 @@ export function VideoDetail() {
       {data.relatedCaseStudies && data.relatedCaseStudies.length > 0 && (
         <section className="mt-12">
           <h2 className="mb-5 text-xl font-bold text-foreground">Estudos de caso relacionados</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {data.relatedCaseStudies.map((cs) => (
-              <Link
-                key={cs.id}
-                to={`/casos/${cs.slug}`}
-className="group flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {data.relatedCaseStudies.map((cs) => {
+              const caseVideo = cs.videoCases?.[0]?.video;
+              return (
+                <Link
+                  key={cs.id}
+                  to={caseVideo ? `/video/${caseVideo.slug}` : `/casos/${cs.slug}`}
+                  state={caseVideo ? { fromCaseStudies: true } : undefined}
+                  className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                 >
-                  <div>
-                    <p className="font-medium text-foreground group-hover:text-amber-600">{cs.title}</p>
-                    <p className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</p>
-                </div>
-                {cs.isFree ? (
-                  <Badge variant="free" className="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-2.5 py-1 text-white">
-                    GRATUITO
-                  </Badge>
-                ) : (
-                  <Badge variant="premium">PREMIUM</Badge>
-                )}
-              </Link>
-            ))}
+                  {caseVideo?.thumbnailUrl ? (
+                    <img
+                      src={resolveImageUrl(caseVideo.thumbnailUrl)}
+                      alt={caseVideo.title}
+                      loading="lazy"
+                      className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary-700 to-teal-600">
+                      <PlayCircle className="h-10 w-10 text-white/80" />
+                    </div>
+                  )}
+                  <div className="flex flex-1 flex-col p-4">
+                    <p className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-amber-600">
+                      {cs.title}
+                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</span>
+                      {cs.isFree ? (
+                        <Badge variant="free" className="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-2.5 py-1 text-white">
+                          GRATUITO
+                        </Badge>
+                      ) : (
+                        <Badge variant="premium">PREMIUM</Badge>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

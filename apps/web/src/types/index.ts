@@ -237,6 +237,15 @@ export interface VideoDetail {
     slug: string;
     difficulty: Difficulty;
     isFree: boolean;
+    videoCases?: {
+      video: {
+        id: string;
+        title: string;
+        slug: string;
+        thumbnailUrl?: string | null;
+        isFree: boolean;
+      };
+    }[];
   }[];
 }
 
