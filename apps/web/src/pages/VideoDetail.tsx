@@ -279,6 +279,29 @@ export function VideoDetail() {
         </div>
       )}
 
+      {data.relatedCaseStudies && data.relatedCaseStudies.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-5 text-xl font-bold text-foreground">Estudos de caso relacionados</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {data.relatedCaseStudies.map((cs) => (
+              <Link
+                key={cs.id}
+                to={`/casos/${cs.slug}`}
+className="group flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+                >
+                  <div>
+                    <p className="font-medium text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">{cs.title}</p>
+                    <p className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</p>
+                </div>
+                <Badge variant={cs.isFree ? "free" : "premium"}>
+                  {cs.isFree ? "GRATUITO" : "PREMIUM"}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {isAuthenticated && !isPremiumLocked && <StudySection videoId={video.id} videoTitle={video.title} />}
 
       {related.length > 0 && (
@@ -349,29 +372,6 @@ export function VideoDetail() {
                   ))}
                 </span>
               </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {data.relatedCaseStudies && data.relatedCaseStudies.length > 0 && (
-        <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-foreground">Estudos de caso relacionados</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {data.relatedCaseStudies.map((cs) => (
-              <Link
-                key={cs.id}
-                to={`/casos/${cs.slug}`}
-className="group flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
-                >
-                  <div>
-                    <p className="font-medium text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">{cs.title}</p>
-                    <p className="text-xs capitalize text-muted-foreground">{cs.difficulty.toLowerCase()}</p>
-                </div>
-                <Badge variant={cs.isFree ? "free" : "premium"}>
-                  {cs.isFree ? "GRATUITO" : "PREMIUM"}
-                </Badge>
-              </Link>
             ))}
           </div>
         </section>
