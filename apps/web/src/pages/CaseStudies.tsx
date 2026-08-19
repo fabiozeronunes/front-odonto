@@ -67,8 +67,8 @@ export function CaseStudies() {
                       ) : (
                         <Badge variant="premium">Pago</Badge>
                       )}
-                      <Badge variant="info" className="bg-slate-900">
-                        <BookOpen className="h-3 w-3" />
+                      <Badge variant="info" className="bg-slate-900 text-white">
+                        <BookOpen className="h-3.5 w-3.5" />
                       </Badge>
                     </div>
                     {video.durationSeconds ? (
