@@ -382,8 +382,6 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
     author: input.author,
     institution: input.institution,
     observations: input.observations,
-    audioUrl: input.audioUrl || null,
-    audioTitle: input.audioTitle || null,
     status: isAdmin ? input.status : input.status ?? ContentStatus.DRAFT,
     specialty: input.specialtyId ? { connect: { id: input.specialtyId } } : undefined,
     createdBy: { connect: { id: createdById } },
@@ -410,7 +408,7 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
   if (input.images.length > 0) {
     data.images = { create: input.images.map((img) => ({ url: img.url, tags: { create: img.tagIds.map((tagId) => ({ tagId })) } })) };
   }
-  if (input.audios.length > 0) {
+  if (input.audios && input.audios.length > 0) {
     data.audios = { create: input.audios.map((a) => ({ url: a.url, title: a.title })) };
   }
 
@@ -445,8 +443,6 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "author",
     "institution",
     "observations",
-    "audioUrl",
-    "audioTitle",
     "status",
   ] as const;
 
