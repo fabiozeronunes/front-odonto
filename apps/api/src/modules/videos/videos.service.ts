@@ -412,7 +412,7 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
     data.audios = { create: input.audios.map((a) => ({ url: a.url, title: a.title })) };
   }
 
-  return prisma.video.create({ data });
+  return prisma.video.create({ data, include: { audios: true } });
 }
 
 export async function assertCanManageVideo(idOrSlug: string, user: AuthUser) {
@@ -495,7 +495,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     };
   }
 
-  return prisma.video.update({ where: { id: video.id }, data });
+  return prisma.video.update({ where: { id: video.id }, data, include: { audios: true } });
 }
 
 export async function deleteVideo(id: string, user: AuthUser) {
