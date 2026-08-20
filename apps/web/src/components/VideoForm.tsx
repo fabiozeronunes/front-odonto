@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { X, Mic, Music } from "lucide-react";
+import { X, Music } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Specialty, Tag } from "../types";
