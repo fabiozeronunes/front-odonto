@@ -108,6 +108,15 @@ const videoSelect = {
   viewCount: true,
   audioUrl: true,
   audioTitle: true,
+  audios: {
+    select: {
+      id: true,
+      url: true,
+      title: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "asc" },
+  },
   specialty: { select: { id: true, name: true, slug: true } },
   tags: {
     select: { tag: { select: { id: true, name: true, slug: true } } },
@@ -401,6 +410,9 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
   if (input.images.length > 0) {
     data.images = { create: input.images.map((img) => ({ url: img.url, tags: { create: img.tagIds.map((tagId) => ({ tagId })) } })) };
   }
+  if (input.audios.length > 0) {
+    data.audios = { create: input.audios.map((a) => ({ url: a.url, title: a.title })) };
+  }
 
   return prisma.video.create({ data });
 }
@@ -478,6 +490,12 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
         url: img.url,
         tags: { create: img.tagIds.map((tagId) => ({ tagId })) },
       })),
+    };
+  }
+  if (input.audios && input.audios.length > 0) {
+    data.audios = {
+      deleteMany: {},
+      create: input.audios.map((a) => ({ url: a.url, title: a.title })),
     };
   }
 

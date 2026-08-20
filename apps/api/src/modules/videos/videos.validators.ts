@@ -11,6 +11,11 @@ const imageItem = z.object({
   tagIds: z.array(z.string()).max(20).default([]),
 });
 
+const audioItem = z.object({
+  url: z.string().max(1000),
+  title: z.string().max(200).optional(),
+});
+
 export const createVideoSchema = z.object({
   title: z.string().min(2, "Título obrigatório").max(200),
   description: z.string().max(5000).optional(),
@@ -33,6 +38,7 @@ export const createVideoSchema = z.object({
   audioUrl: z.string().max(1000).optional().nullable(),
   audioTitle: z.string().max(200).optional().nullable(),
   audioTagIds: z.array(z.string()).max(20).default([]),
+  audios: z.array(audioItem).max(10).default([]),
 });
 
 export const updateVideoSchema = createVideoSchema.partial();

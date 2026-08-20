@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
-import { useAuth } from "../../lib/auth";
 import type { Paginated, Specialty, Tag, Video } from "../../types";
 import { VideoCard } from "../../components/VideoCard";
+import { VideoForm, emptyVideoForm, type VideoFormState } from "../../components/VideoForm";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Textarea } from "../../components/ui/textarea";
-import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent } from "../../components/ui/card";
-import { ImagePicker } from "../../components/ImagePicker";
-import { YouTubeImport } from "../../components/YouTubeImport";
-import { AudioRecorder } from "../../components/AudioRecorder";
-import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
 interface RelatedData {
@@ -28,61 +21,12 @@ interface RelatedData {
   }[];
 }
 
-interface ImageDraft {
-  id: string;
-  url: string;
-  tagIds: string[];
-}
-interface VideoFormState {
-  id?: string;
-  title: string;
-  description: string;
-  videoUrl: string;
-  thumbnailUrl: string;
-  specialtyId: string;
-  difficulty: string;
-  isFree: boolean;
-  source: "FRONTODONTUS" | "STUDENT";
-  status: string;
-  author: string;
-  institution: string;
-  observations: string;
-  audioUrl: string;
-  audioTitle: string;
-  audioTagIds: string[];
-  tagIds: string[];
-  images: ImageDraft[];
-}
-
-const emptyForm: VideoFormState = {
-  title: "",
-  description: "",
-  videoUrl: "",
-  thumbnailUrl: "",
-  specialtyId: "",
-  difficulty: "BASICO",
-  isFree: true,
-  source: "STUDENT",
-  status: "DRAFT",
-  author: "",
-  institution: "",
-  observations: "",
-  audioUrl: "",
-  audioTitle: "",
-  audioTagIds: [],
-  tagIds: [],
-  images: [],
-};
-
 export function MyVideos() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<VideoFormState | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [expandedVideo, setExpandedVideo] = useState<string | null>(null);
   const [relatedMap, setRelatedMap] = useState<Record<string, RelatedData>>({});
   const [loadingRelated, setLoadingRelated] = useState<string | null>(null);
@@ -90,21 +34,12 @@ export function MyVideos() {
   async function load() {
     setLoading(true);
     try {
-      const [v, s, tagsPage] = await Promise.all([
+      const [v, s] = await Promise.all([
         api<Paginated<Video>>("/api/videos/me?perPage=50"),
         api<{ data: Specialty[] }>("/api/specialties"),
-        api<Paginated<Tag>>("/api/tags?perPage=50"),
       ]);
-      let allTags = tagsPage.data;
-      if (tagsPage.pagination.total > allTags.length) {
-        for (let p = 2; p <= tagsPage.pagination.totalPages; p++) {
-          const next = await api<Paginated<Tag>>(`/api/tags?perPage=50&page=${p}`);
-          allTags = [...allTags, ...next.data];
-        }
-      }
       setVideos(v.data);
       setSpecialties(s.data);
-      setTags(allTags);
     } finally {
       setLoading(false);
     }
@@ -115,8 +50,7 @@ export function MyVideos() {
   }, []);
 
   function startCreate() {
-    setEditing({ ...emptyForm, status: "DRAFT" });
-    setError(null);
+    setEditing({ ...emptyVideoForm, status: "DRAFT" });
   }
 
   function startEdit(video: Video) {
@@ -134,9 +68,7 @@ export function MyVideos() {
       author: video.author ?? "",
       institution: video.institution ?? "",
       observations: video.observations ?? "",
-      audioUrl: video.audioUrl ?? "",
-      audioTitle: video.audioTitle ?? "",
-      audioTagIds: video.audioTags?.map((t) => t.tag.id) ?? [],
+      audios: video.audios?.map((a) => ({ id: a.id, url: a.url, title: a.title ?? "" })) ?? [],
       tagIds: video.tags.map((t) => t.tag.id),
       images: video.images?.slice(0, 5).map((i) => ({
         id: i.id,
@@ -144,63 +76,6 @@ export function MyVideos() {
         tagIds: i.tags?.map((t) => t.tag.id) ?? [],
       })) ?? [],
     });
-    setError(null);
-  }
-
-  function applyYouTube(info: {
-    title?: string;
-    author?: string;
-    thumbnailUrl?: string;
-    videoUrl: string;
-  }) {
-    setEditing((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        videoUrl: info.videoUrl,
-        thumbnailUrl: info.thumbnailUrl ?? prev.thumbnailUrl,
-        title: prev.title || info.title || "",
-        author: prev.author || info.author || "",
-      };
-    });
-  }
-
-  async function save() {
-    if (!editing) return;
-    setSaving(true);
-    setError(null);
-    const body = {
-      title: editing.title,
-      description: editing.description || undefined,
-      videoUrl: editing.videoUrl,
-      thumbnailUrl: editing.thumbnailUrl || undefined,
-      specialtyId: editing.specialtyId || null,
-      difficulty: editing.difficulty,
-      isFree: editing.isFree,
-      source: editing.source,
-      status: editing.status,
-      author: editing.author || undefined,
-      institution: editing.institution || undefined,
-      observations: editing.observations || undefined,
-      audioUrl: editing.audioUrl || undefined,
-      audioTitle: editing.audioTitle || undefined,
-      audioTagIds: editing.audioTagIds,
-      tagIds: editing.tagIds,
-      images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
-    };
-    try {
-      if (editing.id) {
-        await api(`/api/videos/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
-      } else {
-        await api("/api/videos", { method: "POST", body: JSON.stringify(body) });
-      }
-      setEditing(null);
-      load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao salvar");
-    } finally {
-      setSaving(false);
-    }
   }
 
   async function remove(id: string) {
@@ -227,139 +102,10 @@ export function MyVideos() {
     try {
       const data = await api<RelatedData>(`/api/videos/${videoId}/related`);
       setRelatedMap((prev) => ({ ...prev, [videoId]: data }));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao carregar relacionados");
+    } catch {
+      /* ignore */
     } finally {
       setLoadingRelated(null);
-    }
-  }
-
-  function toggleTag(id: string) {
-    if (!editing) return;
-    setEditing({
-      ...editing,
-      tagIds: editing.tagIds.includes(id)
-        ? editing.tagIds.filter((t) => t !== id)
-        : [...editing.tagIds, id],
-    });
-  }
-
-  async function createTag(name: string) {
-    if (!editing || !name.trim()) return null;
-    const trimmed = name.trim();
-    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
-    if (existing) {
-      if (!editing.tagIds.includes(existing.id)) {
-        setEditing({ ...editing, tagIds: [...editing.tagIds, existing.id] });
-      }
-      return existing.id;
-    }
-    try {
-      const res = await api<{ data: Tag }>("/api/tags", {
-        method: "POST",
-        body: JSON.stringify({ name: trimmed }),
-      });
-      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
-      setEditing({ ...editing, tagIds: [...editing.tagIds, res.data.id] });
-      return res.data.id;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha ao criar tag");
-      return null;
-    }
-  }
-
-  function toggleAudioTag(id: string) {
-    if (!editing) return;
-    setEditing({
-      ...editing,
-      audioTagIds: editing.audioTagIds.includes(id)
-        ? editing.audioTagIds.filter((t) => t !== id)
-        : [...editing.audioTagIds, id],
-    });
-  }
-
-  async function createAudioTag(name: string) {
-    if (!editing || !name.trim()) return null;
-    const trimmed = name.trim();
-    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
-    if (existing) {
-      if (!editing.audioTagIds.includes(existing.id)) {
-        setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, existing.id] });
-      }
-      return existing.id;
-    }
-    try {
-      const res = await api<{ data: Tag }>("/api/tags", {
-        method: "POST",
-        body: JSON.stringify({ name: trimmed }),
-      });
-      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
-      setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, res.data.id] });
-      return res.data.id;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha ao criar tag");
-      return null;
-    }
-  }
-
-  async function createImageTag(name: string, imageId: string) {
-    if (!editing || !name.trim()) return null;
-    const trimmed = name.trim();
-    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
-    let tagId = existing?.id;
-    if (!tagId) {
-      try {
-        const res = await api<{ data: Tag }>("/api/tags", {
-          method: "POST",
-          body: JSON.stringify({ name: trimmed }),
-        });
-        tagId = res.data.id;
-        setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Falha ao criar tag");
-        return null;
-      }
-    }
-    setEditing((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        images: prev.images.map((img) =>
-          img.id === imageId && !img.tagIds.includes(tagId!)
-            ? { ...img, tagIds: [...img.tagIds, tagId!] }
-            : img
-        ),
-      };
-    });
-    return tagId;
-  }
-
-  function canDeleteTag(tag: Tag): boolean {
-    return user?.role === "ADMIN" || (tag.createdById != null && tag.createdById === user?.id);
-  }
-
-  async function deleteTag(tagId: string) {
-    if (!editing) return;
-    const tag = tags.find((t) => t.id === tagId);
-    if (!tag) return;
-    if (!canDeleteTag(tag)) return;
-    if (!confirm(`Excluir a tag #${tag.name} definitivamente? Ela será removida de todos os vídeos.`)) return;
-    try {
-      await api(`/api/tags/${tagId}`, { method: "DELETE" });
-      setTags((prev) => prev.filter((t) => t.id !== tagId));
-      setEditing((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tagIds: prev.tagIds.filter((t) => t !== tagId),
-          images: prev.images.map((img) => ({
-            ...img,
-            tagIds: img.tagIds.filter((t) => t !== tagId),
-          })),
-        };
-      });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao excluir tag");
     }
   }
 
@@ -374,297 +120,16 @@ export function MyVideos() {
 
       {editing && (
         <Card className="mt-5 border-primary-200">
-          <CardContent className="space-y-4 pt-6">
-            {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Título *</Label>
-                <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>URL do vídeo</Label>
-                <Input
-                  value={editing.videoUrl}
-                  onChange={(e) => setEditing({ ...editing, videoUrl: e.target.value })}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
-              </div>
-            </div>
-
-            <YouTubeImport onInfo={applyYouTube} />
-
-            <AudioRecorder
-              value={editing.audioUrl}
-              onChange={(audioUrl) =>
-                setEditing({
-                  ...editing,
-                  audioUrl,
-                  ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }),
-                })
-              }
-              label="Áudio (gravar ou importar)"
+          <CardContent className="space-y-5 pt-6">
+            <VideoForm
+              initial={editing}
+              specialties={specialties}
+              onDone={() => {
+                setEditing(null);
+                load();
+              }}
+              onCancel={() => setEditing(null)}
             />
-
-            {editing.audioUrl && (
-              <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 p-4">
-                <p className="text-sm font-semibold text-foreground">Detalhes do áudio</p>
-                <div className="space-y-2">
-                  <Label>Título do áudio</Label>
-                  <Input
-                    value={editing.audioTitle}
-                    onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })}
-                    placeholder="Ex.: Explicação do vídeo"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tags do áudio</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Tags específicas para o áudio, independentes das tags do vídeo.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => {
-                      const selected = editing.audioTagIds.includes(tag.id);
-                      return (
-                        <span
-                          key={tag.id}
-                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                            selected
-                              ? "bg-accent-600 text-white"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => toggleAudioTag(tag.id)}
-                            className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
-                            title={selected ? "Remover tag do áudio" : "Adicionar tag ao áudio"}
-                          >
-                            #{tag.name}
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <TagCreator onCreate={createAudioTag} />
-                </div>
-              </div>
-            )}
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Thumbnail URL</Label>
-                <Input
-                  value={editing.thumbnailUrl}
-                  onChange={(e) => setEditing({ ...editing, thumbnailUrl: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Especialidade</Label>
-                <Select value={editing.specialtyId} onChange={(e) => setEditing({ ...editing, specialtyId: e.target.value })}>
-                  <option value="">Sem especialidade</option>
-                  {specialties.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Nível de dificuldade</Label>
-                <Select value={editing.difficulty} onChange={(e) => setEditing({ ...editing, difficulty: e.target.value })}>
-                  <option value="BASICO">Básico</option>
-                  <option value="INTERMEDIARIO">Intermediário</option>
-                  <option value="AVANCADO">Avançado</option>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })}>
-                  <option value="DRAFT">Rascunho</option>
-                  <option value="PUBLISHED">Publicado</option>
-                  <option value="ARCHIVED">Arquivado</option>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Autor</Label>
-                <Input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Instituição</Label>
-                <Input value={editing.institution} onChange={(e) => setEditing({ ...editing, institution: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Observações pessoais</Label>
-              <Textarea value={editing.observations} onChange={(e) => setEditing({ ...editing, observations: e.target.value })} rows={3} placeholder="Anotações privadas sobre este conteúdo..." />
-            </div>
-
-            <ImagePicker
-              value={editing.images.map((img) => img.url)}
-              onChange={(urls) =>
-                setEditing((prev) => {
-                  if (!prev) return prev;
-                  const used = new Set<string>();
-                  return {
-                    ...prev,
-                    images: urls
-                      .map((url) => {
-                        const existing = prev.images.find(
-                          (img) => img.url === url && !used.has(img.id)
-                        );
-                        if (existing) {
-                          used.add(existing.id);
-                          return existing;
-                        }
-                        return { id: crypto.randomUUID(), url, tagIds: [] };
-                      })
-                      .slice(0, 5),
-                  };
-                })
-              }
-              label="Galeria de imagens (upload ou link, máx. 5)"
-            />
-
-            {editing.images.length > 0 && (
-              <div className="space-y-3">
-                <Label>Tags de cada imagem</Label>
-                <p className="text-xs text-muted-foreground">
-                  Tags específicas para cada imagem, independentes das tags do vídeo. Máximo de 5
-                  imagens.
-                </p>
-                {editing.images.map((img, index) => {
-                  const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
-                  return (
-                    <div
-                      key={img.id}
-                      className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
-                    >
-                      <div className="flex shrink-0 flex-col items-center gap-1.5">
-                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
-                          <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
-                        </div>
-                        <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                          Imagem {index + 1}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="mb-2 text-sm font-semibold text-foreground">
-                          Tags da imagem {index + 1}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {imageTags.map((tag) => (
-                            <span
-                              key={tag.id}
-                              className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
-                            >
-                              #{tag.name}
-                              {canDeleteTag(tag) && (
-                                <button
-                                  type="button"
-                                  onClick={() => deleteTag(tag.id)}
-                                  className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                                  title="Excluir tag"
-                                  aria-label={`Excluir tag ${tag.name}`}
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              )}
-                            </span>
-                          ))}
-                          {imageTags.length === 0 && (
-                            <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
-                          )}
-                        </div>
-                        <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              <Label>Tipo de acesso</Label>
-              <Select
-                value={editing.isFree ? "gratuito" : "pago"}
-                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
-              >
-                <option value="gratuito">Gratuito</option>
-                <option value="pago">Pago</option>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Label>Origem do vídeo</Label>
-              <Select
-                value={editing.source}
-                onChange={(e) =>
-                  setEditing({ ...editing, source: e.target.value as "FRONTODONTUS" | "STUDENT" })
-                }
-              >
-                <option value="STUDENT">Estudante</option>
-                <option value="FRONTODONTUS">FrontOdontus</option>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Marque como "Estudante" para separar dos vídeos do administrador.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => {
-                  const selected = editing.tagIds.includes(tag.id);
-                  return (
-                    <span
-                      key={tag.id}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                        selected
-                          ? "bg-primary-700 text-white"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggleTag(tag.id)}
-                        className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
-                        title={selected ? "Remover tag do vídeo" : "Adicionar tag ao vídeo"}
-                      >
-                        #{tag.name}
-                      </button>
-                      {canDeleteTag(tag) && (
-                        <button
-                          type="button"
-                          onClick={() => deleteTag(tag.id)}
-                          className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
-                            selected
-                              ? "bg-white/25 text-white hover:bg-white/40"
-                              : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
-                          }`}
-                          title="Excluir tag"
-                          aria-label={`Excluir tag ${tag.name}`}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
-                    </span>
-                  );
-                })}
-              </div>
-              <TagCreator onCreate={createTag} />
-            </div>
-
-            <div className="flex justify-end gap-2 border-t border-border pt-4">
-              <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
-              <Button onClick={save} disabled={saving || !editing.title || !editing.videoUrl}>
-                {saving ? "Salvando..." : "Salvar"}
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}
@@ -691,8 +156,7 @@ export function MyVideos() {
                     <>
                       <tr key={v.id} className="hover:bg-muted">
                         <td className="max-w-[280px] px-5 py-3">
-                          <p className="truncate font-medium text-foreground">{v.title}</p>
-                          <p className="text-xs text-muted-foreground">{v.author ?? "—"} {v.observations ? "• com observações" : ""}</p>
+                          <p className="truncate font-medium text-foreground" onClick={() => navigate(`/video/${v.slug}`)} title="Assistir vídeo">{v.title}</p>
                         </td>
                         <td className="px-5 py-3 text-muted-foreground">{v.specialty?.name ?? "—"}</td>
                         <td className="px-5 py-3">
