@@ -10,7 +10,6 @@ import { Textarea } from "./ui/textarea";
 import { Select } from "./ui/select";
 import { ImagePicker } from "./ImagePicker";
 import { YouTubeImport } from "./YouTubeImport";
-import { AudioRecorder } from "./AudioRecorder";
 import { TagCreator } from "./TagCreator";
 import { resolveImageUrl } from "../lib/utils";
 
@@ -18,12 +17,6 @@ interface ImageDraft {
   id: string;
   url: string;
   tagIds: string[];
-}
-
-interface AudioDraft {
-  id: string;
-  url: string;
-  title: string;
 }
 
 export interface VideoFormState {
@@ -40,7 +33,6 @@ export interface VideoFormState {
   author: string;
   institution: string;
   observations: string;
-  audios: AudioDraft[];
   tagIds: string[];
   images: ImageDraft[];
 }
@@ -58,7 +50,6 @@ export const emptyVideoForm: VideoFormState = {
   author: "",
   institution: "",
   observations: "",
-  audios: [],
   tagIds: [],
   images: [],
 };
@@ -117,17 +108,6 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
     });
   }
 
-  function handleAudioTitleChange(index: number) {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEditing((prev) => ({
-        ...prev,
-        audios: prev.audios.map((a, i) =>
-          i === index ? { ...a, title: e.target.value } : a
-        ),
-      }));
-    };
-  }
-
   async function save() {
     if (!editing) return;
     setSaving(true);
@@ -145,7 +125,6 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       author: editing.author || undefined,
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
-      audios: editing.audios.map((a) => ({ url: a.url, title: a.title })),
       tagIds: editing.tagIds,
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
@@ -280,71 +259,10 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
         <YouTubeImport
           onInfo={applyYouTube}
           videoUrl={editing.videoUrl}
-        />
+/>
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
-        <h3 className="mb-4 text-lg font-bold text-foreground">Áudios</h3>
-        <div className="space-y-4">
-          {editing.audios.length > 0 && (
-            <div>
-              <p className="mb-3 text-sm font-medium text-foreground">Áudios salvos</p>
-              <div className="space-y-3">
-                {editing.audios.map((audio, index) => (
-                  <div
-                    key={audio.id}
-                    className="flex flex-col gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center"
-                  >
-                    <div className="flex shrink-0 flex-col items-center gap-2 sm:flex-row sm:w-1/4">
-                      <audio controls src={resolveImageUrl(audio.url)} className="h-12 min-w-0 flex-1" preload="metadata" />
-                      <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                        Áudio {index + 1}
-                      </span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="space-y-1">
-                        <Label>Título do áudio</Label>
-                        <Input
-                          value={audio.title}
-                          onChange={handleAudioTitleChange(index)}
-                          placeholder="Ex.: Explicação do vídeo"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setEditing((prev) => ({
-                            ...prev,
-                            audios: prev.audios.filter((_, i) => i !== index),
-                          }))
-                        }
-                        className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700"
-                      >
-                        <X className="h-4 w-4" /> Remover este áudio
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <AudioRecorder
-              value=""
-              onChange={(audioUrl) => {
-                if (audioUrl) {
-                  setEditing((prev) => ({
-                    ...prev,
-                    audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "" }],
-                  }));
-                }
-              }}
-              label="Adicionar novo áudio (gravar ou importar)"
-            />
-          </div>
-        </div>
-      </div>
         <h3 className="mb-4 text-lg font-bold text-foreground">Galeria de imagens</h3>
         <ImagePicker
           value={editing.images.map((img) => img.url)}

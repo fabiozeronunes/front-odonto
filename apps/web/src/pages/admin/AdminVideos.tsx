@@ -54,7 +54,6 @@ export function AdminVideos() {
       author: video.author ?? "",
       institution: video.institution ?? "",
       observations: video.observations ?? "",
-      audios: video.audios?.map((a) => ({ id: a.id, url: a.url, title: a.title ?? "" })) ?? [],
       tagIds: video.tags.map((t) => t.tag.id),
       images: video.images?.slice(0, 5).map((i) => ({
         id: i.id,
