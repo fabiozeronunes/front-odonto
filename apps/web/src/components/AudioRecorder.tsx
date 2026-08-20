@@ -64,8 +64,13 @@ export function AudioRecorder({
       setRecording(true);
       setElapsed(0);
       timerRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
-    } catch {
-      setError("Não foi possível acessar o microfone. Verifique as permissões do navegador.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Erro desconhecido";
+      if (msg.includes("Permission") || msg.includes("permission")) {
+        setError("Permissão de microfone negada. Permita o acesso ao microfone nas configurações do navegador e tente novamente.");
+      } else {
+        setError(`Não foi possível acessar o microfone: ${msg}`);
+      }
     }
   }
 
@@ -99,9 +104,12 @@ export function AudioRecorder({
         method: "POST",
         body: form,
       });
+      console.log("Audio upload successful:", res.data.url);
       onChange(res.data.url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha no upload do áudio");
+      const msg = e instanceof Error ? e.message : "Falha no upload do áudio";
+      console.error("Audio upload failed:", e);
+      setError(`Erro no upload: ${msg}. Verifique se você está logado e tente novamente.`);
     } finally {
       setUploading(false);
     }
@@ -118,9 +126,12 @@ export function AudioRecorder({
         method: "POST",
         body: form,
       });
+      console.log("Audio file upload successful:", res.data.url);
       onChange(res.data.url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha no upload do áudio");
+      const msg = e instanceof Error ? e.message : "Falha no upload do áudio";
+      console.error("Audio file upload failed:", e);
+      setError(`Erro no upload: ${msg}. Verifique se você está logado e tente novamente.`);
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -201,7 +212,11 @@ export function AudioRecorder({
         {uploading && <span className="text-xs text-muted-foreground">Enviando...</span>}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
     </div>
   );
 }
