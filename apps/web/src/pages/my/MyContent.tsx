@@ -59,6 +59,9 @@ export function MyContent() {
 
       <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
         <div className="flex flex-wrap items-center gap-2">
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Seção:
+          </span>
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
