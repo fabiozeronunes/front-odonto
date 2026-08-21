@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, EyeOff, ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
 import type { Paginated, Specialty, Tag, Video } from "../../types";
 import { VideoCard } from "../../components/VideoCard";
@@ -140,6 +140,9 @@ export function MyVideos() {
       {editing && (
         <Card className="mt-5 border-primary-200">
           <CardContent className="space-y-5 pt-6">
+            <Button variant="ghost" size="sm" onClick={() => setEditingAndUrl(null)}>
+              <ArrowLeft className="h-4 w-4" /> Voltar para a lista
+            </Button>
             <VideoForm
               initial={editing}
               specialties={specialties}
