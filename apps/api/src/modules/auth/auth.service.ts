@@ -234,13 +234,6 @@ export async function loginUser(input: LoginInput, ip?: string) {
 }
 
 export async function refreshAccess(refreshToken: string) {
-  let payload;
-  try {
-    payload = verifyRefreshToken(refreshToken);
-  } catch {
-    throw new UnauthorizedError("Refresh token inválido ou expirado");
-  }
-
   const dbToken = await prisma.refreshToken.findUnique({
     where: { token: refreshToken },
     include: { user: { select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true, tokenVersion: true } } },
@@ -260,11 +253,6 @@ export async function refreshAccess(refreshToken: string) {
   if (!user || !user.isActive) {
     await prisma.refreshToken.delete({ where: { id: dbToken.id } });
     throw new UnauthorizedError("Usuário inexistente ou inativo");
-  }
-
-  if (user.tokenVersion !== payload.tokenVersion) {
-    await prisma.refreshToken.delete({ where: { id: dbToken.id } });
-    throw new UnauthorizedError("Sessão expirada. Faça login novamente.");
   }
 
   // Rotate: delete old, create new
