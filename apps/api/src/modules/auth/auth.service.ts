@@ -16,6 +16,8 @@ import { sendEmail, buildPasswordResetEmail, buildEmailVerificationEmail } from 
 import type { RegisterInput, LoginInput } from "./auth.validators.js";
 
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 function publicUser(user: {
   id: string;
@@ -24,6 +26,7 @@ function publicUser(user: {
   role: string;
   planId: string;
   registrationNumber?: string | null;
+  emailVerified?: boolean;
 }) {
   return {
     id: user.id,
@@ -32,6 +35,7 @@ function publicUser(user: {
     role: user.role,
     planId: user.planId,
     registrationNumber: user.registrationNumber ?? null,
+    emailVerified: user.emailVerified ?? false,
   };
 }
 
@@ -57,6 +61,54 @@ async function getFreePlanId() {
   return plan.id;
 }
 
+async function createRefreshToken(userId: string, ip?: string): Promise<string> {
+  const token = crypto.randomBytes(40).toString("hex");
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  await prisma.refreshToken.create({
+    data: { token, userId, expiresAt },
+  });
+
+  return token;
+}
+
+async function checkAccountLockout(email: string, ip: string): Promise<void> {
+  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+  const recentAttempts = await prisma.loginAttempt.findMany({
+    where: {
+      OR: [{ email }, { ip }],
+      success: false,
+      createdAt: { gte: fiveMinAgo },
+    },
+    orderBy: { createdAt: "desc" },
+    take: MAX_LOGIN_ATTEMPTS,
+  });
+
+  if (recentAttempts.length >= MAX_LOGIN_ATTEMPTS) {
+    const oldestAttempt = recentAttempts[recentAttempts.length - 1];
+    const lockoutEnd = new Date(oldestAttempt.createdAt.getTime() + LOCKOUT_DURATION_MS);
+    if (new Date() < lockoutEnd) {
+      const remainingMinutes = Math.ceil((lockoutEnd.getTime() - Date.now()) / 60000);
+      throw new UnauthorizedError(
+        `Conta bloqueada temporariamente. Tente novamente em ${remainingMinutes} minutos.`
+      );
+    }
+  }
+}
+
+async function recordLoginAttempt(email: string, ip: string, success: boolean): Promise<void> {
+  await prisma.loginAttempt.create({
+    data: { email, ip, success },
+  });
+}
+
+async function cleanupOldAttempts(): Promise<void> {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  await prisma.loginAttempt.deleteMany({
+    where: { createdAt: { lt: oneHourAgo } },
+  });
+}
+
 export async function registerUser(input: RegisterInput) {
   const exists = await prisma.user.findUnique({ where: { email: input.email } });
   if (exists) {
@@ -64,7 +116,6 @@ export async function registerUser(input: RegisterInput) {
   }
 
   const planId = await getFreePlanId();
-
   const passwordHash = await bcrypt.hash(input.password, 10);
 
   let referredById: string | null = null;
@@ -90,50 +141,48 @@ export async function registerUser(input: RegisterInput) {
       referredById,
       registrationNumber,
     },
-    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, emailVerified: true },
   });
 
-  // Generate verification token and send email
   const verificationToken = crypto.randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   await prisma.emailVerificationToken.create({
-    data: {
-      token: verificationToken,
-      userId: user.id,
-      expiresAt,
-    },
+    data: { token: verificationToken, userId: user.id, expiresAt },
   });
 
   const verifyUrl = `${env.webUrl}/verify-email?token=${verificationToken}`;
   const { subject, html } = buildEmailVerificationEmail(verifyUrl);
   await sendEmail({ to: user.email, subject, html });
 
+  const refreshToken = await createRefreshToken(user.id);
+
   return {
     user: publicUser(user),
-    tokens: issueTokens(user),
+    tokens: {
+      accessToken: signAccessToken({
+        sub: user.id,
+        email: user.email,
+        role: user.role as "ADMIN" | "USER",
+        planId: user.planId,
+      }),
+      refreshToken,
+    },
   };
 }
 
-export function issueTokens(user: { id: string; email: string; role: string; planId: string; tokenVersion?: number }) {
-  return {
-    accessToken: signAccessToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role as "ADMIN" | "USER",
-      planId: user.planId,
-    }),
-    refreshToken: signRefreshToken({ sub: user.id, tokenVersion: user.tokenVersion ?? 0 }),
-  };
-}
+export async function loginUser(input: LoginInput, ip?: string) {
+  const clientIp = ip || "unknown";
 
-export async function loginUser(input: LoginInput) {
+  await checkAccountLockout(input.email, clientIp);
+
   const user = await prisma.user.findUnique({
     where: { email: input.email },
-    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, passwordHash: true, isActive: true, tokenVersion: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, passwordHash: true, isActive: true, emailVerified: true, tokenVersion: true },
   });
 
   if (!user || !(await bcrypt.compare(input.password, user.passwordHash))) {
+    await recordLoginAttempt(input.email, clientIp, false);
     throw new UnauthorizedError("Credenciais inválidas");
   }
 
@@ -141,74 +190,24 @@ export async function loginUser(input: LoginInput) {
     throw new UnauthorizedError("Conta inativa. Contate o suporte.");
   }
 
+  await recordLoginAttempt(input.email, clientIp, true);
+  cleanupOldAttempts().catch(() => {});
+
   const { passwordHash: _ph, ...safeUser } = user;
-  return { user: publicUser(safeUser), tokens: issueTokens(safeUser) };
-}
+  const refreshToken = await createRefreshToken(user.id);
 
-export async function verifyEmail(token: string) {
-  const verificationToken = await prisma.emailVerificationToken.findUnique({
-    where: { token },
-  });
-
-  if (!verificationToken) {
-    throw new UnauthorizedError("Token de verificação inválido");
-  }
-
-  if (verificationToken.usedAt) {
-    throw new UnauthorizedError("Token de verificação já utilizado");
-  }
-
-  if (verificationToken.expiresAt < new Date()) {
-    throw new UnauthorizedError("Token de verificação expirado. Solicite um novo.");
-  }
-
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: verificationToken.userId },
-      data: { emailVerified: true },
-    }),
-    prisma.emailVerificationToken.update({
-      where: { id: verificationToken.id },
-      data: { usedAt: new Date() },
-    }),
-  ]);
-
-  return { ok: true };
-}
-
-export async function resendVerificationEmail(email: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return { ok: true };
-  }
-
-  if (user.emailVerified) {
-    return { ok: true };
-  }
-
-  // Invalidate existing tokens
-  await prisma.emailVerificationToken.updateMany({
-    where: { userId: user.id, usedAt: null },
-    data: { usedAt: new Date() },
-  });
-
-  // Generate new token
-  const verificationToken = crypto.randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-  await prisma.emailVerificationToken.create({
-    data: {
-      token: verificationToken,
-      userId: user.id,
-      expiresAt,
+  return {
+    user: publicUser(safeUser),
+    tokens: {
+      accessToken: signAccessToken({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        planId: user.planId,
+      }),
+      refreshToken,
     },
-  });
-
-  const verifyUrl = `${env.webUrl}/verify-email?token=${verificationToken}`;
-  const { subject, html } = buildEmailVerificationEmail(verifyUrl);
-  await sendEmail({ to: email, subject, html });
-
-  return { ok: true };
+  };
 }
 
 export async function refreshAccess(refreshToken: string) {
@@ -219,18 +218,35 @@ export async function refreshAccess(refreshToken: string) {
     throw new UnauthorizedError("Refresh token inválido ou expirado");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.sub },
-    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true, tokenVersion: true },
+  const dbToken = await prisma.refreshToken.findUnique({
+    where: { token: refreshToken },
+    include: { user: { select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true, tokenVersion: true } } },
   });
 
+  if (!dbToken) {
+    throw new UnauthorizedError("Refresh token não encontrado");
+  }
+
+  if (dbToken.expiresAt < new Date()) {
+    await prisma.refreshToken.delete({ where: { id: dbToken.id } });
+    throw new UnauthorizedError("Refresh token expirado. Faça login novamente.");
+  }
+
+  const user = dbToken.user;
+
   if (!user || !user.isActive) {
+    await prisma.refreshToken.delete({ where: { id: dbToken.id } });
     throw new UnauthorizedError("Usuário inexistente ou inativo");
   }
 
   if (user.tokenVersion !== payload.tokenVersion) {
+    await prisma.refreshToken.delete({ where: { id: dbToken.id } });
     throw new UnauthorizedError("Sessão expirada. Faça login novamente.");
   }
+
+  // Rotate: delete old, create new
+  await prisma.refreshToken.delete({ where: { id: dbToken.id } });
+  const newRefreshToken = await createRefreshToken(user.id);
 
   return {
     accessToken: signAccessToken({
@@ -239,20 +255,68 @@ export async function refreshAccess(refreshToken: string) {
       role: user.role,
       planId: user.planId,
     }),
+    refreshToken: newRefreshToken,
   };
+}
+
+export async function logoutUser(refreshToken: string) {
+  try {
+    await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+  } catch {}
+  return { ok: true };
+}
+
+export async function logoutAllDevices(userId: string) {
+  await prisma.refreshToken.deleteMany({ where: { userId } });
+  return { ok: true };
+}
+
+export async function verifyEmail(token: string) {
+  const verificationToken = await prisma.emailVerificationToken.findUnique({ where: { token } });
+
+  if (!verificationToken) {
+    throw new UnauthorizedError("Token de verificação inválido");
+  }
+  if (verificationToken.usedAt) {
+    throw new UnauthorizedError("Token de verificação já utilizado");
+  }
+  if (verificationToken.expiresAt < new Date()) {
+    throw new UnauthorizedError("Token de verificação expirado. Solicite um novo.");
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: verificationToken.userId }, data: { emailVerified: true } }),
+    prisma.emailVerificationToken.update({ where: { id: verificationToken.id }, data: { usedAt: new Date() } }),
+  ]);
+
+  return { ok: true };
+}
+
+export async function resendVerificationEmail(email: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return { ok: true };
+  if (user.emailVerified) return { ok: true };
+
+  await prisma.emailVerificationToken.updateMany({ where: { userId: user.id, usedAt: null }, data: { usedAt: new Date() } });
+
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await prisma.emailVerificationToken.create({ data: { token: verificationToken, userId: user.id, expiresAt } });
+
+  const verifyUrl = `${env.webUrl}/verify-email?token=${verificationToken}`;
+  const { subject, html } = buildEmailVerificationEmail(verifyUrl);
+  await sendEmail({ to: email, subject, html });
+
+  return { ok: true };
 }
 
 export async function getProfile(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      registrationNumber: true,
-      isAffiliate: true,
-      affiliateCode: true,
+      id: true, name: true, email: true, role: true, registrationNumber: true,
+      isAffiliate: true, affiliateCode: true, emailVerified: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
       createdAt: true,
     },
@@ -266,13 +330,8 @@ export async function updateProfile(userId: string, name: string) {
     where: { id: userId },
     data: { name },
     select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      registrationNumber: true,
-      isAffiliate: true,
-      affiliateCode: true,
+      id: true, name: true, email: true, role: true, registrationNumber: true,
+      isAffiliate: true, affiliateCode: true, emailVerified: true,
       plan: { select: { id: true, name: true, slug: true, price: true, billing: true } },
       createdAt: true,
     },
@@ -289,39 +348,23 @@ export async function changePassword(userId: string, currentPassword: string, ne
     throw new UnauthorizedError("Senha atual incorreta");
   }
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      passwordHash,
-      tokenVersion: { increment: 1 },
-    },
-  });
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash, tokenVersion: { increment: 1 } } }),
+    prisma.refreshToken.deleteMany({ where: { userId } }),
+  ]);
   return { ok: true };
 }
 
 export async function forgotPassword(email: string) {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return { ok: true };
-  }
+  if (!user) return { ok: true };
 
-  // Invalidate any existing reset tokens for this user
-  await prisma.passwordResetToken.updateMany({
-    where: { userId: user.id, usedAt: null },
-    data: { usedAt: new Date() },
-  });
+  await prisma.passwordResetToken.updateMany({ where: { userId: user.id, usedAt: null }, data: { usedAt: new Date() } });
 
-  // Generate a cryptographically secure single-use token
   const token = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
 
-  await prisma.passwordResetToken.create({
-    data: {
-      token,
-      userId: user.id,
-      expiresAt,
-    },
-  });
+  await prisma.passwordResetToken.create({ data: { token, userId: user.id, expiresAt } });
 
   const resetUrl = `${env.webUrl}/reset-password?token=${token}`;
   const { subject, html } = buildPasswordResetEmail(resetUrl);
@@ -331,36 +374,18 @@ export async function forgotPassword(email: string) {
 }
 
 export async function resetPassword(token: string, newPassword: string) {
-  const resetToken = await prisma.passwordResetToken.findUnique({
-    where: { token },
-  });
+  const resetToken = await prisma.passwordResetToken.findUnique({ where: { token } });
 
-  if (!resetToken) {
-    throw new UnauthorizedError("Token inválido ou expirado");
-  }
-
-  if (resetToken.usedAt) {
-    throw new UnauthorizedError("Token já utilizado. Solicite um novo.");
-  }
-
-  if (resetToken.expiresAt < new Date()) {
-    throw new UnauthorizedError("Token expirado. Solicite um novo.");
-  }
+  if (!resetToken) throw new UnauthorizedError("Token inválido ou expirado");
+  if (resetToken.usedAt) throw new UnauthorizedError("Token já utilizado. Solicite um novo.");
+  if (resetToken.expiresAt < new Date()) throw new UnauthorizedError("Token expirado. Solicite um novo.");
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
 
   await prisma.$transaction([
-    prisma.user.update({
-      where: { id: resetToken.userId },
-      data: {
-        passwordHash,
-        tokenVersion: { increment: 1 },
-      },
-    }),
-    prisma.passwordResetToken.update({
-      where: { id: resetToken.id },
-      data: { usedAt: new Date() },
-    }),
+    prisma.user.update({ where: { id: resetToken.userId }, data: { passwordHash, tokenVersion: { increment: 1 } } }),
+    prisma.passwordResetToken.update({ where: { id: resetToken.id }, data: { usedAt: new Date() } }),
+    prisma.refreshToken.deleteMany({ where: { userId: resetToken.userId } }),
   ]);
 
   return { ok: true };

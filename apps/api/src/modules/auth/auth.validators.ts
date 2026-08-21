@@ -51,6 +51,16 @@ export const resendVerificationSchema = z.object({
   email: z.string().email("E-mail inválido"),
 });
 
+export const twoFactorSetupSchema = z.object({});
+
+export const twoFactorVerifySchema = z.object({
+  token: z.string().length(6, "Código deve ter 6 dígitos"),
+});
+
+export const twoFactorDisableSchema = z.object({
+  token: z.string().length(6, "Código deve ter 6 dígitos"),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

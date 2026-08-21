@@ -12,7 +12,15 @@ import {
   updateProfile,
   verifyEmail,
   resendVerificationEmail,
+  logoutUser,
+  logoutAllDevices,
 } from "./auth.service.js";
+import {
+  generateTwoFactorSecret,
+  verifyAndEnable2FA,
+  disable2FA,
+  get2FAStatus,
+} from "../../services/twoFactor.js";
 import type {
   ChangePasswordInput,
   LoginInput,
@@ -26,12 +34,23 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const result = await loginUser(req.body as LoginInput);
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const result = await loginUser(req.body as LoginInput, ip);
   res.json(result);
 });
 
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const result = await refreshAccess(req.body.refreshToken);
+  res.json(result);
+});
+
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  const result = await logoutUser(req.body.refreshToken);
+  res.json(result);
+});
+
+export const logoutAll = asyncHandler(async (req: Request, res: Response) => {
+  const result = await logoutAllDevices((req as AuthenticatedRequest).user.id);
   res.json(result);
 });
 
@@ -73,5 +92,26 @@ export const verify = asyncHandler(async (req: Request, res: Response) => {
 
 export const resendVerification = asyncHandler(async (req: Request, res: Response) => {
   const result = await resendVerificationEmail(req.body.email);
+  res.json(result);
+});
+
+export const setup2FA = asyncHandler(async (req: Request, res: Response) => {
+  const user = (req as AuthenticatedRequest).user;
+  const result = await generateTwoFactorSecret(user.id, user.email);
+  res.json(result);
+});
+
+export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
+  const result = await verifyAndEnable2FA((req as AuthenticatedRequest).user.id, req.body.token);
+  res.json(result);
+});
+
+export const disable2FAEndpoint = asyncHandler(async (req: Request, res: Response) => {
+  const result = await disable2FA((req as AuthenticatedRequest).user.id, req.body.token);
+  res.json(result);
+});
+
+export const get2FA = asyncHandler(async (req: Request, res: Response) => {
+  const result = await get2FAStatus((req as AuthenticatedRequest).user.id);
   res.json(result);
 });
