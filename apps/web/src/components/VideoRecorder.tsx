@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, Pause, Play, Square, RotateCcw, Video, Trash2 } from "lucide-react";
+import { Camera, Pause, Play, Square, RotateCcw, Video, Trash2, RectangleHorizontal, RectangleVertical } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
 
@@ -8,14 +8,16 @@ interface VideoRecorderProps {
   onRemoved: () => void;
 }
 
+type Ratio = "16:9" | "9:16";
+
 export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
   const liveRef = useRef<HTMLVideoElement>(null);
-  const reviewRef = useRef<HTMLVideoElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
 
   const [phase, setPhase] = useState<"idle" | "preview" | "recording" | "paused" | "review" | "uploading" | "done">("idle");
+  const [ratio, setRatio] = useState<Ratio>("16:9");
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
@@ -44,22 +46,36 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     return `${m}:${sec}`;
   }
 
-  async function startPreview() {
+  function getConstraints(): MediaStreamConstraints {
+    const isPortrait = ratio === "9:16";
+    return {
+      video: {
+        facingMode: "environment",
+        width: isPortrait ? { ideal: 720 } : { ideal: 1280 },
+        height: isPortrait ? { ideal: 1280 } : { ideal: 720 },
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 22050,
+      },
+    };
+  }
+
+  async function openCamera() {
     setError(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: true,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia(getConstraints());
       streamRef.current = stream;
-      if (liveRef.current) {
-        liveRef.current.srcObject = stream;
-        liveRef.current.muted = true;
-        await liveRef.current.play();
+      const el = liveRef.current;
+      if (el) {
+        el.srcObject = stream;
+        el.muted = true;
+        await el.play();
       }
       setPhase("preview");
     } catch {
-      setError("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
+      setError("Nao foi possivel acessar a camera. Verifique as permissoes do navegador.");
     }
   }
 
@@ -67,13 +83,18 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     const stream = streamRef.current;
     if (!stream) return;
 
-    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-      ? "video/webm;codecs=vp9,opus"
-      : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
-        ? "video/webm;codecs=vp8,opus"
+    let mime = "video/webm;codecs=vp8,opus";
+    if (!MediaRecorder.isTypeSupported(mime)) {
+      mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+        ? "video/webm;codecs=vp9,opus"
         : "video/webm";
+    }
 
-    const recorder = new MediaRecorder(stream, { mimeType: mime });
+    const recorder = new MediaRecorder(stream, {
+      mimeType: mime,
+      videoBitsPerSecond: 600_000,
+      audioBitsPerSecond: 48_000,
+    });
     chunksRef.current = [];
 
     recorder.ondataavailable = (e) => {
@@ -89,7 +110,7 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     };
 
     recorderRef.current = recorder;
-    recorder.start();
+    recorder.start(1000);
     setPhase("recording");
     setElapsed(0);
     timerRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
@@ -117,10 +138,19 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
   }
 
   function discard() {
+    if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+    setRecordedBlob(null);
+    setRecordedUrl(null);
+    setElapsed(0);
+    setPhase("preview");
+  }
+
+  function cancelAll() {
     stopStream();
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
     setRecordedBlob(null);
     setRecordedUrl(null);
+    setUploadedUrl(null);
     setElapsed(0);
     setPhase("idle");
   }
@@ -144,7 +174,7 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
       setElapsed(0);
       setPhase("done");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha no upload do vídeo");
+      setError(e instanceof Error ? e.message : "Falha no upload do video");
       setPhase("review");
     }
   }
@@ -156,6 +186,7 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
   }
 
   const showLive = phase === "preview" || phase === "recording" || phase === "paused";
+  const isPortrait = ratio === "9:16";
 
   return (
     <div className="space-y-3">
@@ -165,28 +196,29 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         </div>
       )}
 
-      {/* Camera live view — visible during preview, recording, paused */}
-      {showLive && (
-        <div className="rounded-xl border border-border overflow-hidden bg-black relative">
-          <video
-            ref={liveRef}
-            className="w-full"
-            playsInline
-            muted
-          />
-          {(phase === "recording" || phase === "paused") && (
-            <div className="absolute top-3 left-3 flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-              {fmt(elapsed)}
-            </div>
-          )}
-        </div>
-      )}
+      {/* Video element: always mounted, toggled via CSS */}
+      <div
+        className="rounded-xl border border-border overflow-hidden bg-black relative"
+        style={{ display: showLive ? "block" : "none", aspectRatio: isPortrait ? "9/16" : "16/9" }}
+      >
+        <video
+          ref={liveRef}
+          className="h-full w-full object-cover"
+          playsInline
+          muted
+        />
+        {(phase === "recording" || phase === "paused") && (
+          <div className="absolute top-3 left-3 flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+            {fmt(elapsed)}
+          </div>
+        )}
+      </div>
 
       {/* Review recorded video */}
       {phase === "review" && recordedUrl && (
         <div className="rounded-xl border border-border overflow-hidden">
-          <video ref={reviewRef} controls src={recordedUrl} className="w-full" preload="metadata" />
+          <video controls src={recordedUrl} className="w-full" preload="metadata" style={{ aspectRatio: isPortrait ? "9/16" : "16/9", objectFit: "contain" }} />
         </div>
       )}
 
@@ -201,24 +233,42 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
       {phase === "uploading" && (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 p-6">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm text-muted-foreground">Enviando vídeo...</span>
+          <span className="text-sm text-muted-foreground">Enviando video...</span>
         </div>
       )}
 
-      {/* Controls */}
+      {/* Aspect ratio selector + controls */}
       <div className="flex flex-wrap items-center gap-2">
-        {phase === "idle" && !uploadedUrl && (
-          <Button type="button" variant="outline" size="sm" onClick={startPreview}>
-            <Camera className="h-3.5 w-3.5" /> Abrir câmera
-          </Button>
+        {phase === "idle" && (
+          <>
+            <div className="flex overflow-hidden rounded-lg border border-border mr-1">
+              <button
+                type="button"
+                onClick={() => setRatio("16:9")}
+                className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${ratio === "16:9" ? "bg-primary-600 text-white" : "bg-muted text-muted-foreground"}`}
+              >
+                <RectangleHorizontal className="h-3.5 w-3.5" /> 16:9
+              </button>
+              <button
+                type="button"
+                onClick={() => setRatio("9:16")}
+                className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${ratio === "9:16" ? "bg-primary-600 text-white" : "bg-muted text-muted-foreground"}`}
+              >
+                <RectangleVertical className="h-3.5 w-3.5" /> 9:16
+              </button>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={openCamera}>
+              <Camera className="h-3.5 w-3.5" /> Abrir camera
+            </Button>
+          </>
         )}
 
         {phase === "preview" && (
           <>
             <Button type="button" variant="default" size="sm" onClick={startRecording}>
-              <Video className="h-3.5 w-3.5" /> Iniciar gravação
+              <Video className="h-3.5 w-3.5" /> Gravar
             </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={() => { stopStream(); setPhase("idle"); }}>
+            <Button type="button" variant="ghost" size="sm" onClick={cancelAll}>
               Cancelar
             </Button>
           </>
@@ -244,12 +294,15 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
             <Button type="button" variant="ghost" size="sm" onClick={discard}>
               <RotateCcw className="h-3.5 w-3.5" /> Descartar
             </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={cancelAll}>
+              Cancelar
+            </Button>
           </>
         )}
 
         {phase === "done" && (
           <>
-            <Button type="button" variant="outline" size="sm" onClick={() => { setPhase("idle"); }}>
+            <Button type="button" variant="outline" size="sm" onClick={openCamera}>
               <Camera className="h-3.5 w-3.5" /> Gravar outra
             </Button>
             <Button type="button" variant="ghost" size="sm" onClick={removeUploaded} className="text-red-600 hover:text-red-700">
