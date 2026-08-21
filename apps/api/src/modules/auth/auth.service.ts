@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma.js";
 import {
@@ -11,6 +12,8 @@ import {
   verifyRefreshToken,
 } from "../../utils/jwt.js";
 import type { RegisterInput, LoginInput } from "./auth.validators.js";
+
+const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 function publicUser(user: {
   id: string;
@@ -103,7 +106,7 @@ export async function registerUser(input: RegisterInput) {
   };
 }
 
-export function issueTokens(user: { id: string; email: string; role: string; planId: string }) {
+export function issueTokens(user: { id: string; email: string; role: string; planId: string; tokenVersion?: number }) {
   return {
     accessToken: signAccessToken({
       sub: user.id,
@@ -111,14 +114,14 @@ export function issueTokens(user: { id: string; email: string; role: string; pla
       role: user.role as "ADMIN" | "USER",
       planId: user.planId,
     }),
-    refreshToken: signRefreshToken({ sub: user.id, tokenVersion: 1 }),
+    refreshToken: signRefreshToken({ sub: user.id, tokenVersion: user.tokenVersion ?? 0 }),
   };
 }
 
 export async function loginUser(input: LoginInput) {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
-    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, passwordHash: true, isActive: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, passwordHash: true, isActive: true, tokenVersion: true },
   });
 
   if (!user || !(await bcrypt.compare(input.password, user.passwordHash))) {
@@ -143,11 +146,15 @@ export async function refreshAccess(refreshToken: string) {
 
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
-    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true },
+    select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true, isActive: true, tokenVersion: true },
   });
 
   if (!user || !user.isActive) {
     throw new UnauthorizedError("Usuário inexistente ou inativo");
+  }
+
+  if (user.tokenVersion !== payload.tokenVersion) {
+    throw new UnauthorizedError("Sessão expirada. Faça login novamente.");
   }
 
   return {
@@ -201,13 +208,19 @@ export async function updateProfile(userId: string, name: string) {
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { passwordHash: true },
+    select: { passwordHash: true, tokenVersion: true },
   });
   if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
     throw new UnauthorizedError("Senha atual incorreta");
   }
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      passwordHash,
+      tokenVersion: { increment: 1 },
+    },
+  });
   return { ok: true };
 }
 
@@ -216,21 +229,64 @@ export async function forgotPassword(email: string) {
   if (!user) {
     return { ok: true };
   }
-  const token = signRefreshToken({ sub: user.id, tokenVersion: 1 });
-  return { ok: true, resetToken: token };
+
+  // Invalidate any existing reset tokens for this user
+  await prisma.passwordResetToken.updateMany({
+    where: { userId: user.id, usedAt: null },
+    data: { usedAt: new Date() },
+  });
+
+  // Generate a cryptographically secure single-use token
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token,
+      userId: user.id,
+      expiresAt,
+    },
+  });
+
+  // TODO: Send email with reset link containing the token
+  // For now, log it for development purposes only
+  console.log(`[PASSWORD RESET] Token for ${email}: ${token}`);
+
+  return { ok: true };
 }
 
 export async function resetPassword(token: string, newPassword: string) {
-  let payload;
-  try {
-    payload = verifyRefreshToken(token);
-  } catch {
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { token },
+  });
+
+  if (!resetToken) {
     throw new UnauthorizedError("Token inválido ou expirado");
   }
+
+  if (resetToken.usedAt) {
+    throw new UnauthorizedError("Token já utilizado. Solicite um novo.");
+  }
+
+  if (resetToken.expiresAt < new Date()) {
+    throw new UnauthorizedError("Token expirado. Solicite um novo.");
+  }
+
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({
-    where: { id: payload.sub },
-    data: { passwordHash },
-  });
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: resetToken.userId },
+      data: {
+        passwordHash,
+        tokenVersion: { increment: 1 },
+      },
+    }),
+    prisma.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { usedAt: new Date() },
+    }),
+  ]);
+
   return { ok: true };
 }
