@@ -88,6 +88,7 @@ function buildOrderBy(sort?: string) {
   }
 }
 
+// v2 - force redeploy to apply VideoAudio migration
 const videoSelect = {
   id: true,
   title: true,
