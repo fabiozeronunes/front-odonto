@@ -102,8 +102,8 @@ async function doRefresh(): Promise<boolean> {
       clearTokens();
       return false;
     }
-    const data = (await res.json()) as { accessToken: string };
-    setTokens(data.accessToken);
+    const data = (await res.json()) as { accessToken: string; refreshToken: string };
+    setTokens(data.accessToken, data.refreshToken);
     return true;
   } catch {
     clearTokens();

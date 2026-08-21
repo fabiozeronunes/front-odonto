@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!ok) setUser(null);
       });
     };
-    const id = window.setInterval(keepAlive, 10 * 60 * 1000);
+    const id = window.setInterval(keepAlive, 5 * 60 * 1000);
     const onVisible = () => {
       if (document.visibilityState === "visible") keepAlive();
     };
