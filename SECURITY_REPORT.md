@@ -281,8 +281,40 @@
 ### #9: Verificação de Email Obrigatória
 - **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
 - **Status:** ✅ Implementado
-- **Descrição:** Campo `emailVerified` no modelo User
-- **Nota:** Funcionalidade disponível mas não bloqueia login ainda (requer configuração de email para ativar)
+- **Descrição:** Login bloqueado até verificar email
+- **Detalhes:**
+  - Novos usuários recebem email de verificação (24h de validade)
+  - Login retorna erro "E-mail não verificado" se não verificado
+  - Usuários existentes são auto-verificados na migração
+
+### #10: 2FA Backup Codes
+- **Arquivo:** `apps/api/src/services/twoFactor.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** 8 códigos de backup SHA256-hashed para recuperação
+- **Detalhes:**
+  - Gerados na ativação do 2FA
+  - Código de backup é marcado como usado após consumo
+  - Contagem de códigos restantes visível no status
+
+### #11: Refresh Token Revocation em Todas as Mutations
+- **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
+- **Status:** ✅ Implementado
+- **Endpoints:**
+  - `POST /api/auth/revoke-all` — revoga todos os tokens do usuário
+  - `POST /api/auth/logout-all` — revoga todos os tokens (alias)
+- **Detalhes:**
+  - `changePassword` revoga tokens
+  - `resetPassword` revoga tokens
+  - `revokeAllRefreshTokens` função dedicada
+
+### #12: HTTPS Enforcement
+- **Arquivo:** `apps/api/src/app.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Redirect 301 de HTTP para HTTPS em produção
+- **Detalhes:**
+  - Middleware verifica `x-forwarded-proto` header
+  - Configurado apenas em `NODE_ENV=production`
+  - Vercel já fornece HTTPS por padrão
 
 ---
 
@@ -290,6 +322,6 @@
 
 1. **Configurar Resend:** Adicionar `RESEND_API_KEY` para envio real de emails
 2. **Configurar Stripe:** Adicionar `PAYMENT_GATEWAY_SECRET` após negociação
-3. **Email obrigatório no login:** Bloquear login até verificar email (quando email estiver configurado)
-4. **Monitoramento:** Adicionar alertas para tentativas de brute force
-5. **2FA backup codes:** Implementar códigos de backup para recuperação
+3. **Monitoramento:** Adicionar alertas para tentativas de brute force
+4. **Session fingerprinting:** User-Agent + IP hash para detectar sequestro
+5. **API versioning:** `/api/v1/` prefix para breaking changes
