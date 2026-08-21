@@ -11,6 +11,7 @@ import { Select } from "./ui/select";
 import { ImagePicker } from "./ImagePicker";
 import { YouTubeImport } from "./YouTubeImport";
 import { AudioRecorder } from "./AudioRecorder";
+import { AudioPlayer } from "./AudioPlayer";
 import { TagCreator } from "./TagCreator";
 import { resolveImageUrl } from "../lib/utils";
 
@@ -293,20 +294,15 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           {editing.audios.length > 0 && (
             <div>
               <p className="mb-3 text-sm font-medium text-foreground">Áudios salvos</p>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {editing.audios.map((audio, index) => (
                   <div
                     key={audio.id}
-                    className="flex flex-col gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center"
+                    className="rounded-xl border border-border p-4 space-y-3"
                   >
-                    <div className="flex shrink-0 flex-col items-center gap-2 sm:flex-row sm:w-1/4">
-                      <audio controls src={resolveImageUrl(audio.url)} className="h-12 min-w-0 flex-1" preload="metadata" />
-                      <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                        Áudio {index + 1}
-                      </span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="space-y-1">
+                    <AudioPlayer src={resolveImageUrl(audio.url) || ""} />
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1 space-y-1">
                         <Label>Título do áudio</Label>
                         <Input
                           value={audio.title}
@@ -322,9 +318,9 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                             audios: prev.audios.filter((_, i) => i !== index),
                           }))
                         }
-                        className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700 shrink-0"
                       >
-                        <X className="h-4 w-4" /> Remover este áudio
+                        <X className="h-4 w-4" /> Remover
                       </button>
                     </div>
                   </div>

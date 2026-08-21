@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Heart, Eye, Clock, User, Building2, Calendar, Tag as TagIcon, X, PlayCircle, Video as VideoIcon } from "lucide-react";
+import { AudioPlayer } from "../components/AudioPlayer";
 import { api, ApiRequestError } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { VideoDetail } from "../types";
@@ -237,23 +238,13 @@ export function VideoDetail() {
               </svg>
               Áudios
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {video.audios.map((audio) => (
                 <div
                   key={audio.id}
-                  className="flex flex-col gap-2 rounded-xl border border-border p-4 sm:flex-row sm:items-center"
+                  className="rounded-xl border border-border p-4"
                 >
-                  <div className="flex shrink-0 flex-col items-center gap-2 sm:flex-row sm:w-1/4">
-                    <audio controls src={audio.url} className="h-12 min-w-0 flex-1" preload="metadata" />
-                    <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                      Áudio
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    {audio.title && (
-                      <p className="font-medium text-foreground">{audio.title}</p>
-                    )}
-                  </div>
+                  <AudioPlayer src={audio.url} label={audio.title || undefined} />
                 </div>
               ))}
             </div>
