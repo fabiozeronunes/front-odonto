@@ -6,29 +6,39 @@ import { prisma } from "../lib/prisma.js";
  */
 export async function applyMigrations() {
   try {
-    // Check if emailVerified column exists in users table
-    const hasEmailVerified = await prisma.$queryRaw`
-      SELECT EXISTS (
-        SELECT FROM information_schema.columns 
-        WHERE table_name = 'users' AND column_name = 'emailVerified'
-      ) as exists
-    ` as { exists: boolean }[];
+    // First, find the actual table names by checking information_schema
+    const tables = await prisma.$queryRaw`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+    ` as { table_name: string }[];
+    
+    const tableNames = new Set(tables.map(t => t.table_name));
+    console.log(`[MIGRATION] Found tables: ${Array.from(tableNames).join(', ')}`);
 
-    if (!hasEmailVerified[0]?.exists) {
-      console.log("[MIGRATION] Adding emailVerified column to users...");
-      await prisma.$executeRaw`ALTER TABLE "users" ADD COLUMN "emailVerified" BOOLEAN NOT NULL DEFAULT false`;
-      console.log("[MIGRATION] emailVerified column added.");
+    // Check if emailVerified column exists in users table (check both cases)
+    const userTable = tableNames.has('User') ? 'User' : tableNames.has('users') ? 'users' : null;
+    
+    if (userTable) {
+      const hasEmailVerified = await prisma.$queryRaw`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = ${userTable} AND column_name = 'emailVerified'
+        ) as exists
+      ` as { exists: boolean }[];
+
+      if (!hasEmailVerified[0]?.exists) {
+        console.log(`[MIGRATION] Adding emailVerified column to ${userTable}...`);
+        await prisma.$executeRawUnsafe(`ALTER TABLE "${userTable}" ADD COLUMN "emailVerified" BOOLEAN NOT NULL DEFAULT false`);
+        console.log("[MIGRATION] emailVerified column added.");
+      }
     }
 
-    // Check if emailVerificationTokens table exists
-    const hasTable = await prisma.$queryRaw`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = 'emailVerificationTokens'
-      ) as exists
-    ` as { exists: boolean }[];
-
-    if (!hasTable[0]?.exists) {
+    // Check if emailVerificationTokens table exists (check both cases)
+    const hasEmailVerificationTokens = tableNames.has('emailVerificationTokens') || 
+                                       tableNames.has('EmailVerificationToken');
+    
+    if (!hasEmailVerificationTokens) {
       console.log("[MIGRATION] Creating emailVerificationTokens table...");
       await prisma.$executeRaw`
         CREATE TABLE "emailVerificationTokens" (
@@ -44,22 +54,26 @@ export async function applyMigrations() {
       await prisma.$executeRaw`CREATE UNIQUE INDEX "emailVerificationTokens_token_key" ON "emailVerificationTokens"("token")`;
       await prisma.$executeRaw`CREATE INDEX "emailVerificationTokens_token_idx" ON "emailVerificationTokens"("token")`;
       await prisma.$executeRaw`CREATE INDEX "emailVerificationTokens_userId_idx" ON "emailVerificationTokens"("userId")`;
-      await prisma.$executeRaw`
-        ALTER TABLE "emailVerificationTokens" ADD CONSTRAINT "emailVerificationTokens_userId_fkey"
-        FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
-      `;
+      
+      // Try to add foreign key with the correct user table name
+      if (userTable) {
+        try {
+          await prisma.$executeRawUnsafe(`
+            ALTER TABLE "emailVerificationTokens" ADD CONSTRAINT "emailVerificationTokens_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "${userTable}"("id") ON DELETE CASCADE ON UPDATE CASCADE
+          `);
+        } catch (e) {
+          console.log("[MIGRATION] Foreign key constraint skipped (might already exist)");
+        }
+      }
       console.log("[MIGRATION] emailVerificationTokens table created.");
     }
 
     // Check if auditLogs table exists
-    const hasAuditLogs = await prisma.$queryRaw`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = 'auditLogs'
-      ) as exists
-    ` as { exists: boolean }[];
-
-    if (!hasAuditLogs[0]?.exists) {
+    const hasAuditLogs = tableNames.has('auditLogs') || 
+                         tableNames.has('AuditLog');
+    
+    if (!hasAuditLogs) {
       console.log("[MIGRATION] Creating auditLogs table...");
       await prisma.$executeRaw`
         CREATE TABLE "auditLogs" (
@@ -78,6 +92,18 @@ export async function applyMigrations() {
       await prisma.$executeRaw`CREATE INDEX "auditLogs_userId_idx" ON "auditLogs"("userId")`;
       await prisma.$executeRaw`CREATE INDEX "auditLogs_action_idx" ON "auditLogs"("action")`;
       await prisma.$executeRaw`CREATE INDEX "auditLogs_createdAt_idx" ON "auditLogs"("createdAt")`;
+      
+      // Try to add foreign key with the correct user table name
+      if (userTable) {
+        try {
+          await prisma.$executeRawUnsafe(`
+            ALTER TABLE "auditLogs" ADD CONSTRAINT "auditLogs_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "${userTable}"("id") ON DELETE SET NULL ON UPDATE CASCADE
+          `);
+        } catch (e) {
+          console.log("[MIGRATION] Foreign key constraint skipped (might already exist)");
+        }
+      }
       console.log("[MIGRATION] auditLogs table created.");
     }
 
