@@ -1,21 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, Pause, Play, Square, RotateCcw, Video } from "lucide-react";
+import { Camera, Pause, Play, Square, RotateCcw, Video, Trash2 } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
 
 interface VideoRecorderProps {
   onRecorded: (url: string) => void;
+  onRemoved: () => void;
 }
 
-export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
+  const liveRef = useRef<HTMLVideoElement>(null);
+  const reviewRef = useRef<HTMLVideoElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const [phase, setPhase] = useState<"idle" | "preview" | "recording" | "paused" | "review" | "uploading">("idle");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"idle" | "preview" | "recording" | "paused" | "review" | "uploading" | "done">("idle");
+  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -24,10 +27,13 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
     return () => {
       stopStream();
       if (timerRef.current) window.clearInterval(timerRef.current);
+      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
     };
   }, []);
 
   function stopStream() {
+    if (timerRef.current) window.clearInterval(timerRef.current);
+    timerRef.current = null;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   }
@@ -46,10 +52,10 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
         audio: true,
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.muted = true;
-        await videoRef.current.play();
+      if (liveRef.current) {
+        liveRef.current.srcObject = stream;
+        liveRef.current.muted = true;
+        await liveRef.current.play();
       }
       setPhase("preview");
     } catch {
@@ -75,9 +81,9 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
     };
 
     recorder.onstop = () => {
-      stopStream();
       const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "video/webm" });
       const url = URL.createObjectURL(blob);
+      setRecordedBlob(blob);
       setRecordedUrl(url);
       setPhase("review");
     };
@@ -111,36 +117,45 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
   }
 
   function discard() {
+    stopStream();
     if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+    setRecordedBlob(null);
     setRecordedUrl(null);
-    setPreviewUrl(null);
     setElapsed(0);
     setPhase("idle");
   }
 
   async function uploadAndConfirm() {
-    if (!recordedUrl) return;
+    if (!recordedBlob) return;
     setPhase("uploading");
+    stopStream();
     try {
-      const res = await fetch(recordedUrl);
-      const blob = await res.blob();
       const form = new FormData();
-      form.append("image", blob, "gravacao-aula.webm");
+      form.append("image", recordedBlob, "gravacao-aula.webm");
       const uploadRes = await api<{ data: { url: string } }>("/api/uploads", {
         method: "POST",
         body: form,
       });
-      setPreviewUrl(uploadRes.data.url);
+      setUploadedUrl(uploadRes.data.url);
       onRecorded(uploadRes.data.url);
-      URL.revokeObjectURL(recordedUrl);
+      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+      setRecordedBlob(null);
       setRecordedUrl(null);
       setElapsed(0);
-      setPhase("idle");
+      setPhase("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha no upload do vídeo");
       setPhase("review");
     }
   }
+
+  function removeUploaded() {
+    setUploadedUrl(null);
+    setPhase("idle");
+    onRemoved();
+  }
+
+  const showLive = phase === "preview" || phase === "recording" || phase === "paused";
 
   return (
     <div className="space-y-3">
@@ -150,27 +165,39 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
         </div>
       )}
 
-      {/* Preview of already recorded + uploaded video */}
-      {previewUrl && phase === "idle" && (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <video controls src={previewUrl} className="w-full" preload="metadata" />
-        </div>
-      )}
-
-      {/* Camera view */}
-      {phase !== "idle" && phase !== "uploading" && (
-        <div className="rounded-xl border border-border overflow-hidden bg-black">
+      {/* Camera live view — visible during preview, recording, paused */}
+      {showLive && (
+        <div className="rounded-xl border border-border overflow-hidden bg-black relative">
           <video
-            ref={videoRef}
+            ref={liveRef}
             className="w-full"
             playsInline
-            muted={phase === "recording" || phase === "paused"}
-            src={phase === "review" && recordedUrl ? recordedUrl : undefined}
-            controls={phase === "review"}
+            muted
           />
+          {(phase === "recording" || phase === "paused") && (
+            <div className="absolute top-3 left-3 flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+              {fmt(elapsed)}
+            </div>
+          )}
         </div>
       )}
 
+      {/* Review recorded video */}
+      {phase === "review" && recordedUrl && (
+        <div className="rounded-xl border border-border overflow-hidden">
+          <video ref={reviewRef} controls src={recordedUrl} className="w-full" preload="metadata" />
+        </div>
+      )}
+
+      {/* Uploaded video (done) */}
+      {phase === "done" && uploadedUrl && (
+        <div className="rounded-xl border border-border overflow-hidden">
+          <video controls src={uploadedUrl} className="w-full" preload="metadata" />
+        </div>
+      )}
+
+      {/* Uploading spinner */}
       {phase === "uploading" && (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 p-6">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -180,7 +207,7 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
 
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2">
-        {phase === "idle" && (
+        {phase === "idle" && !uploadedUrl && (
           <Button type="button" variant="outline" size="sm" onClick={startPreview}>
             <Camera className="h-3.5 w-3.5" /> Abrir câmera
           </Button>
@@ -215,16 +242,20 @@ export function VideoRecorder({ onRecorded }: VideoRecorderProps) {
               Enviar e usar
             </Button>
             <Button type="button" variant="ghost" size="sm" onClick={discard}>
-              <RotateCcw className="h-3.5 w-3.5" /> Gravar novamente
+              <RotateCcw className="h-3.5 w-3.5" /> Descartar
             </Button>
           </>
         )}
 
-        {(phase === "recording" || phase === "paused") && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-            {fmt(elapsed)}
-          </span>
+        {phase === "done" && (
+          <>
+            <Button type="button" variant="outline" size="sm" onClick={() => { setPhase("idle"); }}>
+              <Camera className="h-3.5 w-3.5" /> Gravar outra
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={removeUploaded} className="text-red-600 hover:text-red-700">
+              <Trash2 className="h-3.5 w-3.5" /> Excluir
+            </Button>
+          </>
         )}
       </div>
     </div>

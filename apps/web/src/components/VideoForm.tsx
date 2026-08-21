@@ -288,6 +288,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
         </p>
         <VideoRecorder
           onRecorded={(url) => setEditing({ ...editing, videoUrl: url })}
+          onRemoved={() => setEditing({ ...editing, videoUrl: "" })}
         />
         {editing.videoUrl && (
           <div className="mt-3 rounded-xl border border-border overflow-hidden">
