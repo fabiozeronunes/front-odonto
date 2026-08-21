@@ -246,12 +246,50 @@
 - **Dados logados:** userId, action, resource, resourceId, details, ipAddress, userAgent
 - **Tabela:** `AuditLog` criada no banco
 
+### #6: Refresh Tokens Persistentes
+- **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Refresh tokens salvos no DB para revogação individual
+- **Funcionalidades:**
+  - Token rotation: novo refresh token a cada uso
+  - Revogação individual: `POST /api/auth/logout`
+  - Revogação global: `POST /api/auth/logout-all`
+  - Invalidação automática: mudança de senha, reset de senha
+- **Tabela:** `RefreshToken` criada no banco
+
+### #7: 2FA / Autenticação de Dois Fatores
+- **Arquivo:** `apps/api/src/services/twoFactor.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** OTP compatível com Google Authenticator
+- **Endpoints:**
+  - `POST /api/auth/2fa/setup` — gera segredo + QR code
+  - `POST /api/auth/2fa/verify` — ativa 2FA com código OTP
+  - `POST /api/auth/2fa/disable` — desativa 2FA
+  - `GET /api/auth/2fa/status` — verifica status do 2FA
+- **Tabela:** `TwoFactorSecret` criada no banco
+
+### #8: Account Lockout
+- **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Bloqueio temporário após 5 tentativas falhas
+- **Funcionalidades:**
+  - 5 tentativas falhas = 15 minutos de bloqueio
+  - Tracking por email E por IP
+  - Rate limiting adicional: 10 req/15min para auth
+- **Tabela:** `LoginAttempt` criada no banco
+
+### #9: Verificação de Email Obrigatória
+- **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Campo `emailVerified` no modelo User
+- **Nota:** Funcionalidade disponível mas não bloqueia login ainda (requer configuração de email para ativar)
+
 ---
 
 ## ⚠️ Ações recomendadas futuras
 
-1. **Gateway de pagamento:** Configurar `PAYMENT_GATEWAY_SECRET` após negociação de valores
-2. **Email de verificação:** Configurar `RESEND_API_KEY` para envio real de emails
-3. **2FA / MFA:** Adicionar autenticação de dois fatores
-4. **Account lockout:** Bloquear temporariamente após N tentativas falhas
-5. **Monitoramento:** Adicionar alertas para tentativas de brute force
+1. **Configurar Resend:** Adicionar `RESEND_API_KEY` para envio real de emails
+2. **Configurar Stripe:** Adicionar `PAYMENT_GATEWAY_SECRET` após negociação
+3. **Email obrigatório no login:** Bloquear login até verificar email (quando email estiver configurado)
+4. **Monitoramento:** Adicionar alertas para tentativas de brute force
+5. **2FA backup codes:** Implementar códigos de backup para recuperação
