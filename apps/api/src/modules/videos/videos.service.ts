@@ -431,7 +431,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
   const video = await assertCanManageVideo(id, user);
 
   const data: Prisma.VideoUpdateInput = {};
-  data.updatedAt = new Date();
+  data.updatedAt = { set: new Date() };
   const simpleFields = [
     "title",
     "description",
