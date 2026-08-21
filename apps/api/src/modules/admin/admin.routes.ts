@@ -11,6 +11,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { getAuditLogs } from "../../services/audit.js";
 import { AuthenticatedRequest } from "../../types/auth.js";
 import { Request, Response } from "express";
+import { prisma } from "../../lib/prisma.js";
 
 export const adminRouter = Router();
 
@@ -64,4 +65,9 @@ adminRouter.get("/audit-logs", asyncHandler(async (req: Request, res: Response) 
     offset: offset ? parseInt(offset as string) : 0,
   });
   res.json(result);
+}));
+
+adminRouter.post("/users/:id/verify-email", asyncHandler(async (req: Request, res: Response) => {
+  await prisma.user.update({ where: { id: req.params.id }, data: { emailVerified: true } });
+  res.json({ ok: true });
 }));
