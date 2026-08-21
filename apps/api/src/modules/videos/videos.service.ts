@@ -490,14 +490,24 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
       })),
     };
   }
-  if (input.audios && input.audios.length > 0) {
-    data.audios = {
-      deleteMany: {},
-      create: input.audios.map((a) => ({ url: a.url, title: a.title })),
-    };
-  }
+  const audioData = (input.audios && input.audios.length > 0) ? input.audios : null;
 
-  return prisma.video.update({ where: { id: video.id }, data, include: { audios: true } });
+  const updated = await prisma.$transaction(async (tx) => {
+    const result = await tx.video.update({ where: { id: video.id }, data, include: { audios: true } });
+
+    if (audioData) {
+      await tx.videoAudio.deleteMany({ where: { videoId: video.id } });
+      if (audioData.length > 0) {
+        await tx.videoAudio.createMany({
+          data: audioData.map((a: { url: string; title?: string }) => ({ url: a.url, title: a.title ?? null, videoId: video.id })),
+        });
+      }
+    }
+
+    return tx.video.findUnique({ where: { id: video.id }, include: { audios: true } });
+  });
+
+  return updated!;
 }
 
 export async function deleteVideo(id: string, user: AuthUser) {
