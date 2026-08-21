@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: Bloco de Depoimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:"#f0fdfa",100:"#ccfbf1",200:"#99f6e4",300:"#5eead4",400:"#2dd4bf",500:"#14b8a6",600:"#0d9488",700:"#0f766e",800:"#115e59",900:"#134e4a",950:"#042f2e",
+        },
+        accent: {
+          50:"#fffbeb",100:"#fef3c7",200:"#fde68a",300:"#fcd34d",400:"#fbbf24",500:"#f59e0b",600:"#d97706",700:"#b45309",
+        },
+      },
+      fontFamily: { sans:["Inter","system-ui","sans-serif"], display:["Space Grotesk","Inter","system-ui","sans-serif"] },
+      boxShadow: {
+        lift:"0 8px 24px -6px rgb(15 118 110 / .15)",
+        glow:"0 0 30px -6px rgb(245 158 11 / .4)",
+        card:"0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .08)",
+      },
+    },
+  },
+};
+</script>
+<style>
+  .grad-text { background: linear-gradient(90deg,#0d9488,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .anim-fade { animation: fadeIn .5s ease both; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+  .tabs .tabbtn { border:1px solid #cbd5e1; background:#fff; color:#334155; }
+  .tabs .tabbtn.active { background:#0f766e; color:#fff; border-color:#0f766e; }
+  .star { color:#f59e0b; }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="mx-auto max-w-5xl px-4 py-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-teal-700">Prévia — Bloco de Depoimentos (abaixo dos Benefícios)</p>
+        <h1 class="font-display text-xl font-bold text-slate-900">Escolha 1 das 3 opções de estilo</h1>
+      </div>
+      <div class="tabs flex gap-2">
+        <button class="tabbtn active rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(0,this)">A · Grid Cards</button>
+        <button class="tabbtn rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(1,this)">B · Destaque + Grid</button>
+        <button class="tabbtn rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(2,this)">C · Carrossel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ OPÇÃO A · GRID DE CARDS UNIFORMES ══════════════ -->
+<div id="optA" class="panel anim-fade">
+  <section class="border-y border-teal-200/60 bg-teal-50/80 py-14">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="mx-auto max-w-3xl text-center">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10.5h2m-2 4h2m-6-4h.01M4 14.5h.01M6 6h12a4 4 0 014 4v6a4 4 0 01-4 4H6a4 4 0 01-4-4v-6a4 4 0 014-4z"/></svg>
+          Depoimentos
+        </span>
+        <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          Quem estuda aqui, <span class="grad-text">recomenda</span>
+        </h2>
+        <p class="mx-auto mt-3 max-w-2xl text-slate-600">
+          Veja como estudantes e profissionais de odontologia usam os recursos para estudar melhor, revisar mais rápido e se preparar para provas e concursos.
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Os flashcards e mapas mentais gerados pela IA transformaram meu estudo. O que eu demorava horas para revisar, agora reviso em minutos antes das provas. Passei na residência!"
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-primary-700 font-display text-sm font-bold text-white">MS</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Mariana Souza</p>
+              <p class="text-xs text-slate-500">Estudante · Aprovada em residência</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "As gravações em áudio são meu trunfo. Escuto as aulas no trânsito todos os dias e os quizzes me mostram exatamente o que ainda preciso revisar. Mudou minha rotina de estudos."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 font-display text-sm font-bold text-white">CE</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Carlos Eduardo</p>
+              <p class="text-xs text-slate-500">Dentista · Pós-graduação</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Os estudos de caso são incríveis. Vejo a teoria aplicada na prática e os simulados com perguntas comentadas me deixaram muito mais confiante para as provas."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 font-display text-sm font-bold text-white">FL</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Fernanda Lima</p>
+              <p class="text-xs text-slate-500">Aluna · 8º período</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "A IA organizou todo o conteúdo que eu precisava para a prova. Infográficos e resumos prontos me pouparam semanas de preparação. Recomendo demais!"
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-primary-800 font-display text-sm font-bold text-white">RA</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Rafael Almeida</p>
+              <p class="text-xs text-slate-500">Estudante · Concurso público</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Uso os quizzes e testes diariamente. É leve, rápido e me mantém em dia com a matéria. Virou parte da minha rotina de estudos."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-accent-500 font-display text-sm font-bold text-white">JC</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Juliana Castro</p>
+              <p class="text-xs text-slate-500">Dentista · Recém-formada</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Assistir as aulas em vídeo no meu ritmo e depois fixar com flashcards mudou meu desempenho. Minhas notas subiram e o estudo ficou muito mais prazeroso."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-teal-600 font-display text-sm font-bold text-white">PH</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Pedro Henrique</p>
+              <p class="text-xs text-slate-500">Estudante de Odontologia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════ OPÇÃO B · DESTAQUE + GRID ══════════════ -->
+<div id="optB" class="panel hidden anim-fade">
+  <section class="border-y border-teal-200/60 bg-teal-50/80 py-14">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="mx-auto max-w-3xl text-center">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10.5h2m-2 4h2m-6-4h.01M4 14.5h.01M6 6h12a4 4 0 014 4v6a4 4 0 01-4 4H6a4 4 0 01-4-4v-6a4 4 0 014-4z"/></svg>
+          Depoimentos
+        </span>
+        <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          Histórias reais de <span class="grad-text">quem evoluiu</span>
+        </h2>
+        <p class="mx-auto mt-3 max-w-2xl text-slate-600">
+          Depoimentos de quem usa os recursos de estudo, inteligência artificial e revisão inteligente no dia a dia.
+        </p>
+      </div>
+
+      <!-- destaque -->
+      <div class="mt-10 grid gap-4 lg:grid-cols-3">
+        <div class="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-primary-800 to-primary-950 p-8 text-white shadow-lift lg:col-span-2 lg:row-span-2">
+          <div>
+            <div class="flex gap-1 text-sm star">★★★★★</div>
+            <svg class="mt-4 h-10 w-10 text-teal-300" fill="currentColor" viewBox="0 0 24 24"><path d="M9.6 4.6C6 6.3 3.9 9.2 3.9 13c0 4 2.5 6.4 5.9 6.4 2.8 0 4.9-1.9 4.9-4.5 0-2.5-1.7-4.2-4.1-4.2-.4 0-.9.1-1 .1.3-1.8 2-3.9 4.2-4.8L9.6 4.6zm9 0c-3.6 1.7-5.7 4.6-5.7 8.4 0 4 2.5 6.4 5.9 6.4 2.8 0 4.9-1.9 4.9-4.5 0-2.5-1.7-4.2-4.1-4.2-.4 0-.9.1-1 .1.3-1.8 2-3.9 4.2-4.8L18.6 4.6z"/></svg>
+            <p class="mt-3 font-display text-2xl font-bold leading-snug">
+              "Estudei 3 meses com os planos de estudo de teste/prova e a IA que revisa por mim. Fui aprovado em 1º lugar no concurso!"
+            </p>
+            <p class="mt-4 text-sm leading-relaxed text-white/75">
+              O combo de vídeos, áudio, quizzes e mapas mentais criados automaticamente fez toda a diferença. Eu só estudava — a plataforma cuidava da revisão.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-3">
+            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 font-display font-bold text-white">RA</span>
+            <div>
+              <p class="font-bold">Rafael Almeida</p>
+              <p class="text-xs text-teal-200">Aprovado em 1º lugar · Concurso público</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "As gravações em áudio viraram parte da minha rotina. Escuto no trânsito e os quizzes me mostram o que revisar."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 font-display text-xs font-bold text-white">CE</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Carlos Eduardo</p>
+              <p class="text-xs text-slate-500">Dentista · Pós-graduação</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Estudos de caso + simulados comentados me deixaram muito mais confiante para as provas."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 font-display text-xs font-bold text-white">FL</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Fernanda Lima</p>
+              <p class="text-xs text-slate-500">Aluna · 8º período</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Flashcards gerados pela IA: revisão rápida e eficiente antes de qualquer prova."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-primary-700 font-display text-xs font-bold text-white">MS</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Mariana Souza</p>
+              <p class="text-xs text-slate-500">Aprovada em residência</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Quizzes diários: leve, rápido e meu desempenho subiu muito."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-accent-500 font-display text-xs font-bold text-white">JC</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Juliana Castro</p>
+              <p class="text-xs text-slate-500">Dentista · Recém-formada</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════ OPÇÃO C · CARROSSEL ══════════════ -->
+<div id="optC" class="panel hidden anim-fade">
+  <section class="border-y border-teal-200/60 bg-teal-50/80 py-14">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="mx-auto max-w-3xl text-center">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10.5h2m-2 4h2m-6-4h.01M4 14.5h.01M6 6h12a4 4 0 014 4v6a4 4 0 01-4 4H6a4 4 0 01-4-4v-6a4 4 0 014-4z"/></svg>
+          Depoimentos
+        </span>
+        <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          Na voz de quem <span class="grad-text">estuda com a gente</span>
+        </h2>
+        <p class="mx-auto mt-3 max-w-2xl text-slate-600">
+          Arraste para conhecer mais histórias de alunos e profissionais que usam os recursos no dia a dia.
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="flex flex-col rounded-3xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Aulas em vídeo no meu ritmo e flashcards gerados pela IA: estudo em qualquer lugar."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-primary-700 font-display text-xs font-bold text-white">MS</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Mariana Souza</p>
+              <p class="text-xs text-slate-500">Estudante · Residência</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-3xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Áudio no trânsito + quizzes: minha rotina de estudos nunca foi tão produtiva."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 font-display text-xs font-bold text-white">CE</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Carlos Eduardo</p>
+              <p class="text-xs text-slate-500">Dentista · Pós-graduação</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-3xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Infográficos e resumos prontos me pouparam semanas de preparação."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-primary-800 font-display text-xs font-bold text-white">RA</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Rafael Almeida</p>
+              <p class="text-xs text-slate-500">Estudante · Concurso</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-3xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex gap-1 text-sm star">★★★★★</div>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-slate-700">
+            "Estudos de caso com perguntas comentadas: confiança total nas provas."
+          </p>
+          <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 font-display text-xs font-bold text-white">FL</span>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Fernanda Lima</p>
+              <p class="text-xs text-slate-500">Aluna · 8º período</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex items-center justify-center gap-3">
+        <button class="flex h-11 w-11 items-center justify-center rounded-full border border-teal-300 bg-white text-teal-700 hover:bg-teal-50" aria-label="Anterior">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="flex gap-1.5">
+          <span class="h-2.5 w-6 rounded-full bg-teal-600"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-teal-300"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-teal-300"></span>
+        </div>
+        <button class="flex h-11 w-11 items-center justify-center rounded-full border border-teal-300 bg-white text-teal-700 hover:bg-teal-50" aria-label="Próximo">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+function showTab(i, btn) {
+  document.querySelectorAll(".panel").forEach((p, idx) => p.classList.toggle("hidden", idx !== i));
+  document.querySelectorAll(".tabbtn").forEach((b) => b.classList.toggle("active", b === btn));
+}
+</script>
+</body>
+</html>

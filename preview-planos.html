@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: Planos de Assinatura (destaque+grid)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:"#f0fdfa",100:"#ccfbf1",200:"#99f6e4",300:"#5eead4",400:"#2dd4bf",500:"#14b8a6",600:"#0d9488",700:"#0f766e",800:"#115e59",900:"#134e4a",950:"#042f2e",
+        },
+        accent: {
+          50:"#fffbeb",100:"#fef3c7",200:"#fde68a",300:"#fcd34d",400:"#fbbf24",500:"#f59e0b",600:"#d97706",700:"#b45309",
+        },
+      },
+      fontFamily: { sans:["Inter","system-ui","sans-serif"], display:["Space Grotesk","Inter","system-ui","sans-serif"] },
+      boxShadow: {
+        lift:"0 8px 24px -6px rgb(15 118 110 / .15)",
+        glow:"0 0 30px -6px rgb(245 158 11 / .4)",
+        card:"0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .08)",
+      },
+    },
+  },
+};
+</script>
+<style>
+  .grad-text { background: linear-gradient(90deg,#0d9488,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .anim-fade { animation: fadeIn .5s ease both; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="mx-auto max-w-5xl px-4 py-4">
+    <p class="text-[11px] font-bold uppercase tracking-wider text-teal-700">Prévia — Bloco de Planos de Assinatura no padrão dos Depoimentos (destaque + grid)</p>
+    <h1 class="font-display text-xl font-bold text-slate-900">Modelo para aprovação</h1>
+  </div>
+</div>
+
+<!-- ══════════════ PLANOS · DESTAQUE + GRID ══════════════ -->
+<section class="border-y border-teal-200/60 bg-teal-50/80 py-14">
+  <div class="mx-auto max-w-6xl px-5">
+
+    <!-- cabeçalho -->
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+        Planos de assinatura
+      </span>
+      <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        Escolha o plano ideal para <span class="grad-text">seus estudos</span>
+      </h2>
+      <p class="mx-auto mt-3 max-w-2xl text-slate-600">
+        Comece grátis e evolua para o acesso completo quando quiser. O acesso é liberado imediatamente após a confirmação do pagamento.
+      </p>
+    </div>
+
+    <!-- grid -->
+    <div class="mt-10 grid gap-4 lg:grid-cols-3">
+      <!-- destaque: PREMIUM -->
+      <div class="relative flex flex-col justify-between rounded-3xl bg-gradient-to-br from-primary-800 to-primary-950 p-6 text-white shadow-lift sm:p-8 lg:col-span-2">
+        <span class="absolute -top-3 left-8 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-amber-600 px-3 py-1 text-xs font-bold text-white shadow-glow">MAIS POPULAR</span>
+        <div>
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-2xl font-bold">Odontus PREMIUM</h3>
+            <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-teal-300">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Todo conteúdo liberado
+            </span>
+          </div>
+          <p class="mt-2 text-sm text-white/70">Todo conteúdo do site liberado, com todos os recursos de estudo e IA.</p>
+
+          <div class="mt-5">
+            <p class="text-sm font-medium uppercase tracking-wide text-teal-300">Anual</p>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="font-display text-4xl font-bold">R$ 718,80</span>
+              <span class="text-sm text-white/70">/ ano</span>
+            </div>
+            <p class="mt-1 text-xs text-white/70">sai a <span class="font-semibold text-teal-300">R$ 59,90</span> mensal</p>
+          </div>
+
+          <ul class="mt-6 grid gap-2 text-sm sm:grid-cols-2">
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Criação de vídeos, áudios, imagens e estudos de caso</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Estudos personalizados para prova e testes</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>IA: resumos em vídeo e áudio, quizz, flashcards, questionários, infográficos e mapas mentais</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Download de vídeos e Shop Odontus com descontos exclusivos</li>
+          </ul>
+        </div>
+        <a href="#" class="mt-7 inline-block rounded-full bg-amber-500 px-8 py-3 text-center font-bold text-white hover:bg-amber-400">Assinar Premium</a>
+      </div>
+
+      <!-- grid: VIP -->
+      <div class="relative flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+        <span class="absolute -top-3 left-6 inline-block rounded-2xl bg-gradient-to-r from-teal-400 to-teal-600 px-3 py-1 text-xs font-bold text-white">MELHOR CUSTO-BENEFÍCIO</span>
+        <div>
+          <h3 class="font-display text-lg font-bold text-slate-900">Odontus VIP</h3>
+          <p class="mt-1 text-xs text-slate-500">Acesso total a conteúdos VIP, estudos de caso e benefícios do shopping.</p>
+          <div class="mt-4">
+            <p class="text-sm font-medium uppercase tracking-wide text-slate-500">Anual</p>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="font-display text-3xl font-bold text-slate-900">R$ 478,80</span>
+              <span class="text-sm text-slate-500">/ ano</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">sai a <span class="font-semibold text-slate-900">R$ 39,90</span> mensal</p>
+          </div>
+          <ul class="mt-5 space-y-2 text-sm text-slate-600">
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Criação de vídeos, áudios e estudos de caso</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Gravação de aula em áudio e vídeo + download</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>IA: mapas mentais e resumos em áudio</li>
+            <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Shop Odontus com descontos exclusivos</li>
+          </ul>
+        </div>
+        <a href="#" class="mt-6 inline-block rounded-full bg-teal-600 px-6 py-3 text-center text-sm font-bold text-white hover:bg-teal-500">Assinar VIP</a>
+      </div>
+
+      <!-- grid: GRATUITO -->
+      <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift">
+        <span class="inline-flex w-fit items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-teal-600">Comece grátis</span>
+        <h3 class="mt-3 font-display text-lg font-bold text-slate-900">Gratuito</h3>
+        <p class="mt-1 text-xs text-slate-500">Acesso a conteúdos gratuitos, busca e tags.</p>
+        <div class="mt-4 flex items-baseline gap-1">
+          <span class="font-display text-3xl font-bold text-slate-900">R$ 0</span>
+          <span class="text-sm text-slate-500">/ mês</span>
+        </div>
+        <ul class="mt-5 space-y-2 text-sm text-slate-600">
+          <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Área de membros básica</li>
+          <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Vídeos, imagens, áudios e estudos de caso gratuitos</li>
+          <li class="flex items-start gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Shop Odontus</li>
+        </ul>
+        <a href="#" class="mt-6 inline-block rounded-full bg-slate-100 px-6 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-200">Criar conta gratuita</a>
+      </div>
+
+      <!-- grid: garantia -->
+      <div class="flex flex-col justify-center rounded-2xl border border-dashed border-teal-300 bg-white/60 p-6">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100 text-teal-600">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </span>
+        <p class="mt-3 font-display text-base font-bold text-slate-700">Garantia e suporte</p>
+        <p class="mt-1 text-xs text-slate-500">Acesso liberado imediatamente após a confirmação do pagamento, com suporte para sua jornada.</p>
+      </div>
+
+      <!-- grid: pagamento -->
+      <div class="flex flex-col justify-center rounded-2xl border border-dashed border-teal-300 bg-white/60 p-6">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100 text-teal-600">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+        </span>
+        <p class="mt-3 font-display text-base font-bold text-slate-700">Pagamento seguro</p>
+        <p class="mt-1 text-xs text-slate-500">Pague com Pix, cartão de crédito ou boleto e desbloqueie seu plano na hora.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

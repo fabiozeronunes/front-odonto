@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: FAQ v3 (planos + recursos IA, acordeão em todas as caixas)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:"#f0fdfa",100:"#ccfbf1",200:"#99f6e4",300:"#5eead4",400:"#2dd4bf",500:"#14b8a6",600:"#0d9488",700:"#0f766e",800:"#115e59",900:"#134e4a",950:"#042f2e",
+        },
+        accent: {
+          50:"#fffbeb",100:"#fef3c7",200:"#fde68a",300:"#fcd34d",400:"#fbbf24",500:"#f59e0b",600:"#d97706",700:"#b45309",
+        },
+      },
+      fontFamily: { sans:["Inter","system-ui","sans-serif"], display:["Space Grotesk","Inter","system-ui","sans-serif"] },
+      boxShadow: {
+        lift:"0 8px 24px -6px rgb(15 118 110 / .15)",
+        glow:"0 0 30px -6px rgb(245 158 11 / .4)",
+        card:"0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .08)",
+      },
+    },
+  },
+};
+</script>
+<style>
+  .grad-text { background: linear-gradient(90deg,#0d9488,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  details summary::-webkit-details-marker { display:none; }
+  details[open] .chevron { transform: rotate(180deg); }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="mx-auto max-w-5xl px-4 py-4">
+    <p class="text-[11px] font-bold uppercase tracking-wider text-teal-700">Prévia — FAQ v3 · só Planos + Recursos com IA, acordeão em todas as caixas, sem boleto</p>
+    <h1 class="font-display text-xl font-bold text-slate-900">Para aprovação</h1>
+  </div>
+</div>
+
+<section id="faq" class="border-y border-teal-200/60 bg-teal-50/80 py-14 lg:py-20">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-sm font-semibold text-teal-700">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+        Perguntas frequentes
+      </span>
+      <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        Dúvidas? <span class="grad-text">Respondemos aqui</span>
+      </h2>
+      <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">
+        Tudo o que você precisa saber sobre os planos de assinatura e os recursos de estudo com inteligência artificial.
+      </p>
+    </div>
+
+    <div class="mt-10 space-y-6">
+      <!-- bloco 1: caixa verde grande (acordeão planos) + caixa branca menor (suporte) -->
+      <div class="grid gap-4 lg:grid-cols-3">
+        <div class="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-primary-800 to-primary-950 p-6 text-white shadow-lift transition-all duration-300 hover:-translate-y-1 sm:p-8 lg:col-span-2">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-teal-300 backdrop-blur">
+                <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-300">
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Planos de assinatura
+              </span>
+            </div>
+            <h3 class="mt-4 font-display text-2xl font-bold">Escolha o plano ideal</h3>
+            <div class="mt-4 space-y-2.5">
+              <details class="group rounded-xl bg-white/10 p-4 backdrop-blur transition hover:bg-white/15" open>
+                <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
+                  Como funciona o plano gratuito?
+                  <svg class="chevron h-4 w-4 shrink-0 text-teal-300 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <p class="mt-2 text-sm leading-relaxed text-white/75">
+                  O plano gratuito dá acesso a vídeos, imagens, áudios e estudos de caso gratuitos, além de busca, tags e área de membros básica. Sem cartão de crédito.
+                </p>
+              </details>
+              <details class="group rounded-xl bg-white/10 p-4 backdrop-blur transition hover:bg-white/15">
+                <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
+                  Quais as diferenças entre os planos VIP e PREMIUM?
+                  <svg class="chevron h-4 w-4 shrink-0 text-teal-300 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <p class="mt-2 text-sm leading-relaxed text-white/75">
+                  O PREMIUM libera todo o conteúdo do site, com todos os recursos de IA (quizz, flashcards, infográficos, questionários, resumos), download de vídeos e criação de estudos personalizados para provas e testes. O VIP tem acesso total aos conteúdos VIP e a parte dos recursos de IA.
+                </p>
+              </details>
+              <details class="group rounded-xl bg-white/10 p-4 backdrop-blur transition hover:bg-white/15">
+                <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
+                  O acesso é liberado na hora?
+                  <svg class="chevron h-4 w-4 shrink-0 text-teal-300 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <p class="mt-2 text-sm leading-relaxed text-white/75">
+                  Sim. Assim que o pagamento é confirmado via Pix ou cartão de crédito, o acesso ao plano é liberado imediatamente.
+                </p>
+              </details>
+            </div>
+          </div>
+          <span class="mt-5 inline-block w-fit rounded-full bg-teal-400/20 px-3 py-1 text-xs font-bold text-teal-300">
+            Comece grátis e evolua quando quiser
+          </span>
+        </div>
+
+        <div class="flex flex-col justify-center rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+          <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 text-white">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </span>
+          <h3 class="mt-3 font-display text-lg font-bold text-foreground">Ainda com dúvidas?</h3>
+          <p class="mt-2 text-sm leading-relaxed text-foreground/70">
+            Fale com nossa equipe de suporte. Estamos prontos para ajudar na sua jornada de estudos.
+          </p>
+          <a href="#" class="mt-4 inline-block w-fit rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2 text-sm font-bold text-white hover:from-amber-600 hover:to-amber-700">Falar com suporte</a>
+        </div>
+      </div>
+
+      <!-- bloco 2: caixas brancas (acordeões estilo bloco grande) -->
+      <div class="grid gap-4 lg:grid-cols-3">
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex items-center justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-600">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                IA
+              </span>
+            </div>
+          <h3 class="mt-4 font-display text-lg font-bold text-foreground">Recursos com inteligência</h3>
+          <div class="mt-4 space-y-2.5">
+            <details class="group rounded-xl border border-teal-100 bg-teal-50 p-4 transition hover:bg-teal-100/70" open>
+              <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                Quais recursos de IA estão incluídos em cada plano?
+                <svg class="chevron h-4 w-4 shrink-0 text-teal-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                No PREMIUM: resumos em vídeo e áudio, quizz, flashcards, questionários, infográficos e mapas mentais. No VIP: mapas mentais e resumos em áudio.
+              </p>
+            </details>
+            <details class="group rounded-xl border border-teal-100 bg-teal-50 p-4 transition hover:bg-teal-100/70">
+              <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                Como a IA ajuda na revisão?
+                <svg class="chevron h-4 w-4 shrink-0 text-teal-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                A IA organiza o conteúdo, gera materiais de revisão (flashcards, quizz, resumos e mapas mentais) e acompanha seu desempenho para acelerar o aprendizado.
+              </p>
+            </details>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex items-center justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 text-white">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-600">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Planos
+            </span>
+          </div>
+          <h3 class="mt-4 font-display text-lg font-bold text-foreground">Planos de assinatura</h3>
+          <div class="mt-4 space-y-2.5">
+            <details class="group rounded-xl border border-teal-100 bg-teal-50 p-4 transition hover:bg-teal-100/70">
+              <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                Posso baixar os vídeos para estudar offline?
+                <svg class="chevron h-4 w-4 shrink-0 text-teal-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Sim. O download de vídeos está disponível no plano PREMIUM. Também é possível gravar aulas em áudio e vídeo para revisar quando quiser.
+              </p>
+            </details>
+            <details class="group rounded-xl border border-teal-100 bg-teal-50 p-4 transition hover:bg-teal-100/70">
+              <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                O que é o Shop Odontus?
+                <svg class="chevron h-4 w-4 shrink-0 text-teal-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                É a loja de produtos odontológicos da plataforma. Assinantes VIP e PREMIUM têm descontos exclusivos em produtos odontológicos selecionados.
+              </p>
+            </details>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-2xl border border-teal-200 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+          <div class="flex items-center justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-primary-700 text-white">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-600">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Pagamento
+            </span>
+          </div>
+          <h3 class="mt-4 font-display text-lg font-bold text-foreground">Pagamento</h3>
+          <div class="mt-4 space-y-2.5">
+            <details class="group rounded-xl border border-teal-100 bg-teal-50 p-4 transition hover:bg-teal-100/70" open>
+              <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                O pagamento é anual?
+                <svg class="chevron h-4 w-4 shrink-0 text-teal-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Sim, o pagamento é anual, expira anualmente e precisa ser renovado.
+              </p>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- bloco 3: dica de ouro em caixa grande (padrão card destaque, fonte grande) -->
+      <div class="mt-6 flex flex-col justify-between gap-5 rounded-3xl bg-gradient-to-br from-amber-500 to-amber-600 p-6 text-white shadow-glow transition-all duration-300 hover:-translate-y-1 sm:flex-row sm:items-center sm:p-8">
+        <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur">
+            <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </span>
+          <div>
+            <span class="inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Dica
+            </span>
+            <h3 class="mt-2 font-display text-2xl font-bold">Dica de ouro</h3>
+          </div>
+        </div>
+        <p class="max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
+          Assine o PREMIUM para ter todos os recursos de IA e os estudos personalizados para prova e teste — o plano que libera todo o conteúdo do site.
+        </p>
+        <a href="#" class="inline-block w-fit shrink-0 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-amber-600 hover:bg-amber-50">Ver planos</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

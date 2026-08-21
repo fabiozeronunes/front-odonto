@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: Menu Inferior Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: linear-gradient(160deg, #f0fdfa 0%, #e6f7f3 40%, #eef2f7 100%);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+    color: #0f172a;
+  }
+  .page-title { text-align: center; margin-bottom: 8px; }
+  .page-title h1 {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+    font-size: 30px; font-weight: 700; color: #0f766e;
+  }
+  .page-title p { color: #475569; font-size: 15px; margin-top: 6px; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin: 20px auto 40px; max-width: 900px;
+  }
+  .legend .tag {
+    background: #fff; border: 1px solid #ccfbf1; color: #115e59;
+    border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 1px 3px rgb(0 0 0 / .06);
+  }
+  .models {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px; max-width: 1100px; margin: 0 auto;
+  }
+  .model {
+    background: #fff; border-radius: 24px; padding: 24px 20px 28px;
+    box-shadow: 0 12px 32px -12px rgb(15 118 110 / .18);
+    border: 1px solid #e2e8f0;
+  }
+  .model-head { margin-bottom: 18px; }
+  .model-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 10px; background: #0f766e;
+    color: #fff; font-weight: 800; font-size: 14px; margin-right: 8px;
+    font-family: "Space Grotesk", sans-serif;
+  }
+  .model-name { font-family: "Space Grotesk", sans-serif; font-size: 19px; font-weight: 700; color: #0f172a; }
+  .model-desc { color: #64748b; font-size: 13.5px; margin-top: 6px; line-height: 1.55; }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 230px; height: 460px; border-radius: 32px; margin: 0 auto;
+    background: #f8fafc; border: 6px solid #1e293b; position: relative;
+    overflow: hidden; box-shadow: 0 24px 48px -20px rgb(15 23 42 / .4);
+  }
+  .phone .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 22px; background: #1e293b; border-radius: 0 0 14px 14px; z-index: 5;
+  }
+  .phone .screen { height: 100%; display: flex; flex-direction: column; position: relative; }
+  .phone .statusbar {
+    height: 30px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 10px; font-weight: 600; color: #64748b;
+  }
+  .phone .statusbar .dots { letter-spacing: 2px; }
+  .phone .app { flex: 1; overflow: hidden; position: relative; padding-bottom: 0; }
+
+  /* fake content */
+  .fake-nav { height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+  .fake-nav .burger { width: 16px; height: 10px; border-radius: 2px; background: #94a3b8; position: relative; }
+  .fake-nav .burger::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 2px; background: #94a3b8; border-radius: 2px; }
+  .fake-nav .logo { width: 74px; height: 12px; border-radius: 4px; background: linear-gradient(90deg,#0f766e,#14b8a6); }
+  .fake-hero { margin: 6px 10px 0; height: 60px; border-radius: 12px; background: linear-gradient(120deg,#0f766e,#14b8a6); opacity: .85; }
+  .fake-chips { display: flex; gap: 6px; padding: 10px 12px; }
+  .fake-chips span { height: 18px; border-radius: 999px; background: #e2e8f0; }
+  .fake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; }
+  .fake-grid .tile { border-radius: 10px; background: #eef2f7; }
+  .fake-grid .tile .thumb { height: 46px; border-radius: 8px 8px 0 0; background: #cbd5e1; }
+  .fake-grid .tile .line { height: 7px; border-radius: 4px; background: #e2e8f0; margin: 7px 7px 0; }
+  .fake-grid .tile .line.short { width: 60%; }
+
+  /* ═══ MODEL 1 — CLASSIC BAR ═══ */
+  .bar-classic {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58px;
+    background: #fff; border-top: 1px solid #e2e8f0;
+    display: flex; align-items: stretch;
+  }
+  .bar-classic a {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; text-decoration: none; font-size: 9px; font-weight: 600; color: #94a3b8;
+    border-top: 2px solid transparent;
+  }
+  .bar-classic a svg { width: 20px; height: 20px; }
+  .bar-classic a.active { color: #0f766e; border-top-color: #0f766e; }
+  .bar-classic a .badge-dot {
+    position: absolute; top: 8px; margin-left: 14px; width: 7px; height: 7px;
+    border-radius: 50%; background: #ef4444; border: 1.5px solid #fff;
+  }
+
+  /* ═══ MODEL 1B — CLASSIC CAROUSEL ═══ */
+  .bar-carousel {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58px;
+    background: #fff; border-top: 1px solid #e2e8f0;
+    display: flex; align-items: stretch;
+    overflow-x: auto; scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .bar-carousel::-webkit-scrollbar { display: none; }
+  .bar-carousel a {
+    min-width: 70px; flex: 1 0 70px; scroll-snap-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; text-decoration: none; font-size: 9px; font-weight: 600; color: #94a3b8;
+    border-top: 2px solid transparent;
+  }
+  .bar-carousel a svg { width: 20px; height: 20px; }
+  .bar-carousel a.active { color: #0f766e; border-top-color: #0f766e; }
+  .bar-carousel a .badge-dot {
+    position: absolute; top: 8px; margin-left: 14px; width: 7px; height: 7px;
+    border-radius: 50%; background: #ef4444; border: 1.5px solid #fff;
+  }
+  .bar-carousel .hint {
+    position: absolute; right: 8px; bottom: 6px; font-size: 7px; color: #94a3b8;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 1px 5px;
+  }
+
+  /* ═══ MODEL 2 — CENTER FAB ═══ */
+  .bar-fab {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 60px;
+    background: #fff; border-top: 1px solid #e2e8f0;
+    display: flex; align-items: stretch; padding: 0 6px;
+  }
+  .bar-fab .side {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; text-decoration: none; font-size: 9px; font-weight: 600; color: #94a3b8;
+  }
+  .bar-fab .side svg { width: 20px; height: 20px; }
+  .bar-fab .side.active { color: #0f766e; }
+  .bar-fab .fab-wrap { width: 70px; position: relative; }
+  .bar-fab .fab {
+    position: absolute; left: 50%; top: -20px; transform: translateX(-50%);
+    width: 52px; height: 52px; border-radius: 18px;
+    background: linear-gradient(135deg,#0d9488,#0f766e); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 20px -6px rgb(13 148 136 / .55);
+  }
+  .bar-fab .fab svg { width: 24px; height: 24px; }
+  .bar-fab .fab-label {
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; font-weight: 700; color: #0f766e; white-space: nowrap;
+  }
+
+  /* ═══ MODEL 3 — FLOATING DOCK ═══ */
+  .bar-dock {
+    position: absolute; left: 14px; right: 14px; bottom: 10px; height: 58px;
+    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+    border-radius: 20px; border: 1px solid #e2e8f0;
+    box-shadow: 0 16px 32px -12px rgb(15 23 42 / .28);
+    display: flex; align-items: stretch; padding: 4px;
+  }
+  .bar-dock a {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; text-decoration: none; font-size: 9px; font-weight: 600; color: #94a3b8;
+    border-radius: 16px; position: relative;
+  }
+  .bar-dock a svg { width: 20px; height: 20px; }
+  .bar-dock a.active { color: #fff; background: linear-gradient(135deg,#0d9488,#0f766e); }
+  .bar-dock a .badge-dot {
+    position: absolute; top: 6px; margin-left: 12px; width: 7px; height: 7px;
+    border-radius: 50%; background: #ef4444; border: 1.5px solid #fff;
+  }
+
+  .note {
+    margin-top: 18px; background: #f0fdfa; border: 1px dashed #5eead4;
+    color: #134e4a; border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.55;
+  }
+  .note b { color: #0f766e; }
+  .toggle-row { display: flex; justify-content: center; gap: 10px; margin-top: 30px; }
+  .toggle-row button {
+    font-family: "Inter", sans-serif; border: 1px solid #0f766e; color: #0f766e; background: #fff;
+    border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .toggle-row button.on { background: #0f766e; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Menu Inferior — Mobile / Tablet</h1>
+  <p>3 modelos propostos para substituir o menu hambúrguer em telas menores</p>
+</div>
+
+<div class="legend">
+  <span class="tag">★ Item ativo</span>
+  <span class="tag">Início</span>
+  <span class="tag">Catálogo</span>
+  <span class="tag">Loja</span>
+  <span class="tag">Minha Área</span>
+  <span class="tag">Mais (menu)</span>
+</div>
+
+<div class="toggle-row">
+  <button id="btn-light" class="on">Tema claro</button>
+  <button id="btn-dark">Tema escuro</button>
+</div>
+
+<div class="models">
+
+  <!-- ─── MODELO 1 ─── -->
+  <div class="model">
+    <div class="model-head">
+      <span class="model-num">1</span>
+      <span class="model-name">Barra Clássica</span>
+      <p class="model-desc">
+        Barra fixa na base com 5 itens e indicador de item ativo no topo.
+        Padrão de app mobile, direto e familiar.
+      </p>
+    </div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●</span></div>
+        <div class="app">
+          <div class="fake-nav"><span class="burger"></span><span class="logo"></span></div>
+          <div class="fake-hero"></div>
+          <div class="fake-chips"><span style="width:52px"></span><span style="width:60px"></span><span style="width:44px"></span></div>
+          <div class="fake-grid">
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+          </div>
+          <div class="bar-classic">
+            <a class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Catálogo</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Loja</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Minha Área</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>Mais</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Prós:</b> mais simples, familiar, 5 atalhos diretos. <b>Contras:</b> menos espaço para rótulos grandes; item ativo sutil.
+    </div>
+  </div>
+
+  <!-- ─── MODELO 1B (CARROSSEL) ─── -->
+  <div class="model">
+    <div class="model-head">
+      <span class="model-num">1b</span>
+      <span class="model-name">Barra Clássica — Carrossel</span>
+      <p class="model-desc">
+        Mesma barra da opção 1, porém os itens rolam horizontalmente (carrossel).
+        Cabe mais atalhos sem lotar a tela.
+      </p>
+    </div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●</span></div>
+        <div class="app">
+          <div class="fake-nav"><span class="burger"></span><span class="logo"></span></div>
+          <div class="fake-hero"></div>
+          <div class="fake-chips"><span style="width:52px"></span><span style="width:60px"></span><span style="width:44px"></span></div>
+          <div class="fake-grid">
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+          </div>
+          <div class="bar-carousel">
+            <a class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Catálogo</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>Casos</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Loja</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6"/><circle cx="18" cy="18" r="3"/><path d="M18 22v1m0-10v1m-3.5 3.5-1-1m8 8-1-1"/></svg>Planos</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Área</a>
+            <span class="hint">← rolar →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Prós:</b> comporta todos os atalhos (6+), cada item com largura confortável, carrossel natural no dedo. <b>Contras:</b> itens fora da tela exigem rolagem; pode esconder atalhos pouco usados.
+    </div>
+  </div>
+
+  <!-- ─── MODELO 2 ─── -->
+  <div class="model">
+    <div class="model-head">
+      <span class="model-num">2</span>
+      <span class="model-name">Central em Destaque (FAB)</span>
+      <p class="model-desc">
+        Barra com 4 itens e um botão central elevado — ideal para destacar a
+        ação principal (ex.: Assinar Premium ou Buscar).
+      </p>
+    </div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●</span></div>
+        <div class="app">
+          <div class="fake-nav"><span class="burger"></span><span class="logo"></span></div>
+          <div class="fake-hero"></div>
+          <div class="fake-chips"><span style="width:52px"></span><span style="width:60px"></span><span style="width:44px"></span></div>
+          <div class="fake-grid">
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+          </div>
+          <div class="bar-fab">
+            <a class="side active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início</a>
+            <a class="side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Catálogo</a>
+            <div class="fab-wrap">
+              <span class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></span>
+              <span class="fab-label">Buscar</span>
+            </div>
+            <a class="side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Loja</a>
+            <a class="side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Área</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Prós:</b> botão de destaque ganha muita visibilidade (ótimo para conversão). <b>Contras:</b> um item a menos de atalho; botão elevado ocupa área do conteúdo.
+    </div>
+  </div>
+
+  <!-- ─── MODELO 3 ─── -->
+  <div class="model">
+    <div class="model-head">
+      <span class="model-num">3</span>
+      <span class="model-name">Dock Flutuante</span>
+      <p class="model-desc">
+        Barra flutuante arredondada, separada do conteúdo, com o item ativo em
+        "pill" colorido. Visual moderno e leve.
+      </p>
+    </div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="dots">●●●●</span></div>
+        <div class="app">
+          <div class="fake-nav"><span class="burger"></span><span class="logo"></span></div>
+          <div class="fake-hero"></div>
+          <div class="fake-chips"><span style="width:52px"></span><span style="width:60px"></span><span style="width:44px"></span></div>
+          <div class="fake-grid">
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+            <div class="tile"><div class="thumb"></div><div class="line"></div><div class="line short"></div></div>
+          </div>
+          <div class="bar-dock">
+            <a class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Catálogo</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Loja</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Área</a>
+            <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>Mais</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Prós:</b> visual moderno, item ativo bem visível, sensação de "flutuação" leve. <b>Contras:</b> ocupa um pouco mais de espaço vertical na base.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // tema escuro nos frames
+  const btnLight = document.getElementById("btn-light");
+  const btnDark = document.getElementById("btn-dark");
+
+  function applyDark(on) {
+    btnLight.classList.toggle("on", !on);
+    btnDark.classList.toggle("on", on);
+    document.querySelectorAll(".phone .screen").forEach((s) => {
+      s.style.setProperty("--bg", on ? "#0f172a" : "#f8fafc");
+      s.style.setProperty("--bar-bg", on ? "#1e293b" : "#ffffff");
+      s.style.setProperty("--bar-border", on ? "#334155" : "#e2e8f0");
+      s.style.setProperty("--tile", on ? "#1e293b" : "#eef2f7");
+      s.style.setProperty("--thumb", on ? "#334155" : "#cbd5e1");
+      s.style.setProperty("--line", on ? "#334155" : "#e2e8f0");
+      s.style.setProperty("--chip", on ? "#334155" : "#e2e8f0");
+      s.style.setProperty("--muted-txt", on ? "#94a3b8" : "#64748b");
+    });
+    const root = document.querySelector(".phone .app").closest(".phone").parentElement.parentElement;
+    document.querySelectorAll(".phone").forEach((p) => {
+      const app = p.querySelector(".app");
+      app.style.background = on ? "#0f172a" : "#f8fafc";
+    });
+  }
+  btnDark.onclick = () => applyDark(true);
+  btnLight.onclick = () => applyDark(false);
+</script>
+
+</body>
+</html>

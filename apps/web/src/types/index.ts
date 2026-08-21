@@ -96,6 +96,7 @@ export interface Video {
   audioUrl?: string | null;
   audioTitle?: string | null;
   audioTags?: VideoTag[];
+  audios?: { id: string; url: string; title?: string | null; createdAt?: string }[];
   status: ContentStatus;
   publishedAt?: string | null;
   viewCount: number;

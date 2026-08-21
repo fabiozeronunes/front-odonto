@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia de Redesign (design-system)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ═══════════════════════════════════════════════════════════════
+     LAYER 1 — PRIMITIVOS (valores crus)
+     ═══════════════════════════════════════════════════════════════ */
+  :root {
+    --teal-50:  166 76% 97%;
+    --teal-100: 167 85% 89%;
+    --teal-200: 168 84% 78%;
+    --teal-300: 170 74% 66%;
+    --teal-400: 172 66% 50%;
+    --teal-500: 173 80% 40%;
+    --teal-600: 176 84% 32%;
+    --teal-700: 175 77% 26%;
+    --teal-800: 177 64% 22%;
+    --teal-900: 179 68% 18%;
+    --teal-950: 179 84% 10%;
+
+    --amber-100: 48 100% 90%;
+    --amber-500: 38 92% 50%;
+    --amber-600: 32 95% 44%;
+    --amber-700: 26 90% 37%;
+
+    --red-500: 0 84% 60%;
+    --red-600: 0 72% 51%;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    --radius-sm: 0.375rem;
+    --radius-md: 0.625rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 400ms;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     LAYER 2 — SEMÂNTICOS (aliases por propósito)
+     ═══════════════════════════════════════════════════════════════ */
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --surface-muted: 220 14% 96%;
+    --border: 220 13% 90%;
+    --muted-foreground: 220 9% 46%;
+
+    --color-primary: var(--teal-600);
+    --color-primary-hover: var(--teal-700);
+    --color-primary-foreground: 0 0% 100%;
+    --color-primary-soft: var(--teal-50);
+
+    --color-accent: var(--amber-500);
+    --color-accent-hover: var(--amber-600);
+    --color-accent-foreground: 38 92% 14%;
+
+    --color-danger: var(--red-500);
+    --color-danger-hover: var(--red-600);
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.10);
+    --shadow-lg: 0 12px 32px -8px rgb(13 148 136 / 0.25);
+
+    --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+    --font-sans: "Inter", system-ui, sans-serif;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     DARK MODE — override dos tokens semânticos
+     ═══════════════════════════════════════════════════════════════ */
+  .dark {
+    --background: 180 25% 7%;
+    --foreground: 165 25% 94%;
+    --surface: 176 24% 12%;
+    --surface-muted: 178 22% 16%;
+    --border: 177 18% 20%;
+    --muted-foreground: 172 12% 66%;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 12px 32px -8px rgb(13 148 136 / 0.35);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     LAYER 3 — COMPONENTES (exemplos via tokens)
+     ═══════════════════════════════════════════════════════════════ */
+  :root {
+    --button-bg: var(--color-primary);
+    --button-bg-hover: var(--color-primary-hover);
+    --button-fg: var(--color-primary-foreground);
+    --card-bg: var(--surface);
+    --card-border: var(--border);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    transition: background var(--duration-normal), color var(--duration-normal);
+  }
+  img { max-width: 100%; display: block; }
+
+  .container { width: min(1120px, 100% - 2rem); margin-inline: auto; }
+
+  /* Tipografia — ramp */
+  .display { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  .h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+  .h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .h3 { font-size: 1.25rem; }
+  .text-lead { font-size: 1.1rem; color: hsl(var(--muted-foreground)); line-height: 1.65; }
+  .text-muted { color: hsl(var(--muted-foreground)); }
+
+  /* Navbar */
+  .navbar {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(12px);
+    background: hsl(var(--background) / 0.8);
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .logo { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; color: hsl(var(--color-primary)); }
+  .logo span { color: hsl(var(--foreground)); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { text-decoration: none; color: hsl(var(--muted-foreground)); font-size: 0.95rem; font-weight: 500; transition: color var(--duration-fast); }
+  .nav-links a:hover { color: hsl(var(--foreground)); }
+  .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem;
+    border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer;
+    padding: 0.65rem 1.15rem; text-decoration: none;
+    transition: transform var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: hsl(var(--button-bg)); color: hsl(var(--button-fg)); box-shadow: var(--shadow-sm); }
+  .btn-primary:hover { background: hsl(var(--button-bg-hover)); box-shadow: var(--shadow-md); }
+  .btn-accent { background: linear-gradient(90deg, hsl(var(--color-accent)), hsl(var(--color-accent-hover))); color: hsl(var(--color-accent-foreground)); }
+  .btn-accent:hover { box-shadow: 0 8px 24px -6px hsl(var(--color-accent) / 0.5); }
+  .btn-outline { background: hsl(var(--surface)); border-color: hsl(var(--border)); color: hsl(var(--foreground)); }
+  .btn-outline:hover { border-color: hsl(var(--color-primary)); color: hsl(var(--color-primary)); }
+  .btn-ghost { background: transparent; color: hsl(var(--muted-foreground)); }
+  .btn-ghost:hover { color: hsl(var(--foreground)); }
+  .btn-lg { padding: 0.85rem 1.6rem; font-size: 1rem; border-radius: var(--radius-lg); }
+
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: var(--radius-md);
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    color: hsl(var(--muted-foreground)); cursor: pointer; position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: color var(--duration-fast), border-color var(--duration-fast);
+  }
+  .icon-btn:hover { color: hsl(var(--color-primary)); border-color: hsl(var(--color-primary)); }
+  .cart-badge {
+    position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px;
+    padding: 0 4px; border-radius: 999px; font-size: 0.68rem; font-weight: 700;
+    background: hsl(var(--color-danger)); color: #fff; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, hsl(var(--teal-950)), hsl(var(--teal-800)) 45%, hsl(var(--teal-600)));
+    color: #fff; padding: clamp(3rem, 8vw, 5.5rem) 0;
+  }
+  .hero-blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; pointer-events: none; }
+  .hero-blob-1 { width: 380px; height: 380px; background: hsl(var(--teal-400)); top: -120px; left: -80px; }
+  .hero-blob-2 { width: 420px; height: 420px; background: hsl(var(--color-accent) / 0.35); bottom: -160px; right: -60px; }
+  .hero-grid { display: grid; gap: 3rem; align-items: center; grid-template-columns: 1fr; }
+  @media (min-width: 920px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; } }
+
+  .badge-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+    background: hsl(var(--teal-900) / 0.6); border: 1px solid hsl(var(--teal-400) / 0.4); color: hsl(var(--teal-200));
+  }
+  .hero h1 .grad {
+    background: linear-gradient(90deg, hsl(var(--teal-300)), hsl(var(--color-accent)));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-ctas { display: flex; gap: 0.85rem; flex-wrap: wrap; margin-top: 2rem; }
+  .hero-stats { display: flex; gap: 2rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid hsl(var(--teal-400) / 0.25); flex-wrap: wrap; }
+  .hero-stats .stat b { font-family: var(--font-display); font-size: 1.6rem; display: block; }
+  .hero-stats .stat span { font-size: 0.85rem; color: hsl(var(--teal-200)); }
+
+  /* Mockup */
+  .mockup { position: relative; }
+  .mockup-frame {
+    border-radius: var(--radius-xl); border: 1px solid hsl(var(--teal-400) / 0.3);
+    background: hsl(var(--teal-950) / 0.6); backdrop-filter: blur(6px);
+    box-shadow: var(--shadow-lg); overflow: hidden;
+  }
+  .mockup-player { aspect-ratio: 16/9; background: linear-gradient(135deg, hsl(var(--teal-600)), hsl(var(--teal-800))); position: relative; display: flex; align-items: center; justify-content: center; }
+  .mockup-player .play { width: 62px; height: 62px; border-radius: 50%; background: hsl(var(--color-accent)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px hsl(var(--color-accent) / 0.25); animation: pulse 2.4s ease-out infinite; }
+  .mockup-player .play svg { width: 24px; height: 24px; fill: hsl(var(--color-accent-foreground)); }
+  .mockup-body { padding: 1.1rem; }
+  .mockup-row { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0; border-top: 1px solid hsl(var(--teal-400) / 0.15); }
+  .mockup-row:first-of-type { border-top: 0; }
+  .mockup-row .thumb { width: 44px; height: 44px; border-radius: var(--radius-md); background: hsl(var(--teal-700)); }
+  .mockup-row .line { flex: 1; }
+  .mockup-row .line i { display: block; height: 8px; border-radius: 999px; background: hsl(var(--teal-400) / 0.5); margin-bottom: 6px; }
+  .mockup-row .line i:last-child { width: 65%; background: hsl(var(--teal-400) / 0.3); }
+  .mockup-float {
+    position: absolute; padding: 0.7rem 0.95rem; border-radius: var(--radius-lg);
+    background: hsl(var(--surface)); color: hsl(var(--foreground));
+    box-shadow: var(--shadow-md); font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.5rem; border: 1px solid hsl(var(--border));
+    animation: float 5s ease-in-out infinite;
+  }
+  .mockup-float.a { top: 12%; right: -10px; animation-delay: 0.3s; }
+  .mockup-float.b { bottom: 6%; left: -14px; animation-delay: 0.8s; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: hsl(var(--color-accent)); }
+
+  /* Sections */
+  section { padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+  .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  .section-head h2 { margin: 0; }
+
+  /* Cards genéricos */
+  .card { background: hsl(var(--card-bg)); border: 1px solid hsl(var(--card-border)); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+
+  /* Shop */
+  .shop-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
+  .product { overflow: hidden; display: flex; flex-direction: column; transition: transform var(--duration-normal), box-shadow var(--duration-normal), border-color var(--duration-normal); }
+  .product:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: hsl(var(--color-primary) / 0.4); }
+  .product-media { position: relative; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+  .product-media.g1 { background: linear-gradient(135deg, hsl(var(--teal-600)), hsl(var(--teal-800))); }
+  .product-media.g2 { background: linear-gradient(135deg, hsl(var(--teal-500)), hsl(var(--teal-700))); }
+  .product-media.g3 { background: linear-gradient(135deg, hsl(var(--teal-800)), hsl(var(--teal-950))); }
+  .product-media.g4 { background: linear-gradient(135deg, hsl(var(--color-accent-hover)), hsl(var(--color-accent))); }
+  .discount { position: absolute; top: 0.75rem; left: 0.75rem; background: hsl(var(--color-danger)); color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px; }
+  .product-body { padding: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+  .product-body h3 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+  .product-body .meta { font-size: 0.8rem; color: hsl(var(--muted-foreground)); }
+  .price-row { display: flex; align-items: baseline; gap: 0.6rem; margin-top: 0.35rem; }
+  .price-old { color: hsl(var(--muted-foreground)); text-decoration: line-through; font-size: 0.9rem; }
+  .price-now { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
+  .product-actions { display: flex; gap: 0.6rem; margin-top: 0.9rem; }
+  .product-actions .btn { flex: 1; }
+
+  /* Plans */
+  .plans-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .plans-grid { grid-template-columns: repeat(3, 1fr); } }
+  .plan { display: flex; flex-direction: column; padding: 1.6rem; position: relative; }
+  .plan.featured { border: 2px solid hsl(var(--color-primary)); box-shadow: var(--shadow-lg); }
+  .plan-flag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, hsl(var(--color-accent)), hsl(var(--color-accent-hover))); color: hsl(var(--color-accent-foreground)); font-size: 0.72rem; font-weight: 800; padding: 0.3rem 0.9rem; border-radius: 999px; letter-spacing: 0.03em; white-space: nowrap; }
+  .plan .price { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; margin: 0.75rem 0 0.2rem; }
+  .plan .per { color: hsl(var(--muted-foreground)); font-size: 0.9rem; }
+  .plan ul { list-style: none; margin: 1.4rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; flex: 1; }
+  .plan li { display: flex; gap: 0.55rem; font-size: 0.93rem; color: hsl(var(--muted-foreground)); }
+  .plan li::before { content: "✓"; color: hsl(var(--color-primary)); font-weight: 800; }
+  .plan .btn { margin-top: 1.6rem; }
+
+  /* Footer */
+  .footer { border-top: 1px solid hsl(var(--border)); padding: 3rem 0; color: hsl(var(--muted-foreground)); font-size: 0.9rem; }
+  .footer-grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
+  .footer h4 { color: hsl(var(--foreground)); margin: 0 0 0.8rem; }
+  .footer a { color: inherit; text-decoration: none; }
+  .footer a:hover { color: hsl(var(--color-primary)); }
+  .footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .notice {
+    background: linear-gradient(90deg, hsl(var(--color-accent) / 0.15), hsl(var(--teal-500) / 0.15));
+    border-bottom: 1px solid hsl(var(--border)); color: hsl(var(--foreground));
+    font-size: 0.82rem; text-align: center; padding: 0.5rem 1rem;
+  }
+
+  /* Animações */
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 hsl(var(--color-accent) / 0.5); } 100% { box-shadow: 0 0 0 16px hsl(var(--color-accent) / 0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-up { animation: fadeUp 0.7s ease-out both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+  <div class="notice">✦ Prévia de redesign — página demonstrativa usando o sistema de tokens (design-system). Não afeta o site real.</div>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="#" class="logo">🦷 Odont<span>us</span></a>
+      <nav class="nav-links" style="display:none" id="navLinks">
+        <a href="#">Início</a>
+        <a href="#">Catálogo</a>
+        <a href="#">Especialidades</a>
+        <a href="#">Shop</a>
+        <a href="#">Planos</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" title="Buscar" aria-label="Buscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button class="icon-btn" id="darkToggle" title="Alternar tema" aria-label="Alternar tema">
+          <svg id="sunIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+        <button class="icon-btn" title="Carrinho" aria-label="Carrinho">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span class="cart-badge">2</span>
+        </button>
+        <a href="#" class="btn btn-outline" style="padding:0.5rem 0.95rem;border-radius:var(--radius-md)">👤 Maria</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="container hero-grid">
+      <div>
+        <span class="badge-pill animate-up">✦ Plataforma de estudos odontológicos</span>
+        <h1 class="display h1 animate-up delay-1" style="margin:1rem 0 0">Domine a <span class="grad">Odontologia</span> com aulas em vídeo, imagens e casos.</h1>
+        <p class="text-lead animate-up delay-2" style="max-width:520px">Aprenda por especialidades, estude casos reais e evolua com quizz, flashcards e questionários.</p>
+        <div class="hero-ctas animate-up delay-2">
+          <a href="#" class="btn btn-accent btn-lg">🎬 Começar a estudar grátis</a>
+          <a href="#" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.06)">Ver planos</a>
+        </div>
+        <div class="hero-stats animate-up delay-3">
+          <div class="stat"><b>+300</b><span>aulas em vídeo</span></div>
+          <div class="stat"><b>+2.000</b><span>alunos ativos</span></div>
+          <div class="stat"><b>4.9★</b><span>avaliação média</span></div>
+        </div>
+      </div>
+
+      <!-- MOCKUP -->
+      <div class="mockup animate-up delay-2">
+        <div class="mockup-frame">
+          <div class="mockup-player">
+            <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-row"><div class="thumb"></div><div class="line"><i></i><i></i></div></div>
+            <div class="mockup-row"><div class="thumb"></div><div class="line"><i></i><i></i></div></div>
+            <div class="mockup-row"><div class="thumb"></div><div class="line"><i></i><i></i></div></div>
+          </div>
+        </div>
+        <div class="mockup-float a"><span class="dot"></span> Plano Premium ativo</div>
+        <div class="mockup-float b"><span style="font-size:1rem">🛒</span> -20% em kits</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section style="padding-top:2rem">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="badge-pill" style="background:hsl(var(--color-primary-soft));color:hsl(var(--color-primary));border-color:hsl(var(--color-primary) / 0.25)">🛍️ Shop Odontus</span>
+          <h2 class="display h2" style="margin-top:.6rem">Ofertas em produtos, kits e uniformes</h2>
+        </div>
+        <a href="#" class="btn btn-ghost">Ver todos →</a>
+      </div>
+      <div class="shop-grid">
+        <!-- Produto 1 -->
+        <div class="card product">
+          <div class="product-media g1">🧰</div>
+          <div class="product-body">
+            <h3>Kit Clínico Odontus Completo</h3>
+            <span class="meta">Odontus • Kits</span>
+            <div class="price-row"><span class="price-old">R$ 1.499,00</span><span class="price-now">R$ 1.199,00</span></div>
+            <div class="product-actions"><button class="btn btn-outline">🛒 Carrinho</button><button class="btn btn-primary">Comprar</button></div>
+          </div>
+          <span class="discount">-20%</span>
+        </div>
+        <!-- Produto 2 -->
+        <div class="card product">
+          <div class="product-media g2">🥼</div>
+          <div class="product-body">
+            <h3>Jaleco Odontus Premium</h3>
+            <span class="meta">Odontus • Uniformes</span>
+            <div class="price-row"><span class="price-old">R$ 189,00</span><span class="price-now">R$ 129,90</span></div>
+            <div class="product-actions"><button class="btn btn-outline">🛒 Carrinho</button><button class="btn btn-primary">Comprar</button></div>
+          </div>
+          <span class="discount">-31%</span>
+        </div>
+        <!-- Produto 3 -->
+        <div class="card product">
+          <div class="product-media g3">🦷</div>
+          <div class="product-body">
+            <h3>Caneta de Alta Rotação</h3>
+            <span class="meta">Odontus • Instrumentais</span>
+            <div class="price-row"><span class="price-old">R$ 899,00</span><span class="price-now">R$ 699,00</span></div>
+            <div class="product-actions"><button class="btn btn-outline">🛒 Carrinho</button><button class="btn btn-primary">Comprar</button></div>
+          </div>
+          <span class="discount">-22%</span>
+        </div>
+        <!-- Produto 4 -->
+        <div class="card product">
+          <div class="product-media g4">🧤</div>
+          <div class="product-body">
+            <h3>Luvas Descartáveis (100 un)</h3>
+            <span class="meta">Odontus • Materiais</span>
+            <div class="price-row"><span class="price-old">R$ 89,90</span><span class="price-now">R$ 59,90</span></div>
+            <div class="product-actions"><button class="btn btn-outline">🛒 Carrinho</button><button class="btn btn-primary">Comprar</button></div>
+          </div>
+          <span class="discount">-33%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANS -->
+  <section style="background:hsl(var(--surface-muted))">
+    <div class="container">
+      <div class="section-head" style="justify-content:center;text-align:center;flex-direction:column;align-items:center">
+        <span class="badge-pill" style="background:hsl(var(--color-primary-soft));color:hsl(var(--color-primary));border-color:hsl(var(--color-primary) / 0.25)">✦ Planos</span>
+        <h2 class="display h2" style="margin-top:.6rem">Escolha o plano ideal</h2>
+        <p class="text-muted" style="max-width:460px">Comece grátis e evolua para o acesso completo quando quiser.</p>
+      </div>
+      <div class="plans-grid">
+        <div class="card plan">
+          <h3 class="display h3">Odontus PREMIUM</h3>
+          <div class="price">R$ 29,90<span class="per">/ mês</span></div>
+          <ul><li>Todo o catálogo de vídeos</li><li>Estudos de caso exclusivos</li><li>Quizz, flashcards e relatórios</li><li>Suporte prioritário</li></ul>
+          <button class="btn btn-accent btn-lg">Assinar Premium</button>
+          <span class="plan-flag">MAIS POPULAR</span>
+        </div>
+        <div class="card plan">
+          <h3 class="display h3">Odontus VIP</h3>
+          <div class="price">R$ 49,90<span class="per">/ mês</span></div>
+          <ul><li>Tudo do Premium</li><li>Mentorias ao vivo</li><li>Certificados de conclusão</li><li>Descontos no Shop Odontus</li></ul>
+          <button class="btn btn-primary btn-lg">Assinar VIP</button>
+        </div>
+        <div class="card plan">
+          <h3 class="display h3">Gratuito</h3>
+          <div class="price">R$ 0<span class="per">/ mês</span></div>
+          <ul><li>Aulas gratuitas</li><li>Especialidades básicas</li><li>Comunidade</li></ul>
+          <button class="btn btn-outline btn-lg">Criar conta gratuita</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#" class="logo">🦷 Odont<span>us</span></a>
+        <p style="max-width:380px;margin-top:.8rem">Plataforma de estudos odontológicos com vídeos, especialidades e estudos de caso.</p>
+      </div>
+      <div>
+        <h4>Navegação</h4>
+        <ul><li><a href="#">Catálogo</a></li><li><a href="#">Especialidades</a></li><li><a href="#">Shop Odontus</a></li><li><a href="#">Planos</a></li></ul>
+      </div>
+      <div>
+        <h4>Institucional</h4>
+        <ul><li><a href="#">Política de Privacidade</a></li><li><a href="#">Termos de Uso</a></li></ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('darkToggle');
+    const moon = document.getElementById('moonIcon');
+    const sun = document.getElementById('sunIcon');
+    toggle.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      moon.style.display = dark ? 'none' : 'block';
+      sun.style.display = dark ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modelo A — Longform de Conversão · Front Odontus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary-50: #f0fdfa; --primary-100: #ccfbf1; --primary-200: #99f6e4;
+    --primary-300: #5eead4; --primary-400: #2dd4bf; --primary-500: #14b8a6;
+    --primary-600: #0d9488; --primary-700: #0f766e; --primary-800: #115e59;
+    --primary-900: #134e4a; --primary-950: #042f2e;
+    --accent-50: #fffbeb; --accent-100: #fef3c7; --accent-200: #fde68a;
+    --accent-400: #fbbf24; --accent-500: #f59e0b; --accent-600: #d97706;
+    --bg: 220 20% 98%; --fg: 222 47% 11%; --muted: 220 14% 96%;
+    --muted-fg: 220 9% 46%; --border: 220 13% 90%; --surface: 0 0% 100%;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Inter", system-ui, sans-serif; background: hsl(var(--bg)); color: hsl(var(--fg)); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: "Space Grotesk", "Inter", sans-serif; }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .topbar { background: var(--primary-800); color: #fff; text-align: center; font-size: 13px; font-weight: 700; padding: 9px; letter-spacing: .4px; }
+  .badge { display: inline-block; background: var(--primary-50); border: 1px solid var(--primary-200); color: var(--primary-700); padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+  h1 { font-family: "Space Grotesk", sans-serif; font-size: 42px; line-height: 1.12; font-weight: 700; margin: 22px 0 12px; letter-spacing: -.5px; }
+  h2 { font-family: "Space Grotesk", sans-serif; font-size: 30px; font-weight: 700; margin-bottom: 14px; letter-spacing: -.3px; }
+  .sub { font-size: 18px; color: var(--muted-fg); }
+  .cta { display: inline-block; background: linear-gradient(180deg, var(--primary-500), var(--primary-700)); color: #fff; font-weight: 700; font-size: 19px; padding: 16px 42px; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 24px -6px rgb(15 118 110 / .45); margin: 20px 0 10px; transition: transform .15s ease, box-shadow .15s ease; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -6px rgb(15 118 110 / .55); }
+  .cta-alt { background: linear-gradient(180deg, var(--accent-400), var(--accent-600)); color: #422006; box-shadow: 0 8px 24px -6px rgb(217 119 6 / .45); }
+  .safe { font-size: 13px; color: var(--muted-fg); }
+  .section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .section.dark { background: var(--primary-950); color: #fff; }
+  .section.tint { background: var(--primary-50); }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 26px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / .06); }
+  .card h3 { color: var(--primary-800); font-family: "Space Grotesk", sans-serif; font-size: 17px; margin-bottom: 8px; }
+  .card p { color: var(--muted-fg); font-size: 15px; }
+  .pain { text-align: center; color: var(--primary-600); font-size: 19px; font-weight: 700; font-style: italic; margin: 18px 0 4px; }
+  .stats { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 24px; text-align: center; margin-top: 28px; }
+  .stat .num { font-size: 42px; font-weight: 700; color: var(--accent-400); font-family: "Space Grotesk", sans-serif; }
+  .stat .lbl { font-size: 14px; color: var(--primary-100); }
+  .testimonial { display: grid; grid-template-columns: auto 1fr; gap: 14px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .12); border-radius: 14px; padding: 20px; margin-top: 16px; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-500), var(--accent-500)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; }
+  .t-name { font-weight: 700; font-size: 15px; }
+  .t-role { font-size: 13px; color: var(--primary-200); }
+  .t-text { font-size: 15px; color: #e6f4f1; margin-top: 6px; font-style: italic; }
+  .author { display: grid; grid-template-columns: 140px 1fr; gap: 26px; align-items: center; margin-top: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .photo { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-600), var(--accent-500)); display: flex; align-items: center; justify-content: center; font-size: 52px; }
+  .offer-box { background: linear-gradient(160deg, var(--accent-400), var(--accent-500)); color: #422006; border-radius: 18px; padding: 30px; text-align: center; box-shadow: 0 20px 50px -20px rgb(217 119 6 / .5); }
+  .offer-box .price-old { text-decoration: line-through; font-size: 20px; opacity: .7; }
+  .offer-box .price { font-size: 54px; font-weight: 800; font-family: "Space Grotesk", sans-serif; }
+  .offer-box .pay { font-size: 15px; font-weight: 600; margin-top: 6px; }
+  .bonus-list { text-align: left; margin: 16px auto 0; max-width: 460px; font-size: 15px; }
+  .bonus-list li { margin: 6px 0; }
+  .guarantee { display: grid; grid-template-columns: 96px 1fr; gap: 22px; align-items: center; background: var(--primary-50); border: 2px dashed var(--primary-400); border-radius: 16px; padding: 26px; }
+  .guarantee .seal { width: 96px; height: 96px; border-radius: 50%; background: var(--primary-600); color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 13px; box-shadow: 0 8px 20px -8px rgb(13 148 136 / .6); }
+  .countdown { display: flex; gap: 12px; justify-content: center; margin: 18px 0; }
+  .countdown .box { background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .15); border-radius: 12px; padding: 12px 18px; min-width: 84px; }
+  .countdown .n { font-size: 28px; font-weight: 700; color: var(--accent-400); font-family: "Space Grotesk", sans-serif; }
+  .countdown .u { font-size: 11px; color: var(--primary-200); text-transform: uppercase; letter-spacing: 1px; }
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px 18px; margin-top: 10px; }
+  summary { font-weight: 700; cursor: pointer; }
+  details p { color: var(--muted-fg); font-size: 15px; margin-top: 8px; }
+  footer { background: var(--primary-950); padding: 40px 0; font-size: 13px; color: var(--primary-200); text-align: center; }
+  footer .links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; color: var(--primary-100); }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+  <div class="topbar">⚠ OFERTA DE LANÇAMENTO — ACESSE AGORA O PLANO PREMIUM</div>
+
+  <!-- HERO -->
+  <div class="container" style="padding-top:56px; text-align:center;">
+    <span class="badge">Front Odontus · Plataforma de ensino</span>
+    <h1>Vire a referência em Odontologia Digital<br/>em até 90 dias.</h1>
+    <p class="sub">Sem depender de curso presencial. Acesso completo a vídeos de técnica, estudos de caso reais e comunidade de cirurgiões-dentistas — na palma da mão.</p>
+    <div><a href="#" class="cta">QUERO TER ACESSO AGORA →</a></div>
+    <p class="safe">🔒 Pagamento seguro · Acesso imediato · Garantia de 7 dias</p>
+  </div>
+
+  <!-- APRESENTAÇÃO -->
+  <div class="section">
+    <div class="container">
+      <p class="pain">"Você já tentou aprender endodontia moderna assistindo vídeos soltos no YouTube?"</p>
+      <p style="text-align:center; font-size:18px; color:#334155;">Resultado: aulas desconexas, nenhum protocolo definido e insegurança na hora de executar. <strong>O Front Odontus é o único ecossistema que organiza, sequencia e acompanha sua evolução clínica.</strong></p>
+      <div class="grid3">
+        <div class="card"><h3>🎯 Sequência lógica</h3><p>Trilhas que levam você do básico ao avançado sem atropelo.</p></div>
+        <div class="card"><h3>🦷 Estudos de caso reais</h3><p>Protocolos completos de sessão única, passo a passo.</p></div>
+        <div class="card"><h3>🤝 Comunidade ativa</h3><p>Troque experiências e tire dúvidas com outros profissionais.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVA SOCIAL -->
+  <div class="section dark">
+    <div class="container center">
+      <h2 style="color:#fff;">Quem usa, recomenda</h2>
+      <div class="stats">
+        <div class="stat"><div class="num">+2.000</div><div class="lbl">alunos ativos</div></div>
+        <div class="stat"><div class="num">4,9/5</div><div class="lbl">satisfação média</div></div>
+        <div class="stat"><div class="num">93%</div><div class="lbl">mais segurança em 1 semana</div></div>
+      </div>
+      <div class="testimonial">
+        <div class="avatar">DR</div>
+        <div><div class="t-name">Dra. Renata M.</div><div class="t-role">Cirurgiã-dentista · MG</div><p class="t-text">"Em duas semanas já apliquei um protocolo de sessão única que eu nunca tinha feito. Virou minha base de estudos diária."</p></div>
+      </div>
+      <div class="testimonial">
+        <div class="avatar">PC</div>
+        <div><div class="t-name">Dr. Paulo C.</div><div class="t-role">Especialista em Endodontia · SP</div><p class="t-text">"Organização impecável. Não é só vídeo, tem caso clínico comentado de verdade. Recomendo de olhos fechados."</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTORIDADE -->
+  <div class="section">
+    <div class="container">
+      <h2>Quem está por trás</h2>
+      <div class="author">
+        <div class="photo">👨‍⚕️</div>
+        <div>
+          <p style="font-weight:800; font-size:20px; font-family:'Space Grotesk',sans-serif;">Prof. Fábio Nunes</p>
+          <p style="color:var(--muted-fg); font-size:15px;">Cirurgião-dentista, especialista e criador do Front Odontus. Com mais de 15 anos de clínica e ensino, já formou centenas de profissionais que hoje executam Odontologia Digital com segurança.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFERTA -->
+  <div class="section tint">
+    <div class="container">
+      <div class="offer-box">
+        <span class="badge" style="background:rgb(66 32 6 / .12); color:#422006; border-color:transparent;">O QUE VOCÊ RECEBE</span>
+        <h2 style="margin-top:12px; color:#422006;">Plano Premium — acesso completo</h2>
+        <ul class="bonus-list">
+          <li>✅ Catálogo completo de vídeos de técnica</li>
+          <li>✅ Estudos de caso clínicos comentados</li>
+          <li>✅ Materiais de apoio para download</li>
+          <li>✅ Comunidade de alunos (bônus)</li>
+          <li>✅ Atualizações contínuas incluídas</li>
+        </ul>
+        <div style="margin:18px 0 4px;">
+          <span class="price-old">de R$ 197/mês</span><br/>
+          <span class="price">por R$ 67/mês</span>
+          <p class="pay">no plano anual · ou R$ 97/mês mensal · Pix ou cartão</p>
+        </div>
+        <a href="#" class="cta" style="font-size:18px;">FECHAR MINHA VAGA →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GARANTIA -->
+  <div class="section">
+    <div class="container">
+      <div class="guarantee">
+        <div class="seal">GARANTIA<br/>7 DIAS</div>
+        <div>
+          <p style="font-weight:800; font-size:18px; font-family:'Space Grotesk',sans-serif;">Risco zero para você</p>
+          <p style="color:var(--muted-fg); font-size:15px;">Se nos primeiros 7 dias você não gostar do Front Odontus, basta enviar um e-mail que devolvemos <strong>100% do valor</strong>. Sem perguntas, sem burocracia.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA FINAL -->
+  <div class="section dark center">
+    <div class="container">
+      <h2 style="color:#fff;">Últimas vagas da turma de lançamento</h2>
+      <div class="countdown">
+        <div class="box"><div class="n">12</div><div class="u">horas</div></div>
+        <div class="box"><div class="n">48</div><div class="u">min</div></div>
+        <div class="box"><div class="n">33</div><div class="u">seg</div></div>
+      </div>
+      <a href="#" class="cta">QUERO ENTRAR NA TURMA →</a>
+      <p class="safe" style="color:var(--primary-200);">🎓 Garantia de 7 dias · Acesso imediato</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="container">
+      <h2>Perguntas frequentes</h2>
+      <details><summary>Como recebo o acesso?</summary><p>Imediatamente após a confirmação do pagamento, por e-mail e pela plataforma.</p></details>
+      <details><summary>Quais formas de pagamento?</summary><p>Pix (com liberação imediata) e cartão de crédito.</p></details>
+      <details><summary>Posso cancelar quando quiser?</summary><p>Sim. O cancelamento pode ser feito a qualquer momento, sem multa.</p></details>
+      <details><summary>O conteúdo serve para iniciantes?</summary><p>Sim, há trilhas desde o básico até o avançado.</p></details>
+    </div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <footer>
+    <div class="container">
+      <div class="links"><span>Política de Privacidade</span><span>Termos de Uso</span><span>Política de Reembolso</span><span>Contato</span></div>
+      <p>Front Odontus · CNPJ 00.000.000/0001-00 · Avenida das Nações, 3003 · Osasco/SP</p>
+      <p style="margin-top:6px;">© 2026 Front Odontus. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+</body>
+</html>

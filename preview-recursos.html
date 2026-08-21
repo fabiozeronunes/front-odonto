@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odontus — Prévia: Página de Recursos (Benefícios)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:"#f0fdfa",100:"#ccfbf1",200:"#99f6e4",300:"#5eead4",400:"#2dd4bf",500:"#14b8a6",600:"#0d9488",700:"#0f766e",800:"#115e59",900:"#134e4a",950:"#042f2e",
+        },
+        accent: {
+          50:"#fffbeb",100:"#fef3c7",200:"#fde68a",300:"#fcd34d",400:"#fbbf24",500:"#f59e0b",600:"#d97706",700:"#b45309",
+        },
+      },
+      fontFamily: { sans:["Inter","system-ui","sans-serif"], display:["Space Grotesk","Inter","system-ui","sans-serif"] },
+      boxShadow: {
+        lift:"0 8px 24px -6px rgb(15 118 110 / .15)",
+        glow:"0 0 30px -6px rgb(245 158 11 / .4)",
+        card:"0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .08)",
+      },
+    },
+  },
+};
+</script>
+<style>
+  .grad-text { background: linear-gradient(90deg,#5eead4,#fbbf24); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .anim-fade { animation: fadeIn .5s ease both; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+  .tabs .tabbtn { border:1px solid #cbd5e1; background:#fff; color:#334155; }
+  .tabs .tabbtn.active { background:#0f766e; color:#fff; border-color:#0f766e; }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="mx-auto max-w-5xl px-4 py-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-teal-700">Prévia — Página de Recursos (Benefícios)</p>
+        <h1 class="font-display text-xl font-bold text-slate-900">Escolha 1 das 3 opções de estilo</h1>
+      </div>
+      <div class="tabs flex gap-2">
+        <button class="tabbtn active rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(0,this)">A · Bento Grid</button>
+        <button class="tabbtn rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(1,this)">B · Timeline</button>
+        <button class="tabbtn rounded-full px-5 py-2 text-sm font-semibold" onclick="showTab(2,this)">C · Grid Clássico</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="optA" class="panel anim-fade">
+  <!-- ══════════════ OPÇÃO A · BENTO GRID ══════════════ -->
+  <div class="bg-gradient-to-br from-primary-950 via-primary-800 to-teal-700 text-white">
+    <!-- navbar mock -->
+    <header class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+      <span class="font-display text-2xl font-bold">Odontus</span>
+      <nav class="hidden gap-6 text-sm font-medium text-white/80 md:flex">
+        <a href="#" class="hover:text-white">Início</a><a href="#" class="hover:text-white">Catálogo</a><a href="#" class="hover:text-white">Especialidades</a>
+        <a href="#" class="hover:text-white">Estudos de Caso</a><a href="#" class="font-semibold text-teal-300">Recursos</a><a href="#" class="hover:text-white">Planos</a>
+      </nav>
+      <a href="#" class="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-white hover:bg-amber-400">Criar conta</a>
+    </header>
+
+    <!-- hero -->
+    <section class="mx-auto max-w-6xl px-5 pt-10 pb-14 text-center">
+      <span class="inline-block rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-sm text-teal-200">Recursos que potencializam seus estudos</span>
+      <h1 class="mx-auto mt-5 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
+        Tudo que você precisa para <span class="grad-text">aprender de verdade</span> e ir bem nas provas
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-white/80">
+        Nove ferramentas de estudo pensadas para transformar conteúdo em conhecimento duradouro. Cada uma explica o que é e como ajuda você.
+      </p>
+    </section>
+  </div>
+
+  <!-- bento grid -->
+  <section class="mx-auto -mt-6 max-w-6xl px-5 pb-16">
+    <div class="grid auto-rows-[minmax(150px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- card 1 · destaque -->
+      <div class="group col-span-1 rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1 sm:col-span-2">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-primary-700 text-white shadow-glow">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-xl font-bold text-slate-900">Gravação de aulas em vídeo</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Assista aulas gravadas por especialistas quando e onde quiser. Pause, reveja e estude no seu ritmo até fixar o conteúdo — aprenda assistindo, sem limite de tempo e sem perder nada.</p>
+        <span class="mt-4 inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">Aprender assistindo</span>
+      </div>
+
+      <!-- card 2 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Gravação de aulas em áudio</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Leve as aulas para qualquer lugar: ônibus, academia, filas. Transforme tempo ocioso em estudo produtivo.</p>
+      </div>
+
+      <!-- card 3 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Estudos de caso</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Treine com casos clínicos reais, do diagnóstico à conduta, e desenvolva seu raciocínio clínico.</p>
+      </div>
+
+      <!-- card 4 · span 2 -->
+      <div class="group rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 shadow-lift transition hover:-translate-y-1 lg:col-span-2">
+        <div class="flex items-center gap-3">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-bold text-slate-900">Estudos para teste / prova</h3>
+        </div>
+        <p class="mt-3 text-sm leading-relaxed text-slate-600">Monte planos de estudo focados nas matérias que mais caem em provas e concursos. Estude por tópicos estratégicos e chegue ao dia da avaliação preparado e confiante, sem estudar o que não precisa.</p>
+      </div>
+
+      <!-- card 5 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 to-accent-500 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9h8m-8 4h5m-5 4h3m-5 3h10a4 4 0 004-4V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Testes (perguntas e respostas)</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Crie simulados com perguntas e respostas comentadas, corrija e veja exatamente onde errou para evoluir.</p>
+      </div>
+
+      <!-- card 6 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Quizz</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Reveja rápido com quizzes dinâmicos e gamificados que fixam conteúdo e medem seu progresso em minutos.</p>
+      </div>
+
+      <!-- card 7 · span 2 (wide) -->
+      <div class="group flex flex-col justify-between rounded-3xl border border-teal-200 bg-gradient-to-br from-primary-800 to-primary-950 p-6 text-white shadow-lift transition hover:-translate-y-1 lg:col-span-2">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-teal-300 backdrop-blur">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a2 2 0 012-2h4.586A2 2 0 0112 3.586L14 5h4a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm10 4l-4 4m0-4l4 4"/></svg>
+        </div>
+        <div>
+          <h3 class="mt-4 font-display text-xl font-bold">Flashcards</h3>
+          <p class="mt-2 text-sm leading-relaxed text-white/80">Transforme conteúdo em cartões de pergunta e resposta. Repita e fixe com repetição espaçada — a técnica de memorização de longo prazo mais eficiente que existe.</p>
+        </div>
+      </div>
+
+      <!-- card 8 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-teal-600 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Mapas mentais</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Organize a matéria em mapas visuais que conectam conceitos e revisam rápido antes da prova.</p>
+      </div>
+
+      <!-- card 9 -->
+      <div class="group rounded-3xl border border-teal-200 bg-white p-6 shadow-lift transition hover:-translate-y-1">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500 to-accent-600 text-white">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055zm10.45 8A9.003 9.003 0 0012 2.55V11h9.45z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Infográficos</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Resuma conteúdos complexos em imagens claras e fáceis de memorizar — perfeito para revisão rápida.</p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-10 rounded-3xl bg-gradient-to-r from-primary-800 to-teal-700 px-8 py-10 text-center text-white shadow-lift">
+      <h2 class="font-display text-2xl font-bold sm:text-3xl">Pronto para estudar melhor?</h2>
+      <p class="mx-auto mt-2 max-w-xl text-white/80">Experimente todos os recursos e veja seu desempenho subir.</p>
+      <a href="#" class="mt-6 inline-block rounded-full bg-amber-500 px-8 py-3 font-bold text-white hover:bg-amber-400">Começar a estudar grátis</a>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800 bg-slate-950 px-5 py-10 text-center text-xs text-slate-500">
+    Disclaimer: melhoras de desempenho estão relacionadas a estudos diários e comprometimento com as matérias do seu curso. O Front Odonto não realiza mágica. Os recursos aqui apresentados não dão a garantia de melhorar sem estudar, foram criados para te auxiliar a melhorar seu desempenho e métricas em seu curso.<br/>
+    <span class="mt-2 inline-block text-slate-400">© 2026 FrontOdontus. Todos os direitos reservados.</span>
+  </footer>
+</div>
+
+<div id="optB" class="panel hidden anim-fade">
+  <!-- ══════════════ OPÇÃO B · TIMELINE ══════════════ -->
+  <div class="bg-primary-950 text-white">
+    <header class="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
+      <span class="font-display text-2xl font-bold">Odontus</span>
+      <nav class="hidden gap-6 text-sm font-medium text-white/80 md:flex">
+        <a href="#" class="hover:text-white">Início</a><a href="#" class="hover:text-white">Catálogo</a><a href="#" class="hover:text-white">Especialidades</a>
+        <a href="#" class="hover:text-white">Estudos de Caso</a><a href="#" class="font-semibold text-teal-300">Recursos</a><a href="#" class="hover:text-white">Planos</a>
+      </nav>
+      <a href="#" class="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-white hover:bg-amber-400">Criar conta</a>
+    </header>
+
+    <section class="mx-auto max-w-5xl px-5 pb-20 pt-10 text-center">
+      <span class="inline-block rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-sm text-teal-200">Recursos · Benefícios</span>
+      <h1 class="mx-auto mt-5 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
+        Do zero à aprovação, <span class="grad-text">passo a passo</span>
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-white/70">Conheça os 9 recursos da plataforma e entenda como cada um ajuda você a estudar com mais resultado.</p>
+    </section>
+  </div>
+
+  <!-- timeline -->
+  <section class="mx-auto max-w-3xl px-5 py-16">
+    <div class="relative border-l-2 border-teal-200 pl-8 sm:pl-10">
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">01</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-primary-700 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Gravação de aulas em vídeo</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Assista aulas gravadas por especialistas quando e onde quiser. Pause, reveja e estude no seu ritmo até fixar o conteúdo — aprenda assistindo, sem limite de tempo e sem perder nada.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">02</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Gravação de aulas em áudio</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Leve as aulas para qualquer lugar: ônibus, academia, filas ou enquanto realiza outras tarefas. Transforme tempo ocioso em estudo produtivo e revise a matéria quantas vezes precisar, só escutando.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">03</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de estudos de caso</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Treine com casos clínicos reais, do diagnóstico à conduta. Veja a teoria aplicada na prática e desenvolva o raciocínio clínico que cai nas provas e acompanha você na vida profissional.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">04</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de estudos para teste / prova</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Monte planos de estudo focados nas matérias que mais caem em provas e concursos. Estude por tópicos estratégicos e chegue ao dia da avaliação preparado e confiante, sem perder tempo com o que não precisa.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">05</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-accent-500 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9h8m-8 4h5m-5 4h3m-5 3h10a4 4 0 004-4V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4z"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de teste (perguntas e respostas)</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Crie simulados com perguntas e respostas comentadas. Responda, corrija e identifique exatamente onde errou para revisar o que precisa e evoluir a cada tentativa.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">06</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de quizz</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Teste seus conhecimentos com quizzes rápidos e dinâmicos. Uma forma leve e gamificada de revisar que fixa o conteúdo e mede seu progresso em poucos minutos por dia.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">07</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-teal-600 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a2 2 0 012-2h4.586A2 2 0 0112 3.586L14 5h4a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm10 4l-4 4m0-4l4 4"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de flashcards</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Transforme o conteúdo em cartões de pergunta e resposta. Repita, lembre e fixe com a técnica de repetição espaçada — ideal para memorização de longo prazo.</p>
+      </div>
+
+      <div class="timeline-item relative mb-10">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">08</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-primary-700 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de mapas mentais</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Organize a matéria em mapas visuais que conectam os conceitos. Enxergue o conteúdo de forma clara, entenda a relação entre os temas e revise rápido antes das provas.</p>
+      </div>
+
+      <div class="timeline-item relative">
+        <span class="absolute -left-[57px] flex h-10 w-10 items-center justify-center rounded-full bg-primary-700 font-display text-sm font-bold text-white ring-4 ring-teal-100 sm:-left-[69px]">09</span>
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055zm10.45 8A9.003 9.003 0 0012 2.55V11h9.45z"/></svg>
+        </span>
+        <h3 class="mt-3 font-display text-2xl font-bold text-slate-900">Criação de infográficos</h3>
+        <p class="mt-2 text-slate-600 leading-relaxed">Resuma conteúdos complexos em infográficos visuais. Informação simplificada em imagens, fácil de entender e memorizar — perfeito para revisão rápida.</p>
+      </div>
+    </div>
+
+    <div class="mt-12 rounded-3xl bg-gradient-to-r from-primary-800 to-teal-700 px-8 py-10 text-center text-white shadow-lift">
+      <h2 class="font-display text-2xl font-bold sm:text-3xl">Seu próximo nível de estudo começa aqui</h2>
+      <a href="#" class="mt-6 inline-block rounded-full bg-amber-500 px-8 py-3 font-bold text-white hover:bg-amber-400">Começar a estudar grátis</a>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800 bg-slate-950 px-5 py-10 text-center text-xs text-slate-500">
+    Disclaimer: melhoras de desempenho estão relacionadas a estudos diários e comprometimento com as matérias do seu curso. O Front Odonto não realiza mágica. Os recursos aqui apresentados não dão a garantia de melhorar sem estudar, foram criados para te auxiliar a melhorar seu desempenho e métricas em seu curso.<br/>
+    <span class="mt-2 inline-block text-slate-400">© 2026 FrontOdontus. Todos os direitos reservados.</span>
+  </footer>
+</div>
+
+<div id="optC" class="panel hidden anim-fade">
+  <!-- ══════════════ OPÇÃO C · GRID CLÁSSICO ══════════════ -->
+  <div class="bg-gradient-to-br from-primary-950 via-primary-800 to-teal-700 text-white">
+    <header class="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+      <span class="font-display text-2xl font-bold">Odontus</span>
+      <nav class="hidden gap-6 text-sm font-medium text-white/80 md:flex">
+        <a href="#" class="hover:text-white">Início</a><a href="#" class="hover:text-white">Catálogo</a><a href="#" class="hover:text-white">Especialidades</a>
+        <a href="#" class="hover:text-white">Estudos de Caso</a><a href="#" class="font-semibold text-teal-300">Recursos</a><a href="#" class="hover:text-white">Planos</a>
+      </nav>
+      <a href="#" class="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-white hover:bg-amber-400">Criar conta</a>
+    </header>
+
+    <section class="mx-auto max-w-6xl px-5 pb-16 pt-10 text-center">
+      <span class="inline-block rounded-full border border-teal-400/40 bg-primary-900/60 px-4 py-1.5 text-sm text-teal-200">Recursos e Benefícios</span>
+      <h1 class="mx-auto mt-5 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
+        Recursos para <span class="grad-text">estudar com estratégia</span>
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-white/80">Nove ferramentas que transformam seu estudo. Escolha, entenda como funciona e veja o que cada uma faz por você.</p>
+    </section>
+  </div>
+
+  <section class="mx-auto max-w-6xl px-5 py-14">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-primary-700 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Aulas em vídeo</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Assista aulas gravadas por especialistas quando e onde quiser. Pause, reveja e estude no seu ritmo até fixar o conteúdo.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h2m4 0h2m4 0h2m-14 3h12a4 4 0 004-4V8a2 2 0 00-2-2H5a2 2 0 00-2 2v6a4 4 0 004 4z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Aulas em áudio</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Leve as aulas para qualquer lugar: ônibus, academia, filas. Transforme tempo ocioso em estudo produtivo.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Estudos de caso</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Treine com casos clínicos reais, do diagnóstico à conduta, e desenvolva o raciocínio que cai nas provas e na prática.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-primary-800 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Estudos para teste/prova</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Monte planos focados nas matérias que mais caem em provas e concursos e chegue preparado no dia da avaliação.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-accent-500 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9h8m-8 4h5m-5 4h3m-5 3h10a4 4 0 004-4V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Testes (P e R)</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Crie simulados com perguntas e respostas comentadas e veja exatamente onde errou para evoluir a cada tentativa.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-600 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Quizz</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Reveja com quizzes rápidos e gamificados que fixam conteúdo e medem seu progresso em minutos.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-teal-600 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a2 2 0 012-2h4.586A2 2 0 0112 3.586L14 5h4a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm10 4l-4 4m0-4l4 4"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Flashcards</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Transforme conteúdo em cartões de pergunta e resposta e fixe com a técnica de repetição espaçada.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-primary-700 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Mapas mentais</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Organize a matéria em mapas visuais que conectam conceitos e revisam rápido antes das provas.</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lift">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-glow">
+          <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055zm10.45 8A9.003 9.003 0 0012 2.55V11h9.45z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Infográficos</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Resuma conteúdos complexos em imagens claras, fáceis de entender e memorizar — perfeito para revisão rápida.</p>
+      </div>
+    </div>
+
+    <div class="mt-10 rounded-3xl bg-gradient-to-r from-primary-800 to-teal-700 px-8 py-10 text-center text-white shadow-lift">
+      <h2 class="font-display text-2xl font-bold sm:text-3xl">Comece hoje, veja a diferença amanhã</h2>
+      <p class="mx-auto mt-2 max-w-xl text-white/80">Todos os recursos disponíveis no plano que couber no seu bolso.</p>
+      <a href="#" class="mt-6 inline-block rounded-full bg-amber-500 px-8 py-3 font-bold text-white hover:bg-amber-400">Ver planos e assinaturas</a>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800 bg-slate-950 px-5 py-10 text-center text-xs text-slate-500">
+    Disclaimer: melhoras de desempenho estão relacionadas a estudos diários e comprometimento com as matérias do seu curso. O Front Odonto não realiza mágica. Os recursos aqui apresentados não dão a garantia de melhorar sem estudar, foram criados para te auxiliar a melhorar seu desempenho e métricas em seu curso.<br/>
+    <span class="mt-2 inline-block text-slate-400">© 2026 FrontOdontus. Todos os direitos reservados.</span>
+  </footer>
+</div>
+
+<script>
+function showTab(i, btn) {
+  document.querySelectorAll(".panel").forEach((p, idx) => p.classList.toggle("hidden", idx !== i));
+  document.querySelectorAll(".tabbtn").forEach((b) => b.classList.toggle("active", b === btn));
+}
+</script>
+</body>
+</html>
