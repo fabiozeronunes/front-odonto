@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { X, Music, Trash2 } from "lucide-react";
+import { X, Music, Trash2, Camera } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Specialty, Tag } from "../types";
@@ -12,6 +12,7 @@ import { ImagePicker } from "./ImagePicker";
 import { YouTubeImport } from "./YouTubeImport";
 import { AudioRecorder } from "./AudioRecorder";
 import { AudioPlayer } from "./AudioPlayer";
+import { VideoRecorder } from "./VideoRecorder";
 import { TagCreator } from "./TagCreator";
 import { resolveImageUrl } from "../lib/utils";
 
@@ -278,10 +279,39 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+        <h3 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
+          <Camera className="h-5 w-5 text-primary-600" />
+          Gravar aula
+        </h3>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
+        </p>
+        <VideoRecorder
+          onRecorded={(url) => setEditing({ ...editing, videoUrl: url })}
+        />
+        {editing.videoUrl && (
+          <div className="mt-3 rounded-xl border border-border overflow-hidden">
+            <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
         <h3 className="mb-4 text-lg font-bold text-foreground">Importar do YouTube</h3>
         <YouTubeImport
           onInfo={applyYouTube}
-/>
+        />
+        {editing.videoUrl && editing.videoUrl.includes("youtube.com/embed") && (
+          <div className="mt-3 rounded-xl border border-border overflow-hidden">
+            <iframe
+              src={editing.videoUrl}
+              className="w-full aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title="Pré-visualização do vídeo"
+            />
+          </div>
+        )}
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
