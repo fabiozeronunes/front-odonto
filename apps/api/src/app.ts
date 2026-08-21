@@ -18,6 +18,7 @@ import { youtubeRouter } from "./modules/youtube/youtube.routes.js";
 import { settingsRouter } from "./modules/settings/settings.routes.js";
 import { productsRouter } from "./modules/products/products.routes.js";
 import { studyRouter } from "./modules/study/study.routes.js";
+import { startCleanupSchedule } from "./modules/youtube/youtube.service.js";
 
 export function createApp() {
   const app = express();
@@ -77,6 +78,8 @@ export function createApp() {
 
   app.use(notFound);
   app.use(errorHandler);
+
+  startCleanupSchedule();
 
   return app;
 }

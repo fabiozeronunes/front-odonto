@@ -27,12 +27,29 @@ const ALLOWED_MIMES: Record<string, string> = {
   "video/quicktime": ".mov",
 };
 
+const IMAGE_MIMES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const VIDEO_MIMES = new Set(["video/webm", "video/mp4", "video/ogg", "video/quicktime"]);
+
+const LIMITS = {
+  image: 10 * 1024 * 1024,  // 10 MB
+  video: 50 * 1024 * 1024,  // 50 MB
+  audio: 20 * 1024 * 1024,  // 20 MB
+};
+
 export const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 100 * 1024 * 1024 },
+  limits: {
+    fileSize: LIMITS.video, // max default, refined in fileFilter
+  },
   fileFilter: (_req, file, cb) => {
-    if (ALLOWED_MIMES[file.mimetype]) return cb(null, true);
-    cb(new Error("Formato inválido. Use imagens (JPG, PNG, WEBP, GIF) ou áudio (WEBM, MP3, OGG, WAV)."));
+    if (!ALLOWED_MIMES[file.mimetype]) {
+      return cb(new Error("Formato inválido. Use imagens (JPG, PNG, WEBP, GIF), áudio (WEBM, MP3, OGG, WAV) ou vídeo (WEBM, MP4)."));
+    }
+    const limit = IMAGE_MIMES.has(file.mimetype) ? LIMITS.image
+      : VIDEO_MIMES.has(file.mimetype) ? LIMITS.video
+      : LIMITS.audio;
+    (file as any).__sizeLimit = limit;
+    cb(null, true);
   },
 });
 

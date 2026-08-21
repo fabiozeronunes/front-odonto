@@ -1,10 +1,18 @@
 import { z } from "zod";
 
+const passwordValidation = z
+  .string()
+  .min(8, "Senha deve ter ao menos 8 caracteres")
+  .max(72)
+  .regex(/[A-Z]/, "Senha deve conter ao menos 1 letra maiúscula")
+  .regex(/[a-z]/, "Senha deve conter ao menos 1 letra minúscula")
+  .regex(/[0-9]/, "Senha deve conter ao menos 1 número");
+
 export const registerSchema = z.object({
   name: z.string().min(2, "Nome deve ter ao menos 2 caracteres").max(120),
   email: z.string().email("E-mail inválido"),
   phone: z.string().max(20).optional().nullable(),
-  password: z.string().min(8, "Senha deve ter ao menos 8 caracteres").max(72),
+  password: passwordValidation,
   ref: z.string().max(60).optional().nullable(),
 });
 
@@ -19,7 +27,7 @@ export const refreshSchema = z.object({
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Senha atual obrigatória"),
-  newPassword: z.string().min(8, "Nova senha deve ter ao menos 8 caracteres").max(72),
+  newPassword: passwordValidation,
 });
 
 export const forgotPasswordSchema = z.object({
@@ -28,7 +36,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, "Token obrigatório"),
-  newPassword: z.string().min(8, "Senha deve ter ao menos 8 caracteres").max(72),
+  newPassword: passwordValidation,
 });
 
 export const updateProfileSchema = z.object({

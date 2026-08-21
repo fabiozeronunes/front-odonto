@@ -2,6 +2,7 @@ import { prisma } from "../../lib/prisma.js";
 import type { Prisma } from "@prisma/client";
 import { BadRequestError, ConflictError } from "../../utils/errors.js";
 import { decryptApiKey } from "../study/study.service.js";
+import { sanitize } from "../../utils/sanitize.js";
 
 export async function getSiteSetting(key: string) {
   const row = await prisma.siteSetting.findUnique({ where: { key } });
@@ -135,14 +136,14 @@ function normalizeFaq(input: unknown): Faq {
     .map((it) => ({
       id: str(it.id, crypto.randomUUID()),
       groupId: str(it.groupId, groups[0]?.id ?? ""),
-      question: str(it.question, "Pergunta"),
-      answer: str(it.answer, ""),
+      question: sanitize(str(it.question, "Pergunta")),
+      answer: sanitize(str(it.answer, "")),
     }));
 
   return {
-    dicaTitle: str(raw.dicaTitle, source.dicaTitle),
-    dicaText: str(raw.dicaText, source.dicaText),
-    dicaCta: str(raw.dicaCta, source.dicaCta),
+    dicaTitle: sanitize(str(raw.dicaTitle, source.dicaTitle)),
+    dicaText: sanitize(str(raw.dicaText, source.dicaText)),
+    dicaCta: sanitize(str(raw.dicaCta, source.dicaCta)),
     dicaLink: str(raw.dicaLink, source.dicaLink),
     groups,
     items,
@@ -213,11 +214,11 @@ export async function getHeroContent(): Promise<HeroContent> {
 export async function saveHeroContent(input: Partial<HeroContent>) {
   const current = await getHeroContent();
   const next: HeroContent = {
-    title: typeof input.title === "string" && input.title.trim() ? input.title.trim() : current.title,
+    title: typeof input.title === "string" && input.title.trim() ? sanitize(input.title.trim()) : current.title,
     subtitle:
-      typeof input.subtitle === "string" && input.subtitle.trim() ? input.subtitle.trim() : current.subtitle,
-    businessArea: typeof input.businessArea === "string" ? input.businessArea.trim() : current.businessArea,
-    tags: typeof input.tags === "string" ? input.tags.trim() : current.tags,
+      typeof input.subtitle === "string" && input.subtitle.trim() ? sanitize(input.subtitle.trim()) : current.subtitle,
+    businessArea: typeof input.businessArea === "string" ? sanitize(input.businessArea.trim()) : current.businessArea,
+    tags: typeof input.tags === "string" ? sanitize(input.tags.trim()) : current.tags,
   };
   await upsertSiteSetting("heroContent", JSON.stringify(next));
   return next;

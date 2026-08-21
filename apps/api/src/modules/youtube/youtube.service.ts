@@ -3,6 +3,9 @@ import path from "node:path";
 import { execSync, spawn } from "node:child_process";
 import { ApiError } from "../../utils/errors.js";
 
+const CLEANUP_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+let cleanupTimer: NodeJS.Timeout | null = null;
+
 export function parseYoutubeId(url: string): string | null {
   const patterns = [
     /youtube\.com\/watch\?v=([\w-]{11})/,
@@ -86,4 +89,37 @@ export function downloadVideo(
       resolve({ file });
     });
   });
+}
+
+export function cleanupOldDownloads() {
+  const videosDir = path.join(process.cwd(), "public", "uploads", "videos");
+  if (!fs.existsSync(videosDir)) return;
+
+  const now = Date.now();
+  let cleaned = 0;
+
+  for (const file of fs.readdirSync(videosDir)) {
+    const filePath = path.join(videosDir, file);
+    try {
+      const stat = fs.statSync(filePath);
+      if (stat.isFile() && now - stat.mtimeMs > CLEANUP_MAX_AGE_MS) {
+        fs.unlinkSync(filePath);
+        cleaned++;
+      }
+    } catch {
+      // ignore individual file errors
+    }
+  }
+
+  if (cleaned > 0) {
+    console.log(`[CLEANUP] Removed ${cleaned} old YouTube download(s)`);
+  }
+}
+
+export function startCleanupSchedule() {
+  if (cleanupTimer) return;
+  // Run cleanup every 6 hours
+  cleanupTimer = setInterval(cleanupOldDownloads, 6 * 60 * 60 * 1000);
+  // Run once on startup (after 5 minutes)
+  setTimeout(cleanupOldDownloads, 5 * 60 * 1000);
 }
