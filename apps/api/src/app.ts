@@ -25,7 +25,7 @@ export function createApp() {
   app.set("trust proxy", 1);
   app.use(
     cors({
-      origin: env.nodeEnv === "production" ? env.webUrl : true,
+      origin: env.nodeEnv === "production" ? env.webUrl : env.webUrl || "http://localhost:5173",
       credentials: true,
     })
   );

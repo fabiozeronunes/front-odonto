@@ -1,7 +1,12 @@
 import { PrismaClient, Role, ContentStatus, Difficulty, VideoType, BillingPeriod } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 
 const prisma = new PrismaClient();
+
+function randomPassword(): string {
+  return crypto.randomBytes(12).toString("base64url");
+}
 
 const specialties = [
   { name: "Dentística", description: "Restaurações e estética do dente" },
@@ -174,8 +179,16 @@ async function main() {
     },
   });
 
-  const adminPassword = await bcrypt.hash("Admin@123", 10);
-  const userPassword = await bcrypt.hash("Usuario@123", 10);
+  const adminPassword = process.env.ADMIN_PASSWORD ?? randomPassword();
+  const userPassword = process.env.USER_PASSWORD ?? randomPassword();
+  const adminHash = await bcrypt.hash(adminPassword, 10);
+  const userHash = await bcrypt.hash(userPassword, 10);
+
+  console.log("\n========================================");
+  console.log("SEED COMPLETO — Credenciais geradas:");
+  console.log(`  Admin: admin@odonto.study / ${adminPassword}`);
+  console.log(`  User:  aluno@odonto.study / ${userPassword}`);
+  console.log("========================================\n");
 
   await prisma.user.upsert({
     where: { email: "admin@odonto.study" },
@@ -183,7 +196,7 @@ async function main() {
     create: {
       name: "Administrador",
       email: "admin@odonto.study",
-      passwordHash: adminPassword,
+      passwordHash: adminHash,
       role: Role.ADMIN,
       planId: premiumPlan.id,
     },
@@ -195,7 +208,7 @@ async function main() {
     create: {
       name: "Aluno Premium",
       email: "aluno@odonto.study",
-      passwordHash: userPassword,
+      passwordHash: userHash,
       role: Role.USER,
       planId: premiumPlan.id,
     },
