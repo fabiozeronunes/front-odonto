@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, Eye, EyeOff, ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
 import type { Paginated, Specialty, Tag, Video } from "../../types";
 import { VideoCard } from "../../components/VideoCard";
 import { VideoForm, emptyVideoForm, type VideoFormState } from "../../components/VideoForm";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Card, CardContent } from "../../components/ui/card";
-import { resolveImageUrl } from "../../lib/utils";
 
 interface RelatedData {
   videos: Video[];
@@ -130,157 +128,154 @@ export function MyVideos() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground">Meus vídeos</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-display text-xl font-bold text-foreground">Meus vídeos</h2>
         <Button onClick={startCreate}>
           <Plus className="h-4 w-4" /> Novo vídeo
         </Button>
       </div>
 
       {editing && (
-        <Card className="mt-5 border-primary-200">
-          <CardContent className="space-y-5 pt-6">
-            <Button variant="ghost" size="sm" onClick={() => setEditingAndUrl(null)}>
-              <ArrowLeft className="h-4 w-4" /> Voltar para a lista
-            </Button>
-            <VideoForm
-              initial={editing}
-              specialties={specialties}
-              onDone={() => {
-                setEditingAndUrl(null);
-                load();
-              }}
-              onCancel={() => setEditingAndUrl(null)}
-            />
-          </CardContent>
-        </Card>
+        <div className="mb-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
+          <Button variant="ghost" size="sm" onClick={() => setEditingAndUrl(null)} className="mb-4">
+            <ArrowLeft className="h-4 w-4" /> Voltar para a lista
+          </Button>
+          <VideoForm
+            initial={editing}
+            specialties={specialties}
+            onDone={() => {
+              setEditingAndUrl(null);
+              load();
+            }}
+            onCancel={() => setEditingAndUrl(null)}
+          />
+        </div>
       )}
 
-      <Card className="mt-5">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-3">Título</th>
-                  <th className="px-5 py-3">Especialidade</th>
-                  <th className="px-5 py-3">Acesso</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Ações</th>
-                </tr>              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
-                ) : videos.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum vídeo cadastrado ainda.</td></tr>
-                ) : (
-                  videos.map((v) => (
-                    <>
-                      <tr key={v.id} className="hover:bg-muted">
-                        <td className="max-w-[280px] px-5 py-3">
-                          <p className="truncate font-medium text-foreground" onClick={() => navigate(`/video/${v.slug}`)} title="Assistir vídeo">{v.title}</p>
-                        </td>
-                        <td className="px-5 py-3 text-muted-foreground">{v.specialty?.name ?? "—"}</td>
-                        <td className="px-5 py-3">
-                          <Badge variant={v.isFree ? "free" : "premium"}>{v.isFree ? "FREE" : "Pago"}</Badge>
-                        </td>
-                        <td className="px-5 py-3">
-                          <Badge variant={v.status === "PUBLISHED" ? "default" : "outline"}>{v.status}</Badge>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => toggleRelated(v.id)} title="Ver vídeos e imagens relacionados">
-                              {expandedVideo === v.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => togglePublish(v)} title={v.status === "PUBLISHED" ? "Despublicar" : "Publicar"}>
-                              {v.status === "PUBLISHED" ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => startEdit(v)} title="Editar">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => remove(v.id)} className="text-red-600" title="Excluir">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      {expandedVideo === v.id && (
-                        <tr key={`${v.id}-related`}>
-                          <td colSpan={5} className="bg-muted px-5 py-4">
-                            {loadingRelated === v.id ? (
-                              <p className="py-4 text-center text-sm text-muted-foreground">Carregando relacionados...</p>
-                            ) : (
-                              (() => {
-                                const rel = relatedMap[v.id];
-                                if (!rel || (rel.videos.length === 0 && rel.images.length === 0)) {
-                                  return (
-                                    <p className="py-4 text-center text-sm text-muted-foreground">
-                                      Nenhum vídeo ou imagem relacionada. Vincule este vídeo a um estudo de caso
-                                      para ver relacionados.
-                                    </p>
-                                  );
-                                }
+      <div className="rounded-2xl border border-border bg-surface shadow-card">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border bg-muted text-left text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-5 py-3">Título</th>
+                <th className="px-5 py-3">Especialidade</th>
+                <th className="px-5 py-3">Acesso</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {loading ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
+              ) : videos.length === 0 ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum vídeo cadastrado ainda.</td></tr>
+              ) : (
+                videos.map((v) => (
+                  <>
+                    <tr key={v.id} className="hover:bg-muted/50 transition-colors">
+                      <td className="max-w-[280px] px-5 py-3">
+                        <p className="truncate font-medium text-foreground" onClick={() => navigate(`/video/${v.slug}`)} title="Assistir vídeo">{v.title}</p>
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground">{v.specialty?.name ?? "—"}</td>
+                      <td className="px-5 py-3">
+                        <Badge variant={v.isFree ? "free" : "premium"}>{v.isFree ? "FREE" : "Pago"}</Badge>
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge variant={v.status === "PUBLISHED" ? "default" : "outline"}>{v.status}</Badge>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => toggleRelated(v.id)} title="Ver vídeos e imagens relacionados">
+                            {expandedVideo === v.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => togglePublish(v)} title={v.status === "PUBLISHED" ? "Despublicar" : "Publicar"}>
+                            {v.status === "PUBLISHED" ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => startEdit(v)} title="Editar">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => remove(v.id)} className="text-red-600" title="Excluir">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    {expandedVideo === v.id && (
+                      <tr key={`${v.id}-related`}>
+                        <td colSpan={5} className="bg-muted/50 px-5 py-4">
+                          {loadingRelated === v.id ? (
+                            <p className="py-4 text-center text-sm text-muted-foreground">Carregando relacionados...</p>
+                          ) : (
+                            (() => {
+                              const rel = relatedMap[v.id];
+                              if (!rel || (rel.videos.length === 0 && rel.images.length === 0)) {
                                 return (
-                                  <div className="space-y-5">
-                                    {rel.videos.length > 0 && (
-                                      <div>
-                                        <h4 className="mb-3 text-sm font-bold text-foreground">Vídeos relacionados</h4>
-                                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                          {rel.videos.map((rv) => (
-                                            <VideoCard key={rv.id} video={rv} />
-                                          ))}
-                                        </div>
+                                  <p className="py-4 text-center text-sm text-muted-foreground">
+                                    Nenhum vídeo ou imagem relacionada. Vincule este vídeo a um estudo de caso
+                                    para ver relacionados.
+                                  </p>
+                                );
+                              }
+                              return (
+                                <div className="space-y-5">
+                                  {rel.videos.length > 0 && (
+                                    <div>
+                                      <h4 className="mb-3 text-sm font-bold text-foreground">Vídeos relacionados</h4>
+                                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        {rel.videos.map((rv) => (
+                                          <VideoCard key={rv.id} video={rv} />
+                                        ))}
                                       </div>
-                                    )}
-                                    {rel.images.length > 0 && (
-                                      <div>
-                                        <h4 className="mb-3 text-sm font-bold text-foreground">Imagens relacionadas</h4>
-                                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-                                          {rel.images.map((img) => (
-                                            <div
-                                              key={img.id}
-                                              className="overflow-hidden rounded-xl border border-border bg-surface"
-                                            >
-                                              <img
-                                                src={resolveImageUrl(img.url)}
-                                                alt={img.alt ?? img.caseStudy.title}
-                                                className="aspect-video w-full object-cover"
-                                              />
-                                              <div className="space-y-1 p-2">
-                                                <p className="truncate text-xs font-medium text-foreground">
-                                                  {img.caseStudy.title}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1">
-                                                  {img.tags.map(({ tag }) => (
-                                                    <span
-                                                      key={tag.id}
-                                                      className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
-                                                    >
-                                                      #{tag.name}
-                                                    </span>
-                                                  ))}
-                                                </div>
+                                    </div>
+                                  )}
+                                  {rel.images.length > 0 && (
+                                    <div>
+                                      <h4 className="mb-3 text-sm font-bold text-foreground">Imagens relacionadas</h4>
+                                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+                                        {rel.images.map((img) => (
+                                          <div
+                                            key={img.id}
+                                            className="overflow-hidden rounded-xl border border-border bg-surface"
+                                          >
+                                            <img
+                                              src={img.url}
+                                              alt={img.alt ?? img.caseStudy.title}
+                                              className="aspect-video w-full object-cover"
+                                            />
+                                            <div className="space-y-1 p-2">
+                                              <p className="truncate text-xs font-medium text-foreground">
+                                                {img.caseStudy.title}
+                                              </p>
+                                              <div className="flex flex-wrap gap-1">
+                                                {img.tags.map(({ tag }) => (
+                                                  <span
+                                                    key={tag.id}
+                                                    className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium text-accent-700"
+                                                  >
+                                                    #{tag.name}
+                                                  </span>
+                                                ))}
                                               </div>
                                             </div>
-                                          ))}
-                                        </div>
+                                          </div>
+                                        ))}
                                       </div>
-                                    )}
-                                  </div>
-                                );
-                              })()
-                            )}
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

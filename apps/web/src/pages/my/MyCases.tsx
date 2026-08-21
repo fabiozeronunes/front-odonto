@@ -8,7 +8,6 @@ import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
-import { Card, CardContent } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
 import { YouTubeImport } from "../../components/YouTubeImport";
 import { AudioRecorder } from "../../components/AudioRecorder";
@@ -373,16 +372,16 @@ export function MyCases() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground">Meus estudos de caso</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-display text-xl font-bold text-foreground">Meus estudos de caso</h2>
         <Button onClick={startCreate}>
           <Plus className="h-4 w-4" /> Novo caso
         </Button>
       </div>
 
       {editing && (
-        <Card className="mt-5 border-primary-200">
-          <CardContent className="space-y-4 pt-6">
+        <div className="mb-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
+          <div className="space-y-4">
             {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -675,63 +674,61 @@ export function MyCases() {
                 {saving ? "Salvando..." : "Salvar"}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      <Card className="mt-5">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-3">Título</th>
-                  <th className="px-5 py-3">Especialidade</th>
-                  <th className="px-5 py-3">Acesso</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
-                ) : cases.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum estudo de caso cadastrado ainda.</td></tr>
-                ) : (
-                  cases.map((c) => (
-                    <tr key={c.id} className="hover:bg-muted">
-                      <td className="max-w-[280px] px-5 py-3">
-                        <p className="truncate font-medium text-foreground">{c.title}</p>
-                        <p className="text-xs text-muted-foreground">{c.author ?? "—"} {c.observations ? "• com observações" : ""}</p>
-                      </td>
-                      <td className="px-5 py-3 text-muted-foreground">{c.specialty?.name ?? "—"}</td>
-                      <td className="px-5 py-3">
-                        <Badge variant={c.isFree ? "free" : "premium"}>{c.isFree ? "FREE" : "Pago"}</Badge>
-                      </td>
-                      <td className="px-5 py-3">
-                        <Badge variant={c.status === "PUBLISHED" ? "default" : "outline"}>{c.status}</Badge>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => togglePublish(c)} title={c.status === "PUBLISHED" ? "Despublicar" : "Publicar"}>
-                            {c.status === "PUBLISHED" ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => startEdit(c)} title="Editar">
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(c.id)} className="text-red-600" title="Excluir">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-border bg-surface shadow-card">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border bg-muted text-left text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-5 py-3">Título</th>
+                <th className="px-5 py-3">Especialidade</th>
+                <th className="px-5 py-3">Acesso</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {loading ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Carregando...</td></tr>
+              ) : cases.length === 0 ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">Nenhum estudo de caso cadastrado ainda.</td></tr>
+              ) : (
+                cases.map((c) => (
+                  <tr key={c.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="max-w-[280px] px-5 py-3">
+                      <p className="truncate font-medium text-foreground">{c.title}</p>
+                      <p className="text-xs text-muted-foreground">{c.author ?? "—"} {c.observations ? "• com observações" : ""}</p>
+                    </td>
+                    <td className="px-5 py-3 text-muted-foreground">{c.specialty?.name ?? "—"}</td>
+                    <td className="px-5 py-3">
+                      <Badge variant={c.isFree ? "free" : "premium"}>{c.isFree ? "FREE" : "Pago"}</Badge>
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge variant={c.status === "PUBLISHED" ? "default" : "outline"}>{c.status}</Badge>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => togglePublish(c)} title={c.status === "PUBLISHED" ? "Despublicar" : "Publicar"}>
+                          {c.status === "PUBLISHED" ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(c)} title="Editar">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => remove(c.id)} className="text-red-600" title="Excluir">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
