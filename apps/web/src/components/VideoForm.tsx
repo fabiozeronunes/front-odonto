@@ -475,92 +475,100 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
         <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
           <h3 className="mb-4 text-lg font-bold text-foreground">Tags de cada imagem</h3>
           <p className="mb-4 text-xs text-muted-foreground">
-            Tags específicas para cada imagem, independentes das tags do vídeo.
+            Tags específicas para cada imagem, independentes das tags do vídeo. Clique no nome para editar, ou nos botões para gerenciar.
           </p>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {editing.images.map((img, index) => {
               const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
               return (
                 <div
                   key={img.id}
-                  className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
+                  className="rounded-xl border border-border p-4"
                 >
-                  <div className="flex shrink-0 flex-col items-center gap-1.5">
-                    <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
-                      <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                  <div className="flex items-start gap-4">
+                    <div className="flex shrink-0 flex-col items-center gap-1.5">
+                      <div className="h-16 w-16 overflow-hidden rounded-lg border border-border">
+                        <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                      </div>
+                      <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
+                        {index + 1}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                      Imagem {index + 1}
-                    </span>
-                  </div>
-                    <div className="flex-1">
-                    <p className="mb-2 text-sm font-semibold text-foreground">
-                      Tags da imagem {index + 1}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {imageTags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
-                        >
-                          {editingTagId === tag.id ? (
-                            <input
-                              type="text"
-                              value={editingTagName}
-                              onChange={(e) => setEditingTagName(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") saveRenameTag(tag.id);
-                                if (e.key === "Escape") cancelRenameTag();
-                              }}
-                              onBlur={() => saveRenameTag(tag.id)}
-                              className="w-20 bg-white/20 text-white placeholder-white/50 rounded px-1 outline-none"
-                              autoFocus
-                            />
-                          ) : (
-                            <span onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)} className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}>
-                              #{tag.name}
-                            </span>
-                          )}
-                          {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
-                            <button
-                              type="button"
-                              onClick={() => startRenameTag(tag)}
-                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
-                              title="Editar nome da tag"
-                              aria-label={`Editar tag ${tag.name}`}
+                    <div className="flex-1 min-w-0">
+                      <p className="mb-2 text-sm font-semibold text-foreground">
+                        Imagem {index + 1}
+                      </p>
+                      {imageTags.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {imageTags.map((tag) => (
+                            <div
+                              key={tag.id}
+                              className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1.5 text-xs font-medium text-white"
                             >
-                              <Pencil className="h-2.5 w-2.5" />
-                            </button>
-                          )}
-                          {canRemoveTagFromVideo(tag) && (
-                            <button
-                              type="button"
-                              onClick={() => removeImageTag(tag.id, img.id)}
-                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                              title="Remover tag da imagem"
-                              aria-label={`Remover tag ${tag.name} da imagem`}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          )}
-                          {canEditOrDeleteTag(tag) && (
-                            <button
-                              type="button"
-                              onClick={() => setDeleteConfirmTagId(tag.id)}
-                              className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500/50 text-white transition-colors hover:bg-red-500"
-                              title="Excluir tag permanentemente"
-                              aria-label={`Excluir tag ${tag.name}`}
-                            >
-                              <Trash2 className="h-2.5 w-2.5" />
-                            </button>
-                          )}
-                        </span>
-                      ))}
-                      {imageTags.length === 0 && (
-                        <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
+                              {editingTagId === tag.id ? (
+                                <input
+                                  type="text"
+                                  value={editingTagName}
+                                  onChange={(e) => setEditingTagName(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") saveRenameTag(tag.id);
+                                    if (e.key === "Escape") cancelRenameTag();
+                                  }}
+                                  onBlur={() => saveRenameTag(tag.id)}
+                                  className="w-24 bg-white/20 text-white placeholder-white/50 rounded px-1.5 py-0.5 outline-none text-xs"
+                                  autoFocus
+                                />
+                              ) : (
+                                <span
+                                  onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)}
+                                  className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}
+                                  title={canEditOrDeleteTag(tag) ? "Clique para editar" : tag.name}
+                                >
+                                  #{tag.name}
+                                </span>
+                              )}
+                              <div className="flex items-center gap-0.5 ml-1">
+                                {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => startRenameTag(tag)}
+                                    className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
+                                    title="Editar nome da tag"
+                                  >
+                                    <Pencil className="h-3 w-3" />
+                                  </button>
+                                )}
+                                {canRemoveTagFromVideo(tag) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImageTag(tag.id, img.id)}
+                                    className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                                    title="Remover tag desta imagem"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                )}
+                                {canEditOrDeleteTag(tag) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteConfirmTagId(tag.id)}
+                                    className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500/60 text-white transition-colors hover:bg-red-500"
+                                    title="Excluir tag permanentemente"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground mb-2">Nenhuma tag nesta imagem.</p>
                       )}
+                      <div className="mt-2">
+                        <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
+                      </div>
                     </div>
-                    <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
                   </div>
                 </div>
               );
