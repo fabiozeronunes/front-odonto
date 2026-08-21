@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BookOpen, Film, Layers, Lock } from "lucide-react";
 import { MyVideos } from "./MyVideos";
 import { MyCases } from "./MyCases";
@@ -18,7 +17,12 @@ const tabs: { id: Tab; label: string; icon: typeof Film }[] = [
 
 export function MyContent() {
   const { user } = useAuth();
-  const [tab, setTab] = useState<Tab>("videos");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = (searchParams.get("tab") as Tab) || "videos";
+
+  function setTab(t: Tab) {
+    setSearchParams({ tab: t });
+  }
 
   const hasAccess =
     user?.role === "ADMIN" || (user?.plan?.slug !== undefined && user?.plan?.slug !== "gratuito");
