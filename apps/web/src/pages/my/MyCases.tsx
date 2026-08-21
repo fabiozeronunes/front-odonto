@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music, FileText, Image as ImageIcon, Tag, Settings } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music, FileText, Image as ImageIcon, Settings } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import type { CaseStudy, Paginated, Specialty, Tag as TagType, Video } from "../../types";

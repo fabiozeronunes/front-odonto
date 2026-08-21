@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, X, Plus, Video as VideoIcon, Clock, Flame, Filter } from "lucide-react";
+import { Search, SlidersHorizontal, X, Plus, Video as VideoIcon, Clock, Flame } from "lucide-react";
 import { api } from "../../lib/api";
-import type { Paginated, Specialty, Tag, Video } from "../../types";
+import type { Paginated, Specialty, Video } from "../../types";
 import { VideoCard } from "../../components/VideoCard";
 import { VideoForm, emptyVideoForm, type VideoFormState } from "../../components/VideoForm";
 import { Button } from "../../components/ui/button";
