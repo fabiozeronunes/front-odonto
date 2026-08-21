@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { optionalAuthenticate } from "../../middlewares/optionalAuthenticate.js";
 import { requirePaidPlan } from "../../middlewares/requirePaidPlan.js";
 import { validate } from "../../middlewares/validate.js";
 import * as ctrl from "./caseStudies.controller.js";
@@ -10,9 +11,9 @@ import {
 
 export const caseStudiesRouter = Router();
 
-caseStudiesRouter.get("/", ctrl.list);
+caseStudiesRouter.get("/", optionalAuthenticate, ctrl.list);
 caseStudiesRouter.get("/me", authenticate, ctrl.myCaseStudies);
-caseStudiesRouter.get("/:slugOrId", ctrl.getOne);
+caseStudiesRouter.get("/:slugOrId", optionalAuthenticate, ctrl.getOne);
 
 caseStudiesRouter.use(authenticate);
 

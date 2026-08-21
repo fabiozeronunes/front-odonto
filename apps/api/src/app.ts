@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/errorHandler.js";
@@ -23,6 +24,7 @@ export function createApp() {
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
+  app.use(helmet());
   app.use(
     cors({
       origin: env.nodeEnv === "production" ? env.webUrl : env.webUrl || "http://localhost:5173",

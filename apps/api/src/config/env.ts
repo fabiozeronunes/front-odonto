@@ -50,4 +50,5 @@ export const env = {
   paymentGateway: process.env.PAYMENT_GATEWAY ?? "",
   paymentGatewaySecret: process.env.PAYMENT_GATEWAY_SECRET ?? "",
   paymentGatewayPublicKey: process.env.PAYMENT_GATEWAY_PUBLIC_KEY ?? "",
+  encryptionKey: process.env.ENCRYPTION_KEY ?? "",
 };

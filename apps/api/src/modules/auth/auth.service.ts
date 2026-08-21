@@ -61,16 +61,7 @@ export async function registerUser(input: RegisterInput) {
     throw new ConflictError("E-mail já cadastrado");
   }
 
-  let planId = await getFreePlanId();
-  if (input.planSlug && input.planSlug !== "gratuito") {
-    const plan = await prisma.membershipPlan.findUnique({
-      where: { slug: input.planSlug },
-      select: { id: true, status: true },
-    });
-    if (plan && plan.status === "ACTIVE") {
-      planId = plan.id;
-    }
-  }
+  const planId = await getFreePlanId();
 
   const passwordHash = await bcrypt.hash(input.password, 10);
 

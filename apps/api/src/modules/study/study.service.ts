@@ -22,7 +22,8 @@ function toWatchUrl(url: string | null | undefined): string | null {
 }
 
 function encryptionKey(): Buffer {
-  return crypto.createHash("sha256").update(env.jwtSecret).digest();
+  const key = env.encryptionKey || env.jwtSecret;
+  return crypto.createHash("sha256").update(key).digest();
 }
 
 export function encryptApiKey(key: string): string {

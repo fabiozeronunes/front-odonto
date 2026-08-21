@@ -6,7 +6,6 @@ export const registerSchema = z.object({
   phone: z.string().max(20).optional().nullable(),
   password: z.string().min(8, "Senha deve ter ao menos 8 caracteres").max(72),
   ref: z.string().max(60).optional().nullable(),
-  planSlug: z.string().max(60).optional().nullable(),
 });
 
 export const loginSchema = z.object({

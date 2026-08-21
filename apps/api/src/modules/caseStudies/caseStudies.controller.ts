@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AuthenticatedRequest } from "../../types/auth.js";
+import { ForbiddenError } from "../../utils/errors.js";
 import * as service from "./caseStudies.service.js";
 import type {
   CreateCaseStudyInput,
@@ -8,8 +9,15 @@ import type {
 } from "./caseStudies.validators.js";
 
 export const list = asyncHandler(async (req: Request, res: Response) => {
+  const wantsAll = req.query.all === "true";
+  if (wantsAll && !(req as AuthenticatedRequest).user) {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
+  if (wantsAll && (req as AuthenticatedRequest).user?.role !== "ADMIN") {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
   const result = await service.listCaseStudies(req.query, {
-    admin: req.query.all === "true",
+    admin: wantsAll,
   });
   res.json(result);
 });
@@ -20,8 +28,15 @@ export const myCaseStudies = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const getOne = asyncHandler(async (req: Request, res: Response) => {
+  const wantsAll = req.query.all === "true";
+  if (wantsAll && !(req as AuthenticatedRequest).user) {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
+  if (wantsAll && (req as AuthenticatedRequest).user?.role !== "ADMIN") {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
   const result = await service.getCaseStudy(req.params.slugOrId, {
-    admin: req.query.all === "true",
+    admin: wantsAll,
   });
   res.json(result);
 });

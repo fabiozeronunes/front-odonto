@@ -325,34 +325,47 @@ export async function confirmUserPayment(id: string) {
   });
   if (!user) throw new NotFoundError("Usuário não encontrado");
 
-  const subscription = await prisma.subscription.findFirst({
-    where: { userId: id, status: "PENDING" },
-    orderBy: { createdAt: "desc" },
-    include: { plan: true },
+  const result = await prisma.$transaction(async (tx) => {
+    // Lock the order row by updating it atomically
+    const order = await tx.order.findFirst({
+      where: { userId: id, status: "PENDING" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (!order) {
+      throw new ConflictError("Nenhum pedido pendente para confirmar");
+    }
+
+    // Immediately mark as PAID to prevent concurrent processing
+    const updatedOrder = await tx.order.updateMany({
+      where: { id: order.id, status: "PENDING" },
+      data: { status: "PAID" },
+    });
+    if (updatedOrder.count === 0) {
+      throw new ConflictError("Pedido já foi processado");
+    }
+
+    const subscription = await tx.subscription.findFirst({
+      where: { userId: id, status: "PENDING" },
+      orderBy: { createdAt: "desc" },
+      include: { plan: true },
+    });
+    if (!subscription) {
+      throw new ConflictError("Nenhuma assinatura pendente para confirmar");
+    }
+
+    // Lock subscription
+    const updatedSub = await tx.subscription.updateMany({
+      where: { id: subscription.id, status: "PENDING" },
+      data: { status: "ACTIVE", startsAt: new Date(), endsAt: addBillingPeriod(subscription.plan.billing, new Date()) },
+    });
+    if (updatedSub.count === 0) {
+      throw new ConflictError("Assinatura já foi processada");
+    }
+
+    await tx.user.update({ where: { id }, data: { planId: subscription.planId } });
+
+    return { order, subscription };
   });
-  if (!subscription) {
-    throw new ConflictError("Nenhuma assinatura pendente para confirmar");
-  }
-
-  const order = await prisma.order.findFirst({
-    where: { userId: id, status: "PENDING" },
-    orderBy: { createdAt: "desc" },
-  });
-  if (!order) {
-    throw new ConflictError("Nenhum pedido pendente para confirmar");
-  }
-
-  const startsAt = new Date();
-  const endsAt = addBillingPeriod(subscription.plan.billing, startsAt);
-
-  await prisma.$transaction([
-    prisma.order.update({ where: { id: order.id }, data: { status: "PAID" } }),
-    prisma.subscription.update({
-      where: { id: subscription.id },
-      data: { status: "ACTIVE", startsAt, endsAt },
-    }),
-    prisma.user.update({ where: { id }, data: { planId: subscription.planId } }),
-  ]);
 
   const referred = await prisma.user.findUnique({
     where: { id },
@@ -373,7 +386,7 @@ export async function confirmUserPayment(id: string) {
         },
       });
       if (!existing) {
-        const amount = Math.round(Number(order.total) * Number(affiliate.commissionRate)) / 100;
+        const amount = Math.round(Number(result.order.total) * Number(affiliate.commissionRate)) / 100;
         await prisma.affiliateCommission.create({
           data: {
             affiliateId: affiliate.id,
@@ -381,7 +394,7 @@ export async function confirmUserPayment(id: string) {
             amount,
             percent: Number(affiliate.commissionRate),
             source: "PLAN",
-            planName: subscription.plan.name,
+            planName: result.subscription.plan.name,
           },
         });
       }
@@ -391,10 +404,10 @@ export async function confirmUserPayment(id: string) {
   return {
     ok: true,
     userId: id,
-    planId: subscription.planId,
-    planName: subscription.plan.name,
-    startsAt: startsAt.toISOString(),
-    endsAt: endsAt.toISOString(),
+    planId: result.subscription.planId,
+    planName: result.subscription.plan.name,
+    startsAt: new Date().toISOString(),
+    endsAt: addBillingPeriod(result.subscription.plan.billing, new Date()).toISOString(),
   };
 }
 

@@ -1,12 +1,20 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AuthenticatedRequest } from "../../types/auth.js";
+import { ForbiddenError } from "../../utils/errors.js";
 import * as service from "./videos.service.js";
 import type { CreateVideoInput, UpdateVideoInput, VideoQueryInput } from "./videos.validators.js";
 
 export const list = asyncHandler(async (req: Request, res: Response) => {
+  const wantsAll = req.query.all === "true";
+  if (wantsAll && !(req as AuthenticatedRequest).user) {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
+  if (wantsAll && (req as AuthenticatedRequest).user?.role !== "ADMIN") {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
   const result = await service.listVideos(req.query as VideoQueryInput, {
-    admin: req.query.all === "true",
+    admin: wantsAll,
   });
   res.json(result);
 });
@@ -17,8 +25,15 @@ export const myVideos = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getOne = asyncHandler(async (req: Request, res: Response) => {
+  const wantsAll = req.query.all === "true";
+  if (wantsAll && !(req as AuthenticatedRequest).user) {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
+  if (wantsAll && (req as AuthenticatedRequest).user?.role !== "ADMIN") {
+    throw new ForbiddenError("Acesso restrito a administradores");
+  }
   const result = await service.getVideo(req.params.slugOrId, {
-    admin: req.query.all === "true",
+    admin: wantsAll,
   });
   res.json(result);
 });
