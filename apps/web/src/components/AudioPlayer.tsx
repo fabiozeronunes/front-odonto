@@ -89,7 +89,7 @@ export function AudioPlayer({ src, label }: AudioPlayerProps) {
         >
           <Square className="h-4 w-4" />
         </Button>
-        <span className="min-w-[36px] text-xs text-muted-foreground tabular-nums">
+        <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
           {fmt(currentTime)}
         </span>
         <input
@@ -99,9 +99,9 @@ export function AudioPlayer({ src, label }: AudioPlayerProps) {
           step={0.1}
           value={currentTime}
           onChange={seek}
-          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-muted accent-primary-600"
+          className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-muted accent-primary-600"
         />
-        <span className="min-w-[36px] text-right text-xs text-muted-foreground tabular-nums">
+        <span className="shrink-0 text-right text-xs text-muted-foreground tabular-nums">
           {fmt(duration)}
         </span>
       </div>
