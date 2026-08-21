@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AuthenticatedRequest } from "../../types/auth.js";
-import { createCheckout, confirmCheckout, getMyFinance } from "./checkout.service.js";
+import { createCheckout, confirmCheckout, getMyFinance, handleWebhook } from "./checkout.service.js";
 import type { CreateCheckoutInput } from "./checkout.validators.js";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
@@ -18,6 +18,11 @@ export const confirm = asyncHandler(async (req: Request, res: Response) => {
     req.params.orderId
   );
   res.json({ data: result });
+});
+
+export const webhook = asyncHandler(async (req: Request, res: Response) => {
+  const result = await handleWebhook(req);
+  res.json(result);
 });
 
 export const myFinance = asyncHandler(async (req: Request, res: Response) => {

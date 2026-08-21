@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../config/env.js";
 import { ConflictError, NotFoundError } from "../../utils/errors.js";
@@ -163,4 +164,26 @@ export async function getMyFinance(userId: string) {
   ]);
 
   return { subscriptions, orders };
+}
+
+export async function handleWebhook(req: Request) {
+  // TODO: Implement payment gateway webhook verification
+  // When integrating with Stripe/Asaas/etc:
+  // 1. Verify the webhook signature using the gateway secret
+  // 2. Parse the event payload
+  // 3. If payment confirmed, call confirmCheckout(userId, orderId)
+  // 4. Return 200 to acknowledge receipt
+
+  const gateway = env.paymentGateway;
+  if (!gateway) {
+    console.warn("[WEBHOOK] No payment gateway configured. Webhook ignored.");
+    return { ok: false, message: "Payment gateway not configured" };
+  }
+
+  // Placeholder — implement per gateway:
+  // - Stripe: verify stripe.webhooks.constructEvent(rawBody, sig, secret)
+  // - Asaas: verify x-asaas-signature header
+
+  console.log("[WEBHOOK] Received webhook from:", gateway);
+  return { ok: true, message: "Webhook received (not yet implemented)" };
 }
