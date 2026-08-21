@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
 import type { Paginated, Specialty, Tag, Video } from "../../types";
@@ -23,6 +23,7 @@ interface RelatedData {
 
 export function MyVideos() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,8 @@ export function MyVideos() {
   const [expandedVideo, setExpandedVideo] = useState<string | null>(null);
   const [relatedMap, setRelatedMap] = useState<Record<string, RelatedData>>({});
   const [loadingRelated, setLoadingRelated] = useState<string | null>(null);
+
+  const editingId = searchParams.get("edit");
 
   async function load() {
     setLoading(true);
@@ -40,6 +43,13 @@ export function MyVideos() {
       ]);
       setVideos(v.data);
       setSpecialties(s.data);
+
+      if (editingId) {
+        const found = v.data.find((vid) => vid.id === editingId);
+        if (found) {
+          startEdit(found);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -49,12 +59,21 @@ export function MyVideos() {
     load();
   }, []);
 
+  function setEditingAndUrl(state: VideoFormState | null) {
+    setEditing(state);
+    if (state?.id) {
+      setSearchParams({ edit: state.id }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }
+
   function startCreate() {
-    setEditing({ ...emptyVideoForm, status: "DRAFT" });
+    setEditingAndUrl({ ...emptyVideoForm, status: "DRAFT" });
   }
 
   function startEdit(video: Video) {
-    setEditing({
+    setEditingAndUrl({
       id: video.id,
       title: video.title,
       description: video.description ?? "",
@@ -68,7 +87,7 @@ export function MyVideos() {
       author: video.author ?? "",
       institution: video.institution ?? "",
       observations: video.observations ?? "",
-      audios: video.audios?.map((a) => ({ id: a.id, url: a.url, title: a.title ?? "" })) ?? [],
+      audios: video.audios?.map((a) => ({ id: a.id, url: a.url, title: a.title ?? "", createdAt: a.createdAt })) ?? [],
       tagIds: video.tags.map((t) => t.tag.id),
       images: video.images?.slice(0, 5).map((i) => ({
         id: i.id,
@@ -125,10 +144,10 @@ export function MyVideos() {
               initial={editing}
               specialties={specialties}
               onDone={() => {
-                setEditing(null);
+                setEditingAndUrl(null);
                 load();
               }}
-              onCancel={() => setEditing(null)}
+              onCancel={() => setEditingAndUrl(null)}
             />
           </CardContent>
         </Card>

@@ -25,6 +25,7 @@ interface AudioDraft {
   id: string;
   url: string;
   title: string;
+  createdAt?: string;
 }
 
 export interface VideoFormState {
@@ -291,46 +292,6 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           </h3>
         </div>
         <div className="space-y-4">
-          {editing.audios.length > 0 && (
-            <div>
-              <p className="mb-3 text-sm font-medium text-foreground">Áudios salvos</p>
-              <div className="space-y-4">
-                {editing.audios.map((audio, index) => (
-                  <div
-                    key={audio.id}
-                    className="rounded-xl border border-border p-4 space-y-3"
-                  >
-                    <AudioPlayer src={resolveImageUrl(audio.url) || ""} />
-                    <div className="flex items-end gap-2">
-                      <div className="flex-1 space-y-1">
-                        <Label>Título do áudio</Label>
-                        <Input
-                          value={audio.title}
-                          onChange={handleAudioTitleChange(index)}
-                          placeholder="Ex.: Explicação do vídeo"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setEditing((prev) => ({
-                            ...prev,
-                            audios: prev.audios.filter((_, i) => i !== index),
-                          }))
-                        }
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
-                        title="Remover áudio"
-                        aria-label="Remover áudio"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="rounded-xl border border-border bg-muted/50 p-4">
             <AudioRecorder
               value=""
@@ -338,13 +299,55 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                 if (audioUrl) {
                   setEditing((prev) => ({
                     ...prev,
-                    audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "" }],
+                    audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "", createdAt: new Date().toISOString() }],
                   }));
                 }
               }}
               label="Adicionar novo áudio (gravar ou importar)"
             />
           </div>
+
+          {editing.audios.length > 0 && (
+            <div className="space-y-4">
+              {editing.audios.map((audio, index) => (
+                <div
+                  key={audio.id}
+                  className="rounded-xl border border-border p-4 space-y-3"
+                >
+                  <AudioPlayer src={resolveImageUrl(audio.url) || ""} />
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1 space-y-1">
+                      <Label>Título do áudio</Label>
+                      <Input
+                        value={audio.title}
+                        onChange={handleAudioTitleChange(index)}
+                        placeholder="Ex.: Explicação do vídeo"
+                      />
+                      {audio.createdAt && (
+                        <p className="text-xs text-muted-foreground">
+                          Criado em {new Date(audio.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditing((prev) => ({
+                          ...prev,
+                          audios: prev.audios.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
+                      title="Remover áudio"
+                      aria-label="Remover áudio"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
