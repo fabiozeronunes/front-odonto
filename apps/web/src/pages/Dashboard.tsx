@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
@@ -134,10 +134,15 @@ export function Dashboard() {
       )}
 
       <section className="mt-10">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
-            <History className="h-5 w-5 text-primary-700" /> Continuar assistindo
-          </h2>
+        <div className="mb-6 rounded-2xl border border-border bg-surface p-4 shadow-card">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+              Continue de onde parou:
+            </span>
+            <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
+              <History className="h-5 w-5 text-primary-700" /> Continuar assistindo
+            </h2>
+          </div>
         </div>        {loading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -145,9 +150,13 @@ export function Dashboard() {
             ))}
           </div>
         ) : recent.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center">
-            <p className="text-muted-foreground">Você ainda não assistiu a nenhum vídeo.</p>
-            <Link to="/catalogo" className="mt-4 inline-block">
+          <div className="flex flex-col items-center py-12 text-center">
+            <VideoIcon className="h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhum vídeo assistido</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Você ainda não assistiu a nenhum vídeo.
+            </p>
+            <Link to="/catalogo" className="mt-4">
               <Button>Começar a estudar</Button>
             </Link>
           </div>
@@ -163,7 +172,7 @@ export function Dashboard() {
       <section className="mt-10">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
-            <ShoppingBag className="h-5 w-5 text-primary-700" /> Ofertas e descontos em produtos
+            <ShoppingBag className="h-5 w-5 text-primary-700" /> Shop Odontus
           </h2>
           <Link to="/loja">
             <Button variant="outline" size="sm">
@@ -175,22 +184,31 @@ export function Dashboard() {
           Descontos exclusivos em kits, uniformes e materiais odontológicos para assinantes.
         </p>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Produtos por linha:</span>
-          <div className="inline-flex overflow-hidden rounded-lg border border-border">
-            {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => changeRows(value)}
-                className={cn(
-                  "px-4 py-1.5 font-semibold transition-colors",
-                  activeRows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
-                )}
-              >
-                {value} produto{value === "2" || value === "3" ? "s" : ""}
-              </button>
-            ))}
+        <div className="mb-6 rounded-2xl border border-border bg-surface p-4 shadow-card">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+              Produtos por linha:
+            </span>
+            <div className="inline-flex overflow-hidden rounded-lg border border-border">
+              {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => changeRows(value)}
+                  className={cn(
+                    "px-4 py-1.5 text-[9px] font-medium uppercase tracking-wide transition-colors",
+                    activeRows === value
+                      ? "bg-primary-700 text-primary-foreground"
+                      : "bg-surface text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  {value} produto{value === "2" || value === "3" ? "s" : ""}
+                </button>
+              ))}
+            </div>
+            <span className="ml-1 text-xs text-muted-foreground">
+              {activeRows === "1" ? "1 por linha no celular · 2 no tablet" : activeRows === "2" ? "2 por linha no celular · 2 no tablet" : "2 por linha no celular · 3 no tablet"}
+            </span>
           </div>
         </div>
 
@@ -201,9 +219,12 @@ export function Dashboard() {
             ))}
           </div>
         ) : saleProducts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-            <Package className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-2 text-muted-foreground">Novas ofertas em breve.</p>
+          <div className="flex flex-col items-center py-10 text-center">
+            <Package className="h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhuma oferta disponível</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Novas ofertas em breve. Fique de olho!
+            </p>
           </div>
         ) : (
           <div
