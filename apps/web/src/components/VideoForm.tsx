@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { X, Music } from "lucide-react";
+import { X, Music, Trash2 } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Specialty, Tag } from "../types";
@@ -318,9 +318,11 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                             audios: prev.audios.filter((_, i) => i !== index),
                           }))
                         }
-                        className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700 shrink-0"
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
+                        title="Remover áudio"
+                        aria-label="Remover áudio"
                       >
-                        <X className="h-4 w-4" /> Remover
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
