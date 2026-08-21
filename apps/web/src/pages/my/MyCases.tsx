@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle } from "lucide-react";
 import { api } from "../../lib/api";
+import { useAuth } from "../../lib/auth";
 import type { CaseStudy, Paginated, Specialty, Tag, Video } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -60,6 +61,7 @@ const emptyForm: CaseFormState = {
 };
 
 export function MyCases() {
+  const { user } = useAuth();
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -68,6 +70,9 @@ export function MyCases() {
   const [editing, setEditing] = useState<CaseFormState | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [editingTagName, setEditingTagName] = useState("");
+  const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -192,6 +197,64 @@ export function MyCases() {
         ? editing.tagIds.filter((t) => t !== id)
         : [...editing.tagIds, id],
     });
+  }
+
+  function canEditOrDeleteTag(tag: Tag): boolean {
+    return user?.role === "ADMIN" || (tag.createdById != null && tag.createdById === user?.id);
+  }
+
+  function startRenameTag(tag: Tag) {
+    setEditingTagId(tag.id);
+    setEditingTagName(tag.name);
+  }
+
+  function cancelRenameTag() {
+    setEditingTagId(null);
+    setEditingTagName("");
+  }
+
+  async function saveRenameTag(tagId: string) {
+    if (!editingTagName.trim()) return;
+    try {
+      await api(`/api/tags/${tagId}`, {
+        method: "PUT",
+        body: JSON.stringify({ name: editingTagName.trim() }),
+      });
+      setTags((prev) =>
+        prev.map((t) => (t.id === tagId ? { ...t, name: editingTagName.trim() } : t))
+      );
+      setEditingTagId(null);
+      setEditingTagName("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao renomear tag");
+    }
+  }
+
+  function countImagesWithTag(tagId: string): number {
+    if (!editing) return 0;
+    return editing.images.filter((img) => img.tagIds.includes(tagId)).length;
+  }
+
+  async function deleteTagGlobally(tagId: string) {
+    try {
+      await api(`/api/tags/${tagId}`, { method: "DELETE" });
+      setTags((prev) => prev.filter((t) => t.id !== tagId));
+      setEditing((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          tagIds: prev.tagIds.filter((t) => t !== tagId),
+          audioTagIds: prev.audioTagIds.filter((t) => t !== tagId),
+          images: prev.images.map((img) => ({
+            ...img,
+            tagIds: img.tagIds.filter((t) => t !== tagId),
+          })),
+        };
+      });
+      setDeleteConfirmTagId(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao excluir tag");
+    }
   }
 
   function toggleVideo(id: string) {
@@ -596,16 +659,46 @@ export function MyCases() {
                             key={tag.id}
                             className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
                           >
-                            #{tag.name}
-                            <button
-                              type="button"
-                              onClick={() => deleteTag(tag.id)}
-                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                              title="Excluir tag"
-                              aria-label={`Excluir tag ${tag.name}`}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
+                            {editingTagId === tag.id ? (
+                              <input
+                                type="text"
+                                value={editingTagName}
+                                onChange={(e) => setEditingTagName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") saveRenameTag(tag.id);
+                                  if (e.key === "Escape") cancelRenameTag();
+                                }}
+                                onBlur={() => saveRenameTag(tag.id)}
+                                className="w-20 bg-white/20 text-white placeholder-white/50 rounded px-1 outline-none"
+                                autoFocus
+                              />
+                            ) : (
+                              <span onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)} className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}>
+                                #{tag.name}
+                              </span>
+                            )}
+                            {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
+                              <button
+                                type="button"
+                                onClick={() => startRenameTag(tag)}
+                                className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
+                                title="Editar nome da tag"
+                                aria-label={`Editar tag ${tag.name}`}
+                              >
+                                <Pencil className="h-2.5 w-2.5" />
+                              </button>
+                            )}
+                            {canEditOrDeleteTag(tag) && (
+                              <button
+                                type="button"
+                                onClick={() => setDeleteConfirmTagId(tag.id)}
+                                className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500/50 text-white transition-colors hover:bg-red-500"
+                                title="Excluir tag permanentemente"
+                                aria-label={`Excluir tag ${tag.name}`}
+                              >
+                                <Trash2 className="h-2.5 w-2.5" />
+                              </button>
+                            )}
                           </span>
                         ))}
                         {imageTags.length === 0 && (
@@ -733,6 +826,44 @@ export function MyCases() {
           </table>
         </div>
       </div>
+
+      {deleteConfirmTagId && (() => {
+        const tag = tags.find((t) => t.id === deleteConfirmTagId);
+        if (!tag) return null;
+        const imageCount = countImagesWithTag(tag.id);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="mx-4 w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Excluir tag</h3>
+                  <p className="text-sm text-muted-foreground">Esta ação é irreversível</p>
+                </div>
+              </div>
+              <p className="text-sm text-foreground mb-2">
+                Tem certeza que deseja excluir a tag <strong>#{tag.name}</strong>?
+              </p>
+              {imageCount > 0 && (
+                <p className="text-sm text-amber-700 bg-amber-50 rounded-lg p-3 mb-4">
+                  Esta tag está em {imageCount} {imageCount === 1 ? "imagem" : "imagens"} nesta lista.
+                  As imagens perderão esta tag ao excluí-la.
+                </p>
+              )}
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="ghost" onClick={() => setDeleteConfirmTagId(null)}>
+                  Cancelar
+                </Button>
+                <Button variant="danger" onClick={() => deleteTagGlobally(tag.id)}>
+                  Excluir tag
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

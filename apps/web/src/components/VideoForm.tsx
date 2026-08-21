@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { X, Music, Trash2, Camera } from "lucide-react";
+import { X, Music, Trash2, Camera, Pencil, AlertTriangle } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Specialty, Tag } from "../types";
@@ -81,6 +81,9 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const importedVideoUrl = useRef<string | null>(null);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [editingTagName, setEditingTagName] = useState("");
+  const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
 
   useEffect(() => {
     setEditing(initial ?? emptyVideoForm);
@@ -244,6 +247,59 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   function canRemoveTagFromVideo(tag: Tag): boolean {
     if (editing.source === "FRONTODONTUS") return false;
     return user?.role === "ADMIN" || (tag.createdById != null && tag.createdById === user?.id);
+  }
+
+  function canEditOrDeleteTag(tag: Tag): boolean {
+    return user?.role === "ADMIN" || (tag.createdById != null && tag.createdById === user?.id);
+  }
+
+  function startRenameTag(tag: Tag) {
+    setEditingTagId(tag.id);
+    setEditingTagName(tag.name);
+  }
+
+  function cancelRenameTag() {
+    setEditingTagId(null);
+    setEditingTagName("");
+  }
+
+  async function saveRenameTag(tagId: string) {
+    if (!editingTagName.trim()) return;
+    try {
+      await api(`/api/tags/${tagId}`, {
+        method: "PUT",
+        body: JSON.stringify({ name: editingTagName.trim() }),
+      });
+      setTags((prev) =>
+        prev.map((t) => (t.id === tagId ? { ...t, name: editingTagName.trim() } : t))
+      );
+      setEditingTagId(null);
+      setEditingTagName("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao renomear tag");
+    }
+  }
+
+  function countImagesWithTag(tagId: string): number {
+    return editing.images.filter((img) => img.tagIds.includes(tagId)).length;
+  }
+
+  async function deleteTagGlobally(tagId: string) {
+    try {
+      await api(`/api/tags/${tagId}`, { method: "DELETE" });
+      setTags((prev) => prev.filter((t) => t.id !== tagId));
+      setEditing((prev) => ({
+        ...prev,
+        images: prev.images.map((img) => ({
+          ...img,
+          tagIds: img.tagIds.filter((t) => t !== tagId),
+        })),
+        tagIds: prev.tagIds.filter((t) => t !== tagId),
+      }));
+      setDeleteConfirmTagId(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao excluir tag");
+    }
   }
 
   return (
@@ -437,7 +493,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                       Imagem {index + 1}
                     </span>
                   </div>
-                  <div className="flex-1">
+                    <div className="flex-1">
                     <p className="mb-2 text-sm font-semibold text-foreground">
                       Tags da imagem {index + 1}
                     </p>
@@ -447,7 +503,35 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                           key={tag.id}
                           className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
                         >
-                          #{tag.name}
+                          {editingTagId === tag.id ? (
+                            <input
+                              type="text"
+                              value={editingTagName}
+                              onChange={(e) => setEditingTagName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveRenameTag(tag.id);
+                                if (e.key === "Escape") cancelRenameTag();
+                              }}
+                              onBlur={() => saveRenameTag(tag.id)}
+                              className="w-20 bg-white/20 text-white placeholder-white/50 rounded px-1 outline-none"
+                              autoFocus
+                            />
+                          ) : (
+                            <span onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)} className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}>
+                              #{tag.name}
+                            </span>
+                          )}
+                          {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
+                            <button
+                              type="button"
+                              onClick={() => startRenameTag(tag)}
+                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
+                              title="Editar nome da tag"
+                              aria-label={`Editar tag ${tag.name}`}
+                            >
+                              <Pencil className="h-2.5 w-2.5" />
+                            </button>
+                          )}
                           {canRemoveTagFromVideo(tag) && (
                             <button
                               type="button"
@@ -457,6 +541,17 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                               aria-label={`Remover tag ${tag.name} da imagem`}
                             >
                               <X className="h-3 w-3" />
+                            </button>
+                          )}
+                          {canEditOrDeleteTag(tag) && (
+                            <button
+                              type="button"
+                              onClick={() => setDeleteConfirmTagId(tag.id)}
+                              className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500/50 text-white transition-colors hover:bg-red-500"
+                              title="Excluir tag permanentemente"
+                              aria-label={`Excluir tag ${tag.name}`}
+                            >
+                              <Trash2 className="h-2.5 w-2.5" />
                             </button>
                           )}
                         </span>
@@ -623,6 +718,44 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           {saving ? "Salvando..." : "Salvar"}
         </Button>
       </div>
+
+      {deleteConfirmTagId && (() => {
+        const tag = tags.find((t) => t.id === deleteConfirmTagId);
+        if (!tag) return null;
+        const imageCount = countImagesWithTag(tag.id);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="mx-4 w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Excluir tag</h3>
+                  <p className="text-sm text-muted-foreground">Esta ação é irreversível</p>
+                </div>
+              </div>
+              <p className="text-sm text-foreground mb-2">
+                Tem certeza que deseja excluir a tag <strong>#{tag.name}</strong>?
+              </p>
+              {imageCount > 0 && (
+                <p className="text-sm text-amber-700 bg-amber-50 rounded-lg p-3 mb-4">
+                  Esta tag está em {imageCount} {imageCount === 1 ? "imagem" : "imagens"} nesta lista.
+                  As imagens perderão esta tag ao excluí-la.
+                </p>
+              )}
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="ghost" onClick={() => setDeleteConfirmTagId(null)}>
+                  Cancelar
+                </Button>
+                <Button variant="danger" onClick={() => deleteTagGlobally(tag.id)}>
+                  Excluir tag
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
