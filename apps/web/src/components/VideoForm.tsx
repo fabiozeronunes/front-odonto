@@ -500,64 +500,64 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                   </div>
 
                   {imageTags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="space-y-2">
                       {imageTags.map((tag) => (
                         <div
                           key={tag.id}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-accent-600 px-3 py-2 text-xs font-medium text-white"
+                          className="flex items-center gap-2"
                         >
-                          {editingTagId === tag.id ? (
-                            <input
-                              type="text"
-                              value={editingTagName}
-                              onChange={(e) => setEditingTagName(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") saveRenameTag(tag.id);
-                                if (e.key === "Escape") cancelRenameTag();
-                              }}
-                              onBlur={() => saveRenameTag(tag.id)}
-                              className="w-28 bg-white/20 text-white placeholder-white/50 rounded px-2 py-1 outline-none text-xs"
-                              autoFocus
-                            />
-                          ) : (
-                            <span
-                              onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)}
-                              className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}
-                              title={canEditOrDeleteTag(tag) ? "Clique para editar" : tag.name}
-                            >
-                              #{tag.name}
-                            </span>
-                          )}
-                          {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
-                            <button
-                              type="button"
-                              onClick={() => startRenameTag(tag)}
-                              className="inline-flex items-center justify-center h-6 w-6 rounded-lg bg-white/20 text-white transition-colors hover:bg-white/40"
-                              title="Editar nome da tag"
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </button>
-                          )}
-                          {canRemoveTagFromVideo(tag) && (
-                            <button
-                              type="button"
-                              onClick={() => removeImageTag(tag.id, img.id)}
-                              className="inline-flex items-center justify-center h-6 w-6 rounded-lg bg-white/25 text-white transition-colors hover:bg-white/40"
-                              title="Remover tag desta imagem"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                          {canEditOrDeleteTag(tag) && (
-                            <button
-                              type="button"
-                              onClick={() => setDeleteConfirmTagId(tag.id)}
-                              className="inline-flex items-center justify-center h-6 w-6 rounded-lg bg-red-500/60 text-white transition-colors hover:bg-red-500"
-                              title="Excluir tag permanentemente"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          )}
+                          <div className="flex-1 min-w-0">
+                            {editingTagId === tag.id ? (
+                              <input
+                                type="text"
+                                value={editingTagName}
+                                onChange={(e) => setEditingTagName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") saveRenameTag(tag.id);
+                                  if (e.key === "Escape") cancelRenameTag();
+                                }}
+                                onBlur={() => saveRenameTag(tag.id)}
+                                className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary-600"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="text-sm font-medium text-foreground">
+                                #{tag.name}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
+                              <button
+                                type="button"
+                                onClick={() => startRenameTag(tag)}
+                                className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                title="Editar nome da tag"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </button>
+                            )}
+                            {canRemoveTagFromVideo(tag) && (
+                              <button
+                                type="button"
+                                onClick={() => removeImageTag(tag.id, img.id)}
+                                className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                title="Remover tag desta imagem"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            )}
+                            {canEditOrDeleteTag(tag) && (
+                              <button
+                                type="button"
+                                onClick={() => setDeleteConfirmTagId(tag.id)}
+                                className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                title="Excluir tag permanentemente"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
