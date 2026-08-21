@@ -53,4 +53,5 @@ export const env = {
   encryptionKey: process.env.ENCRYPTION_KEY ?? "",
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   emailFrom: process.env.EMAIL_FROM ?? "noreply@odonto.study",
+  corsOrigins: process.env.CORS_ORIGINS ?? "",
 };

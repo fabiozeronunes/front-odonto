@@ -4,6 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/errorHandler.js";
+import { requestId, requestTimeout } from "./middlewares/request.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { specialtiesRouter } from "./modules/specialties/specialties.routes.js";
 import { tagsRouter } from "./modules/tags/tags.routes.js";
@@ -19,6 +20,7 @@ import { settingsRouter } from "./modules/settings/settings.routes.js";
 import { productsRouter } from "./modules/products/products.routes.js";
 import { studyRouter } from "./modules/study/study.routes.js";
 import { startCleanupSchedule } from "./modules/youtube/youtube.service.js";
+import { prisma } from "./lib/prisma.js";
 
 export function createApp() {
   const app = express();
@@ -35,10 +37,23 @@ export function createApp() {
     });
   }
 
+  app.use(requestId);
+  app.use(requestTimeout(30000));
   app.use(helmet());
+
+  const allowedOrigins = env.corsOrigins
+    ? env.corsOrigins.split(",").map((s) => s.trim())
+    : [env.webUrl];
+
   app.use(
     cors({
-      origin: env.nodeEnv === "production" ? env.webUrl : env.webUrl || "http://localhost:5173",
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
     })
   );
@@ -58,8 +73,13 @@ export function createApp() {
     })
   );
 
-  app.get("/health", (_req, res) => {
-    res.json({ status: "ok", service: "odontologia-study-api" });
+  app.get("/health", async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ status: "ok", service: "odontologia-study-api", db: "connected" });
+    } catch {
+      res.status(503).json({ status: "error", service: "odontologia-study-api", db: "disconnected" });
+    }
   });
 
   app.post("/admin/migrate", async (_req, res) => {
