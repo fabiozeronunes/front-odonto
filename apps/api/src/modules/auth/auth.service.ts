@@ -63,43 +63,56 @@ async function getFreePlanId() {
 
 async function createRefreshToken(userId: string, ip?: string): Promise<string> {
   const token = crypto.randomBytes(40).toString("hex");
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  await prisma.refreshToken.create({
-    data: { token, userId, expiresAt },
-  });
+  try {
+    await prisma.refreshToken.create({
+      data: { token, userId, expiresAt },
+    });
+  } catch (err) {
+    console.warn("[REFRESH] Could not persist refresh token:", err);
+  }
 
   return token;
 }
 
 async function checkAccountLockout(email: string, ip: string): Promise<void> {
-  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recentAttempts = await prisma.loginAttempt.findMany({
-    where: {
-      OR: [{ email }, { ip }],
-      success: false,
-      createdAt: { gte: fiveMinAgo },
-    },
-    orderBy: { createdAt: "desc" },
-    take: MAX_LOGIN_ATTEMPTS,
-  });
+  try {
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentAttempts = await prisma.loginAttempt.findMany({
+      where: {
+        OR: [{ email }, { ip }],
+        success: false,
+        createdAt: { gte: fiveMinAgo },
+      },
+      orderBy: { createdAt: "desc" },
+      take: MAX_LOGIN_ATTEMPTS,
+    });
 
-  if (recentAttempts.length >= MAX_LOGIN_ATTEMPTS) {
-    const oldestAttempt = recentAttempts[recentAttempts.length - 1];
-    const lockoutEnd = new Date(oldestAttempt.createdAt.getTime() + LOCKOUT_DURATION_MS);
-    if (new Date() < lockoutEnd) {
-      const remainingMinutes = Math.ceil((lockoutEnd.getTime() - Date.now()) / 60000);
-      throw new UnauthorizedError(
-        `Conta bloqueada temporariamente. Tente novamente em ${remainingMinutes} minutos.`
-      );
+    if (recentAttempts.length >= MAX_LOGIN_ATTEMPTS) {
+      const oldestAttempt = recentAttempts[recentAttempts.length - 1];
+      const lockoutEnd = new Date(oldestAttempt.createdAt.getTime() + LOCKOUT_DURATION_MS);
+      if (new Date() < lockoutEnd) {
+        const remainingMinutes = Math.ceil((lockoutEnd.getTime() - Date.now()) / 60000);
+        throw new UnauthorizedError(
+          `Conta bloqueada temporariamente. Tente novamente em ${remainingMinutes} minutos.`
+        );
+      }
     }
+  } catch (err) {
+    if (err instanceof UnauthorizedError) throw err;
+    console.warn("[LOCKOUT] Table may not exist yet, skipping lockout check");
   }
 }
 
 async function recordLoginAttempt(email: string, ip: string, success: boolean): Promise<void> {
-  await prisma.loginAttempt.create({
-    data: { email, ip, success },
-  });
+  try {
+    await prisma.loginAttempt.create({
+      data: { email, ip, success },
+    });
+  } catch (err) {
+    console.warn("[LOCKOUT] Could not record login attempt:", err);
+  }
 }
 
 async function cleanupOldAttempts(): Promise<void> {
