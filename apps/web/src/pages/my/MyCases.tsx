@@ -558,122 +558,126 @@ export function MyCases() {
               }
               label="Galeria de imagens (upload ou link, máx. 5)"
             />
-
             {editing.images.length > 0 && (
-              <div className="space-y-3">
-                <Label>Tags de cada imagem</Label>
-                <p className="text-xs text-muted-foreground">
-                  Tags específicas para cada imagem, independentes das tags do caso. Máximo de 5
-                  imagens.
-                </p>
-                {editing.images.map((img, index) => {
-                  const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
-                  return (
-                    <div
-                      key={img.id}
-                      className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
-                    >
-                      <div className="flex shrink-0 flex-col items-center gap-1.5">
-                        <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
-                          <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
-                        </div>
-                        <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
-                          Imagem {index + 1}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="mb-2 text-sm font-semibold text-foreground">
-                          Tags da imagem {index + 1}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {imageTags.map((tag) => (
-                            <span
-                              key={tag.id}
-                              className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
-                            >
-                              #{tag.name}
-                              <button
-                                type="button"
-                                onClick={() => deleteTag(tag.id)}
-                                className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                                title="Excluir tag"
-                                aria-label={`Excluir tag ${tag.name}`}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </span>
-                          ))}
-                          {imageTags.length === 0 && (
-                            <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
-                          )}
-                        </div>
-                        <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {editing.images.length} {editing.images.length === 1 ? "imagem selecionada" : "imagens selecionadas"} (máx. 5)
+              </p>
             )}
+          </div>
 
-            <div className="flex items-center gap-4">
-              <Label>Tipo de acesso</Label>
-              <Select
-                value={editing.isFree ? "gratuito" : "pago"}
-                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
-              >
-                <option value="gratuito">Gratuito</option>
-                <option value="pago">Pago</option>
-              </Select>
+          {editing.images.length > 0 && (
+            <div className="space-y-3">
+              <Label>Tags de cada imagem</Label>
+              <p className="text-xs text-muted-foreground">
+                Tags específicas para cada imagem, independentes das tags do caso.
+              </p>
+              {editing.images.map((img, index) => {
+                const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
+                return (
+                  <div
+                    key={img.id}
+                    className="flex flex-col gap-3 rounded-xl border border-border p-3 sm:flex-row sm:items-start"
+                  >
+                    <div className="flex shrink-0 flex-col items-center gap-1.5">
+                      <div className="h-20 w-20 overflow-hidden rounded-lg border border-border">
+                        <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
+                      </div>
+                      <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800">
+                        Imagem {index + 1}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="mb-2 text-sm font-semibold text-foreground">
+                        Tags da imagem {index + 1}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {imageTags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
+                          >
+                            #{tag.name}
+                            <button
+                              type="button"
+                              onClick={() => deleteTag(tag.id)}
+                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                              title="Excluir tag"
+                              aria-label={`Excluir tag ${tag.name}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                        {imageTags.length === 0 && (
+                          <p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem ainda.</p>
+                        )}
+                      </div>
+                      <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => {
-                  const selected = editing.tagIds.includes(tag.id);
-                  return (
-                    <span
-                      key={tag.id}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                        selected
-                          ? "bg-primary-700 text-white"
-                          : "bg-muted text-muted-foreground"
-                      }`}
+          <div className="mt-4 flex items-center gap-4">
+            <Label>Tipo de acesso</Label>
+            <Select
+              value={editing.isFree ? "gratuito" : "pago"}
+              onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
+            >
+              <option value="gratuito">Gratuito</option>
+              <option value="pago">Pago</option>
+            </Select>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <Label>Tags</Label>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const selected = editing.tagIds.includes(tag.id);
+                return (
+                  <span
+                    key={tag.id}
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                      selected
+                        ? "bg-primary-700 text-white"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
+                      title={selected ? "Remover tag do caso" : "Adicionar tag ao caso"}
                     >
-                      <button
-                        type="button"
-                        onClick={() => toggleTag(tag.id)}
-                        className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
-                        title={selected ? "Remover tag do caso" : "Adicionar tag ao caso"}
-                      >
-                        #{tag.name}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteTag(tag.id)}
-                        className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
-                          selected
-                            ? "bg-white/25 text-white hover:bg-white/40"
-                            : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
-                        }`}
-                        title="Excluir tag"
-                        aria-label={`Excluir tag ${tag.name}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-              <TagCreator onCreate={createTag} />
+                      #{tag.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteTag(tag.id)}
+                      className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${
+                        selected
+                          ? "bg-white/25 text-white hover:bg-white/40"
+                          : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"
+                      }`}
+                      title="Excluir tag"
+                      aria-label={`Excluir tag ${tag.name}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
             </div>
+            <TagCreator onCreate={createTag} />
+          </div>
 
-            <div className="flex justify-end gap-2 border-t border-border pt-4">
-              <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
-              <Button onClick={save} disabled={saving || !editing.title}>
-                {saving ? "Salvando..." : "Salvar"}
-              </Button>
-            </div>
+          <div className="flex justify-end gap-2 border-t border-border pt-4">
+            <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button onClick={save} disabled={saving || !editing.title}>
+              {saving ? "Salvando..." : "Salvar"}
+            </Button>
           </div>
         </div>
       )}

@@ -408,14 +408,20 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           }
           label="Galeria de imagens (upload ou link, máx. 5)"
         />
-
         {editing.images.length > 0 && (
-          <div className="mt-4 space-y-3">
-            <Label>Tags de cada imagem</Label>
-            <p className="text-xs text-muted-foreground">
-              Tags específicas para cada imagem, independentes das tags do vídeo. Máximo de 5
-              imagens.
-            </p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {editing.images.length} {editing.images.length === 1 ? "imagem selecionada" : "imagens selecionadas"} (máx. 5)
+          </p>
+        )}
+      </div>
+
+      {editing.images.length > 0 && (
+        <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+          <h3 className="mb-4 text-lg font-bold text-foreground">Tags de cada imagem</h3>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Tags específicas para cada imagem, independentes das tags do vídeo.
+          </p>
+          <div className="space-y-3">
             {editing.images.map((img, index) => {
               const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
               return (
@@ -442,17 +448,17 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                           className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white"
                         >
                           #{tag.name}
-{canRemoveTagFromVideo(tag) && (
-                        <button
-                          type="button"
-                          onClick={() => removeImageTag(tag.id, img.id)}
-                          className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
-                          title="Remover tag da imagem"
-                          aria-label={`Remover tag ${tag.name} da imagem`}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
+                          {canRemoveTagFromVideo(tag) && (
+                            <button
+                              type="button"
+                              onClick={() => removeImageTag(tag.id, img.id)}
+                              className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                              title="Remover tag da imagem"
+                              aria-label={`Remover tag ${tag.name} da imagem`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
                         </span>
                       ))}
                       {imageTags.length === 0 && (
@@ -465,8 +471,8 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
               );
             })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
         <h3 className="mb-4 text-lg font-bold text-foreground">Detalhes</h3>
