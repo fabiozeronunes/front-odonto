@@ -10,6 +10,8 @@ import {
   registerUser,
   resetPassword,
   updateProfile,
+  verifyEmail,
+  resendVerificationEmail,
 } from "./auth.service.js";
 import type {
   ChangePasswordInput,
@@ -61,5 +63,15 @@ export const forgot = asyncHandler(async (req: Request, res: Response) => {
 
 export const reset = asyncHandler(async (req: Request, res: Response) => {
   const result = await resetPassword(req.body.token, req.body.newPassword);
+  res.json(result);
+});
+
+export const verify = asyncHandler(async (req: Request, res: Response) => {
+  const result = await verifyEmail(req.body.token);
+  res.json(result);
+});
+
+export const resendVerification = asyncHandler(async (req: Request, res: Response) => {
+  const result = await resendVerificationEmail(req.body.email);
   res.json(result);
 });

@@ -11,6 +11,8 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../../utils/jwt.js";
+import { env } from "../../config/env.js";
+import { sendEmail, buildPasswordResetEmail, buildEmailVerificationEmail } from "../../services/email.js";
 import type { RegisterInput, LoginInput } from "./auth.validators.js";
 
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
@@ -91,6 +93,22 @@ export async function registerUser(input: RegisterInput) {
     select: { id: true, name: true, email: true, role: true, planId: true, registrationNumber: true },
   });
 
+  // Generate verification token and send email
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      token: verificationToken,
+      userId: user.id,
+      expiresAt,
+    },
+  });
+
+  const verifyUrl = `${env.webUrl}/verify-email?token=${verificationToken}`;
+  const { subject, html } = buildEmailVerificationEmail(verifyUrl);
+  await sendEmail({ to: user.email, subject, html });
+
   return {
     user: publicUser(user),
     tokens: issueTokens(user),
@@ -125,6 +143,72 @@ export async function loginUser(input: LoginInput) {
 
   const { passwordHash: _ph, ...safeUser } = user;
   return { user: publicUser(safeUser), tokens: issueTokens(safeUser) };
+}
+
+export async function verifyEmail(token: string) {
+  const verificationToken = await prisma.emailVerificationToken.findUnique({
+    where: { token },
+  });
+
+  if (!verificationToken) {
+    throw new UnauthorizedError("Token de verificação inválido");
+  }
+
+  if (verificationToken.usedAt) {
+    throw new UnauthorizedError("Token de verificação já utilizado");
+  }
+
+  if (verificationToken.expiresAt < new Date()) {
+    throw new UnauthorizedError("Token de verificação expirado. Solicite um novo.");
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: verificationToken.userId },
+      data: { emailVerified: true },
+    }),
+    prisma.emailVerificationToken.update({
+      where: { id: verificationToken.id },
+      data: { usedAt: new Date() },
+    }),
+  ]);
+
+  return { ok: true };
+}
+
+export async function resendVerificationEmail(email: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return { ok: true };
+  }
+
+  if (user.emailVerified) {
+    return { ok: true };
+  }
+
+  // Invalidate existing tokens
+  await prisma.emailVerificationToken.updateMany({
+    where: { userId: user.id, usedAt: null },
+    data: { usedAt: new Date() },
+  });
+
+  // Generate new token
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      token: verificationToken,
+      userId: user.id,
+      expiresAt,
+    },
+  });
+
+  const verifyUrl = `${env.webUrl}/verify-email?token=${verificationToken}`;
+  const { subject, html } = buildEmailVerificationEmail(verifyUrl);
+  await sendEmail({ to: email, subject, html });
+
+  return { ok: true };
 }
 
 export async function refreshAccess(refreshToken: string) {
@@ -239,9 +323,9 @@ export async function forgotPassword(email: string) {
     },
   });
 
-  // TODO: Send email with reset link containing the token
-  // For now, log it for development purposes only
-  console.log(`[PASSWORD RESET] Token for ${email}: ${token}`);
+  const resetUrl = `${env.webUrl}/reset-password?token=${token}`;
+  const { subject, html } = buildPasswordResetEmail(resetUrl);
+  await sendEmail({ to: email, subject, html });
 
   return { ok: true };
 }

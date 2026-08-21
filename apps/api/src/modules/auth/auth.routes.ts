@@ -2,6 +2,7 @@ import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import { authenticate } from "../../middlewares/authenticate.js";
 import { validate } from "../../middlewares/validate.js";
+import { auditLog } from "../../middlewares/audit.js";
 import * as ctrl from "./auth.controller.js";
 import {
   changePasswordSchema,
@@ -11,6 +12,8 @@ import {
   registerSchema,
   resetPasswordSchema,
   updateProfileSchema,
+  verifyEmailSchema,
+  resendVerificationSchema,
 } from "./auth.validators.js";
 
 export const authRouter = Router();
@@ -32,10 +35,12 @@ const forgotLimiter = rateLimit({
 });
 
 authRouter.post("/register", authLimiter, validate(registerSchema), ctrl.register);
-authRouter.post("/login", authLimiter, validate(loginSchema), ctrl.login);
+authRouter.post("/login", authLimiter, auditLog("auth.login"), ctrl.login);
 authRouter.post("/refresh", validate(refreshSchema), ctrl.refresh);
 authRouter.get("/me", authenticate, ctrl.me);
 authRouter.patch("/me", authenticate, validate(updateProfileSchema), ctrl.patchMe);
-authRouter.post("/change-password", authenticate, validate(changePasswordSchema), ctrl.updatePassword);
+authRouter.post("/change-password", authenticate, validate(changePasswordSchema), auditLog("auth.change_password"), ctrl.updatePassword);
 authRouter.post("/forgot-password", forgotLimiter, validate(forgotPasswordSchema), ctrl.forgot);
-authRouter.post("/reset-password", authLimiter, validate(resetPasswordSchema), ctrl.reset);
+authRouter.post("/reset-password", authLimiter, validate(resetPasswordSchema), auditLog("auth.reset_password"), ctrl.reset);
+authRouter.post("/verify-email", authLimiter, validate(verifyEmailSchema), ctrl.verify);
+authRouter.post("/resend-verification", forgotLimiter, validate(resendVerificationSchema), ctrl.resendVerification);

@@ -43,6 +43,14 @@ export const updateProfileSchema = z.object({
   name: z.string().min(2, "Nome deve ter ao menos 2 caracteres").max(120),
 });
 
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Token obrigatório"),
+});
+
+export const resendVerificationSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

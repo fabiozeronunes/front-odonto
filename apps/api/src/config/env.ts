@@ -51,4 +51,6 @@ export const env = {
   paymentGatewaySecret: process.env.PAYMENT_GATEWAY_SECRET ?? "",
   paymentGatewayPublicKey: process.env.PAYMENT_GATEWAY_PUBLIC_KEY ?? "",
   encryptionKey: process.env.ENCRYPTION_KEY ?? "",
+  resendApiKey: process.env.RESEND_API_KEY ?? "",
+  emailFrom: process.env.EMAIL_FROM ?? "noreply@odonto.study",
 };
