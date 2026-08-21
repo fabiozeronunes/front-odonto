@@ -21,11 +21,15 @@ const ALLOWED_MIMES: Record<string, string> = {
   "audio/wav": ".wav",
   "audio/wave": ".wav",
   "audio/mp4": ".m4a",
+  "video/webm": ".webm",
+  "video/mp4": ".mp4",
+  "video/ogg": ".ogv",
+  "video/quicktime": ".mov",
 };
 
 export const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (ALLOWED_MIMES[file.mimetype]) return cb(null, true);
     cb(new Error("Formato inválido. Use imagens (JPG, PNG, WEBP, GIF) ou áudio (WEBM, MP3, OGG, WAV)."));
