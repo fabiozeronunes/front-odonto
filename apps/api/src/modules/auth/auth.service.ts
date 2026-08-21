@@ -13,6 +13,7 @@ import {
 } from "../../utils/jwt.js";
 import { env } from "../../config/env.js";
 import { sendEmail, buildPasswordResetEmail, buildEmailVerificationEmail } from "../../services/email.js";
+import { isPasswordBreached } from "../../services/breach.js";
 import type { RegisterInput, LoginInput } from "./auth.validators.js";
 
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
@@ -126,6 +127,11 @@ export async function registerUser(input: RegisterInput) {
   const exists = await prisma.user.findUnique({ where: { email: input.email } });
   if (exists) {
     throw new ConflictError("E-mail já cadastrado");
+  }
+
+  const breached = await isPasswordBreached(input.password);
+  if (breached.breached) {
+    throw new ConflictError(`Esta senha foi exposta em ${breached.count.toLocaleString()} vazamentos. Escolha outra senha.`);
   }
 
   const planId = await getFreePlanId();
@@ -369,6 +375,12 @@ export async function changePassword(userId: string, currentPassword: string, ne
   if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
     throw new UnauthorizedError("Senha atual incorreta");
   }
+
+  const breached = await isPasswordBreached(newPassword);
+  if (breached.breached) {
+    throw new ConflictError(`Esta senha foi exposta em ${breached.count.toLocaleString()} vazamentos. Escolha outra senha.`);
+  }
+
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await prisma.$transaction([
     prisma.user.update({ where: { id: userId }, data: { passwordHash, tokenVersion: { increment: 1 } } }),
@@ -401,6 +413,11 @@ export async function resetPassword(token: string, newPassword: string) {
   if (!resetToken) throw new UnauthorizedError("Token inválido ou expirado");
   if (resetToken.usedAt) throw new UnauthorizedError("Token já utilizado. Solicite um novo.");
   if (resetToken.expiresAt < new Date()) throw new UnauthorizedError("Token expirado. Solicite um novo.");
+
+  const breached = await isPasswordBreached(newPassword);
+  if (breached.breached) {
+    throw new ConflictError(`Esta senha foi exposta em ${breached.count.toLocaleString()} vazamentos. Escolha outra senha.`);
+  }
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
 

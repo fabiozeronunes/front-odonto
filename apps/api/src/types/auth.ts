@@ -6,6 +6,7 @@ export interface AuthUser {
   email: string;
   role: Role;
   planId: string;
+  fingerprint?: string;
 }
 
 export interface AuthenticatedRequest extends Request {

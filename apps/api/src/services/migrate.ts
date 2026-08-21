@@ -94,6 +94,14 @@ export async function applyMigrations() {
       await safeExec(`CREATE INDEX "LoginAttempt_createdAt_idx" ON "LoginAttempt"("createdAt")`, "LA createdAt idx");
     }
 
+    // 7. IPBlacklist
+    if (!(await tableExists("IPBlacklist"))) {
+      console.log("[MIGRATION] Creating IPBlacklist...");
+      await safeExec(`CREATE TABLE "IPBlacklist" ("id" TEXT NOT NULL,"ip" TEXT NOT NULL,"reason" TEXT,"expiresAt" TIMESTAMP(3),"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "IPBlacklist_pkey" PRIMARY KEY ("id"))`, "IPBlacklist table");
+      await safeExec(`CREATE UNIQUE INDEX "IPBlacklist_ip_key" ON "IPBlacklist"("ip")`, "IPBlacklist ip unique");
+      await safeExec(`CREATE INDEX "IPBlacklist_expiresAt_idx" ON "IPBlacklist"("expiresAt")`, "IPBlacklist expiresAt idx");
+    }
+
     console.log("[MIGRATION] All migrations applied successfully.");
   } catch (err) {
     console.error("[MIGRATION] Error applying migrations:", err);

@@ -12,6 +12,7 @@ import { getAuditLogs } from "../../services/audit.js";
 import { AuthenticatedRequest } from "../../types/auth.js";
 import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma.js";
+import { blacklistIP, removeIPFromBlacklist, getBlacklistedIPs } from "../../services/blacklist.js";
 
 export const adminRouter = Router();
 
@@ -71,3 +72,32 @@ adminRouter.post("/users/:id/verify-email", asyncHandler(async (req: Request, re
   await prisma.user.update({ where: { id: req.params.id }, data: { emailVerified: true } });
   res.json({ ok: true });
 }));
+
+adminRouter.get("/blacklist", asyncHandler(async (_req: Request, res: Response) => {
+  const ips = await getBlacklistedIPs();
+  res.json({ ips });
+}));
+
+adminRouter.post(
+  "/blacklist",
+  validate(z.object({
+    ip: z.string().ip("IP inválido"),
+    reason: z.string().max(200).optional(),
+    expiresAt: z.string().datetime().optional(),
+  })),
+  auditLog("ip.blacklist", "ip"),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { ip, reason, expiresAt } = req.body;
+    await blacklistIP(ip, reason, expiresAt ? new Date(expiresAt) : undefined);
+    res.json({ ok: true });
+  })
+);
+
+adminRouter.delete(
+  "/blacklist/:ip",
+  auditLog("ip.unblock", "ip"),
+  asyncHandler(async (req: Request, res: Response) => {
+    await removeIPFromBlacklist(req.params.ip);
+    res.json({ ok: true });
+  })
+);

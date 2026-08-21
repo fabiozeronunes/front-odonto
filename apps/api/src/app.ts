@@ -5,6 +5,9 @@ import rateLimit from "express-rate-limit";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/errorHandler.js";
 import { requestId, requestTimeout } from "./middlewares/request.js";
+import { sanitizeInput } from "./middlewares/sanitize.js";
+import { fingerprintDetector } from "./middlewares/fingerprint.js";
+import { checkBlacklist } from "./services/blacklist.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { specialtiesRouter } from "./modules/specialties/specialties.routes.js";
 import { tagsRouter } from "./modules/tags/tags.routes.js";
@@ -39,7 +42,23 @@ export function createApp() {
 
   app.use(requestId);
   app.use(requestTimeout(30000));
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+      },
+    },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  }));
 
   const allowedOrigins = env.corsOrigins
     ? env.corsOrigins.split(",").map((s) => s.trim())
@@ -58,6 +77,9 @@ export function createApp() {
     })
   );
   app.use(express.json({ limit: "1mb" }));
+  app.use(sanitizeInput);
+  app.use(fingerprintDetector);
+  app.use(checkBlacklist);
 
   app.use(
     rateLimit({
