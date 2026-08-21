@@ -25,6 +25,16 @@ export function createApp() {
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
+
+  if (env.nodeEnv === "production") {
+    app.use((req, res, next) => {
+      if (req.headers["x-forwarded-proto"] !== "https") {
+        return res.redirect(301, `https://${req.headers.host}${req.url}`);
+      }
+      next();
+    });
+  }
+
   app.use(helmet());
   app.use(
     cors({

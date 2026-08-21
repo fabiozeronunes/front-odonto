@@ -41,6 +41,7 @@ authRouter.post("/login", authLimiter, auditLog("auth.login"), ctrl.login);
 authRouter.post("/refresh", validate(refreshSchema), ctrl.refresh);
 authRouter.post("/logout", authenticate, ctrl.logout);
 authRouter.post("/logout-all", authenticate, auditLog("auth.logout_all"), ctrl.logoutAll);
+authRouter.post("/revoke-all", authenticate, auditLog("auth.revoke_all"), ctrl.revokeAll);
 authRouter.get("/me", authenticate, ctrl.me);
 authRouter.patch("/me", authenticate, validate(updateProfileSchema), ctrl.patchMe);
 authRouter.post("/change-password", authenticate, validate(changePasswordSchema), auditLog("auth.change_password"), ctrl.updatePassword);

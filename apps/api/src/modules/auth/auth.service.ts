@@ -203,6 +203,10 @@ export async function loginUser(input: LoginInput, ip?: string) {
     throw new UnauthorizedError("Conta inativa. Contate o suporte.");
   }
 
+  if (!user.emailVerified) {
+    throw new UnauthorizedError("E-mail não verificado. Verifique sua caixa de entrada.");
+  }
+
   await recordLoginAttempt(input.email, clientIp, true);
   cleanupOldAttempts().catch(() => {});
 
@@ -350,6 +354,11 @@ export async function updateProfile(userId: string, name: string) {
     },
   });
   return user;
+}
+
+export async function revokeAllRefreshTokens(userId: string) {
+  await prisma.refreshToken.deleteMany({ where: { userId } });
+  return { ok: true };
 }
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {

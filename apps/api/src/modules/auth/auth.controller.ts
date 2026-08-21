@@ -14,6 +14,7 @@ import {
   resendVerificationEmail,
   logoutUser,
   logoutAllDevices,
+  revokeAllRefreshTokens,
 } from "./auth.service.js";
 import {
   generateTwoFactorSecret,
@@ -51,6 +52,11 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
 
 export const logoutAll = asyncHandler(async (req: Request, res: Response) => {
   const result = await logoutAllDevices((req as AuthenticatedRequest).user.id);
+  res.json(result);
+});
+
+export const revokeAll = asyncHandler(async (req: Request, res: Response) => {
+  const result = await revokeAllRefreshTokens((req as AuthenticatedRequest).user.id);
   res.json(result);
 });
 
