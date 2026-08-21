@@ -52,6 +52,12 @@ export function createApp() {
     res.json({ status: "ok", service: "odontologia-study-api" });
   });
 
+  app.post("/admin/migrate", async (_req, res) => {
+    const { applyMigrations } = await import("./services/migrate.js");
+    await applyMigrations();
+    res.json({ status: "ok", message: "Migrations applied" });
+  });
+
   app.get("/", (_req, res) => {
     res.json({
       name: "FrontOdontus API",

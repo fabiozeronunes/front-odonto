@@ -4,7 +4,7 @@ import { prisma } from "./lib/prisma.js";
 import { applyMigrations } from "./services/migrate.js";
 
 async function main() {
-  await applyMigrations();
+  applyMigrations().catch(() => {});
   const app = createApp();
 
   const server = app.listen(env.port, () => {
