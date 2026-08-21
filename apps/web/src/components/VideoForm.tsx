@@ -279,7 +279,6 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
         <h3 className="mb-4 text-lg font-bold text-foreground">Importar do YouTube</h3>
         <YouTubeImport
           onInfo={applyYouTube}
-          videoUrl={editing.videoUrl}
 />
       </div>
 
