@@ -49,6 +49,7 @@ export async function saveUploadedFile(
     upsert: true,
   });
   if (error) {
+    console.error("[upload] Supabase error:", error.message, error);
     throw new Error(`Falha ao enviar arquivo para o armazenamento: ${error.message}`);
   }
 

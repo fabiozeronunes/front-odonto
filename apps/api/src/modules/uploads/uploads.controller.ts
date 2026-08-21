@@ -6,6 +6,7 @@ import { listMyUploads, saveUploadedFile } from "./uploads.service.js";
 
 export const uploadImage = asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) throw new ApiError(400, "Nenhuma imagem enviada");
+  console.log("[upload] File received:", req.file.mimetype, req.file.size, "bytes");
   const userId = (req as AuthenticatedRequest).user.id;
   const url = await saveUploadedFile(userId, req.file);
   res.status(201).json({ data: { url } });
