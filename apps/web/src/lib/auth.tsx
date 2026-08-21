@@ -38,9 +38,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const data = await api<{ user: User }>("/api/auth/me");
       setUser(data.user);
-    } catch {
-      clearTokens();
-      setUser(null);
+    } catch (err: any) {
+      if (err?.status === 401) {
+        const refreshed = await refreshSession();
+        if (refreshed) {
+          try {
+            const retry = await api<{ user: User }>("/api/auth/me");
+            setUser(retry.user);
+            return;
+          } catch {
+            // secondary failure
+          }
+        }
+        clearTokens();
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -56,9 +68,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
+    let failedCount = 0;
     const keepAlive = () => {
       refreshSession().then((ok) => {
-        if (!ok) setUser(null);
+        if (!ok) {
+          failedCount++;
+          if (failedCount >= 3) {
+            setUser(null);
+          }
+        } else {
+          failedCount = 0;
+        }
       });
     };
     const id = window.setInterval(keepAlive, 5 * 60 * 1000);

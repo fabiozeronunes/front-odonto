@@ -38,7 +38,7 @@ export const env = {
   port: Number(process.env.PORT ?? 4000),
   databaseUrl: required("DATABASE_URL"),
   jwtSecret: requireSecure("JWT_SECRET"),
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "15m",
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "30m",
   jwtRefreshSecret: requireSecure("JWT_REFRESH_SECRET"),
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "7d",
   apiUrl: process.env.API_URL ?? "http://localhost:4000",
