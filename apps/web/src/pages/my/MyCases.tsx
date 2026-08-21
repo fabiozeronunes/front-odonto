@@ -398,19 +398,46 @@ export function MyCases() {
           <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
             <BlockHeader icon={VideoIcon} title="Vídeos do caso" subtitle="Importe do YouTube ou selecione seus vídeos" />
             <YouTubeImport onInfo={importYouTubeVideo} />
-            <div className="mt-3 flex flex-wrap gap-2">
-              {myVideos.map((v) => {
-                const selected = editing.videoIds.includes(v.id);
-                return (
-                  <span key={v.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-primary-700 text-white" : "bg-muted text-muted-foreground"}`}>
-                    <button type="button" onClick={() => toggleVideo(v.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"} title={selected ? "Remover vídeo do caso" : "Adicionar vídeo ao caso"}>
-                      {v.title}
+            {myVideos.length > 0 ? (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {myVideos.map((v) => {
+                  const selected = editing.videoIds.includes(v.id);
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => toggleVideo(v.id)}
+                      className={`group overflow-hidden rounded-2xl border-2 text-left transition-all ${
+                        selected
+                          ? "border-primary-700 shadow-md ring-2 ring-primary-200"
+                          : "border-border hover:-translate-y-0.5 hover:shadow-lift"
+                      }`}
+                    >
+                      <div className="relative aspect-video overflow-hidden bg-muted">
+                        {v.thumbnailUrl ? (
+                          <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                        ) : (
+                          <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
+                            <VideoIcon className="h-10 w-10 text-white/60" />
+                          </div>
+                        )}
+                        {selected && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
+                            <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
+                      </div>
                     </button>
-                  </span>
-                );
-              })}
-              {myVideos.length === 0 && (<p className="text-sm text-muted-foreground">Nenhum vídeo seu ainda. Use a importação do YouTube acima para criar o primeiro.</p>)}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">Nenhum vídeo seu ainda. Use a importação do YouTube acima.</p>
+            )}
           </div>
 
           {/* Block 3: Áudio */}
@@ -468,9 +495,9 @@ export function MyCases() {
             </div>
           </div>
 
-          {/* Block 5: Galeria de imagens */}
+          {/* Block 5: Galeria de imagens + Tags de imagem */}
           <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={ImageIcon} title="Galeria de imagens" subtitle="Upload ou link, máximo 5 imagens" />
+            <BlockHeader icon={ImageIcon} title="Galeria de imagens e tags" subtitle="Upload ou link, máximo 5 imagens com tags" />
             <ImagePicker
               value={editing.images.map((img) => img.url)}
               onChange={(urls) => setEditing((prev) => {
@@ -492,19 +519,14 @@ export function MyCases() {
                 {editing.images.length} {editing.images.length === 1 ? "imagem selecionada" : "imagens selecionadas"} (máx. 5)
               </p>
             )}
-          </div>
-
-          {/* Block 6: Tags de cada imagem */}
-          {editing.images.length > 0 && (
-            <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-              <BlockHeader icon={Tag} title="Tags de imagem" subtitle="Tags específicas para cada imagem" />
-              <div className="space-y-4">
+            {editing.images.length > 0 && (
+              <div className="mt-4 space-y-4">
                 {editing.images.map((img, index) => {
                   const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
                   return (
                     <div key={img.id} className="rounded-xl border border-border p-4">
                       <div className="mb-3 flex items-center gap-3">
-                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-border">
+                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border">
                           <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
                         </div>
                         <div>
@@ -545,10 +567,10 @@ export function MyCases() {
                   );
                 })}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Block 7: Acesso e tags */}
+          {/* Block 6: Acesso e tags */}
           <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
             <BlockHeader icon={Settings} title="Acesso e tags" subtitle="Configure a visibilidade e categorização" />
             <div className="space-y-4">
