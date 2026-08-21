@@ -199,14 +199,59 @@
 | `b990b90` | security: MEDIUM #9-15 - Helmet, admin-only all=true, rate limits, encryption key, race condition fix |
 | `b3785be` | security: LOW #16-20 - password complexity, error handler cleanup, upload limits, YouTube cleanup, XSS sanitization |
 | `3c6dd06` | fix: replace sanitize-html (ESM) with custom sanitizer for CommonJS compatibility |
+| `56b532c` | feat: Resend email, Stripe prep, email verification, audit logs |
+
+---
+
+## 🎯 Melhorias de impacto (2026-08-21)
+
+### #1: Serviço de Email (Resend)
+- **Arquivo:** `apps/api/src/services/email.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Integração com Resend para envio de emails transacionais
+- **Uso:** Reset de senha envia email HTML com link de redefinição (expira em 1h)
+- **Uso:** Registro envia email de verificação (expira em 24h)
+- **Config:** `RESEND_API_KEY` e `EMAIL_FROM` nas env vars
+
+### #2: Gateway de Pagamento (Stripe)
+- **Arquivo:** `apps/api/src/modules/checkout/checkout.service.ts`
+- **Status:** ✅ Infraestrutura preparada
+- **Descrição:** Checkout cria sessão Stripe Checkout com webhook handler
+- **Funcionalidades:**
+  - Cria sessão de checkout com recorrência (mensal/anual)
+  - Webhook handler verifica assinatura e confirma pagamento
+  - Suporte a múltiplos métodos de pagamento (card, etc.)
+- **Config:** `PAYMENT_GATEWAY_SECRET` e `PAYMENT_GATEWAY_PUBLIC_KEY` nas env vars
+- **Nota:** Aguardando negociação de valores para ativar
+
+### #3: Verificação de Email no Registro
+- **Arquivo:** `apps/api/src/modules/auth/auth.service.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Usuários recebem email de verificação ao se registrar
+- **Endpoints:**
+  - `POST /api/auth/verify-email` — valida token (24h de validade)
+  - `POST /api/auth/resend-verification` — reenvia email de verificação
+- **Tabela:** `EmailVerificationToken` criada no banco
+
+### #4: Dependências Seguras
+- **Status:** ✅ Atualizado
+- **Descrição:** Vulnerabilidades reduzidas de 13 para 10
+- **Nota:** Vulnerabilidades restantes são em deps de build do Vercel (não afetam produção)
+
+### #5: Audit Log
+- **Arquivo:** `apps/api/src/services/audit.ts`, `apps/api/src/middlewares/audit.ts`
+- **Status:** ✅ Implementado
+- **Descrição:** Sistema de auditoria para ações sensíveis
+- **Endpoints:** `GET /api/admin/audit-logs` (apenas ADMIN)
+- **Dados logados:** userId, action, resource, resourceId, details, ipAddress, userAgent
+- **Tabela:** `AuditLog` criada no banco
 
 ---
 
 ## ⚠️ Ações recomendadas futuras
 
-1. **Gateway de pagamento:** Implementar webhook real com verificação de assinatura (Stripe/Asaas)
-2. **Email para reset de senha:** Integrar serviço de email (SendGrid, Resend, etc.) para enviar token em vez de logar no console
-3. **ENCRYPTION_KEY:** Definir variável de ambiente separada para criptografia de chaves de API
-4. **JWT secrets em produção:** Garantir que `JWT_SECRET` e `JWT_REFRESH_SECRET` são únicos e fortes (>32 chars)
-5. **Monitoramento:** Adicionar logging estruturado e alertas para tentativas de brute force
-6. **Audit log:** Registrar ações sensíveis (login, mudança de senha, confirmação de pagamento)
+1. **Gateway de pagamento:** Configurar `PAYMENT_GATEWAY_SECRET` após negociação de valores
+2. **Email de verificação:** Configurar `RESEND_API_KEY` para envio real de emails
+3. **2FA / MFA:** Adicionar autenticação de dois fatores
+4. **Account lockout:** Bloquear temporariamente após N tentativas falhas
+5. **Monitoramento:** Adicionar alertas para tentativas de brute force
