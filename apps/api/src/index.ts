@@ -1,8 +1,10 @@
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
+import { applyMigrations } from "./services/migrate.js";
 
 async function main() {
+  await applyMigrations();
   const app = createApp();
 
   const server = app.listen(env.port, () => {
