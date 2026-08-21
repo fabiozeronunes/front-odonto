@@ -272,6 +272,7 @@ model VideoAudio {
   videoId   String
   video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   @@index([videoId])
 }
