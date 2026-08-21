@@ -230,6 +230,7 @@ model Video {
   updatedAt       DateTime      @updatedAt
 
   tags           VideoTag[]
+  audios         VideoAudio[]
   audioTags      VideoAudioTag[]
   caseStudies    VideoCaseStudy[]
   watchHistory   WatchHistory[]
@@ -262,6 +263,17 @@ model VideoAudioTag {
 
   @@id([videoId, tagId])
   @@index([tagId])
+}
+
+model VideoAudio {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([videoId])
 }
 
 model CaseStudy {

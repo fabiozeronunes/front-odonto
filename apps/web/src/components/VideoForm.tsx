@@ -287,7 +287,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
         </p>
         <VideoRecorder
-          onRecorded={(url) => setEditing({ ...editing, videoUrl: url })}
+          onRecorded={(url, recTitle) => setEditing({ ...editing, title: recTitle || editing.title, videoUrl: url })}
           onRemoved={() => setEditing({ ...editing, videoUrl: "" })}
         />
         {editing.videoUrl && (

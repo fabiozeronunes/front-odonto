@@ -2,9 +2,11 @@ import { useRef, useState } from "react";
 import { Camera, Trash2, RotateCcw, Video } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 interface VideoRecorderProps {
-  onRecorded: (url: string) => void;
+  onRecorded: (url: string, title: string) => void;
   onRemoved: () => void;
 }
 
@@ -14,6 +16,8 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
   const [phase, setPhase] = useState<"idle" | "preview" | "uploading" | "done">("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [recordedMeta, setRecordedMeta] = useState<{ date: string; dayWeek: string; hour: string } | null>(null);
+  const [title, setTitle] = useState("");
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,12 +26,31 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     inputRef.current?.click();
   }
 
+  function formatDate(d: Date) {
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+
+  function formatDayWeek(d: Date) {
+    return d.toLocaleDateString("pt-BR", { weekday: "long" });
+  }
+
+  function formatHour(d: Date) {
+    return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
   function onFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
+    const now = new Date();
     setRecordedBlob(file);
     setPreviewUrl(url);
+    setRecordedMeta({
+      date: formatDate(now),
+      dayWeek: formatDayWeek(now),
+      hour: formatHour(now),
+    });
+    setTitle(`Aula ${formatDate(now)} ${formatHour(now)}`);
     setPhase("preview");
     e.target.value = "";
   }
@@ -44,10 +67,11 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         body: form,
       });
       setUploadedUrl(uploadRes.data.url);
-      onRecorded(uploadRes.data.url);
+      onRecorded(uploadRes.data.url, title);
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setRecordedBlob(null);
       setPreviewUrl(null);
+      setRecordedMeta(null);
       setPhase("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha no upload do video");
@@ -59,6 +83,8 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setRecordedBlob(null);
     setPreviewUrl(null);
+    setRecordedMeta(null);
+    setTitle("");
     setPhase("idle");
   }
 
@@ -76,7 +102,6 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         </div>
       )}
 
-      {/* Hidden file input: opens native camera on mobile */}
       <input
         ref={inputRef}
         type="file"
@@ -86,21 +111,31 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         onChange={onFileSelected}
       />
 
-      {/* Preview of recorded video */}
       {phase === "preview" && previewUrl && (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <video controls src={previewUrl} className="w-full" preload="metadata" playsInline />
+        <div className="space-y-3">
+          <div className="rounded-xl border border-border overflow-hidden">
+            <video controls src={previewUrl} className="w-full" preload="metadata" playsInline />
+          </div>
+          {recordedMeta && (
+            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <span className="rounded-full bg-muted px-2 py-0.5">{recordedMeta.dayWeek}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5">{recordedMeta.date}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5">{recordedMeta.hour}</span>
+            </div>
+          )}
+          <div className="space-y-1">
+            <Label>Titulo do video</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Aula sobre endodontia" />
+          </div>
         </div>
       )}
 
-      {/* Uploaded video (done) */}
       {phase === "done" && uploadedUrl && (
         <div className="rounded-xl border border-border overflow-hidden">
           <video controls src={uploadedUrl} className="w-full" preload="metadata" />
         </div>
       )}
 
-      {/* Uploading spinner */}
       {phase === "uploading" && (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 p-6">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -108,7 +143,6 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         </div>
       )}
 
-      {/* Controls */}
       <div className="flex flex-wrap items-center gap-2">
         {phase === "idle" && (
           <Button type="button" variant="outline" size="sm" onClick={openCamera}>
