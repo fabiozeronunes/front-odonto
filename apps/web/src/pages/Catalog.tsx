@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame, Video as VideoIcon } from "lucide-react";
+import { Search, SlidersHorizontal, X, Image as ImageIcon, Clock, Flame, Video as VideoIcon, BookOpen, Music } from "lucide-react";
 import { api } from "../lib/api";
-import type { Paginated, Specialty, Tag, Video } from "../types";
+import type { Paginated, Specialty, Tag, Video, CaseStudy } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -17,9 +17,12 @@ interface ImageSearchItem {
   video: { id: string; title: string; slug: string };
 }
 
+type ContentType = "videos" | "cases" | "audios" | "images";
+
 export function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [imageTags, setImageTags] = useState<Tag[]>([]);
@@ -55,8 +58,9 @@ export function Catalog() {
   const access = searchParams.get("access") ?? "";
   const source = searchParams.get("source") ?? "";
   const sort = searchParams.get("sort") ?? "recent";
+  const contentType = (searchParams.get("type") as ContentType) || "videos";
 
-  const filterKey = [search, specialty, tag, imageTag, difficulty, access, source, sort].join("|");
+  const filterKey = [search, specialty, tag, imageTag, difficulty, access, source, sort, contentType].join("|");
 
   useEffect(() => {
     setVisibleCount(8);
@@ -91,27 +95,48 @@ export function Catalog() {
     const isLoadMore = isLoadMoreRef.current;
     isLoadMoreRef.current = false;
     if (!isLoadMore) setLoading(true);
-    const params = new URLSearchParams();
-    params.set("page", "1");
-    params.set("perPage", String(visibleCount));
-    params.set("sort", sort);
-    if (search) params.set("search", search);
-    if (specialty) params.set("specialty", specialty);
-    if (tag) params.set("tag", tag);
-    if (imageTag) params.set("imageTag", imageTag);
-    if (difficulty) params.set("difficulty", difficulty);
-    if (access) params.set("isFree", access === "gratuito" ? "true" : "false");
-    if (source) params.set("source", source);
 
-    api<Paginated<Video>>(`/api/videos?${params.toString()}`)
-      .then((data) => {
-        setVideos(data.data);
-        setTotal(data.pagination.total);
-      })
-      .finally(() => {
-        setLoading(false);
-        setLoadingMore(false);
-      });
+    if (contentType === "cases") {
+      const params = new URLSearchParams();
+      params.set("page", "1");
+      params.set("perPage", String(visibleCount));
+      if (search) params.set("search", search);
+      if (specialty) params.set("specialty", specialty);
+      if (difficulty) params.set("difficulty", difficulty);
+      if (access) params.set("isFree", access === "gratuito" ? "true" : "false");
+
+      api<Paginated<CaseStudy>>(`/api/case-studies?${params.toString()}`)
+        .then((data) => {
+          setCaseStudies(data.data);
+          setTotal(data.pagination.total);
+        })
+        .finally(() => {
+          setLoading(false);
+          setLoadingMore(false);
+        });
+    } else {
+      const params = new URLSearchParams();
+      params.set("page", "1");
+      params.set("perPage", String(visibleCount));
+      params.set("sort", sort);
+      if (search) params.set("search", search);
+      if (specialty) params.set("specialty", specialty);
+      if (tag) params.set("tag", tag);
+      if (imageTag) params.set("imageTag", imageTag);
+      if (difficulty) params.set("difficulty", difficulty);
+      if (access) params.set("isFree", access === "gratuito" ? "true" : "false");
+      if (source) params.set("source", source);
+
+      api<Paginated<Video>>(`/api/videos?${params.toString()}`)
+        .then((data) => {
+          setVideos(data.data);
+          setTotal(data.pagination.total);
+        })
+        .finally(() => {
+          setLoading(false);
+          setLoadingMore(false);
+        });
+    }
   }, [filterKey, visibleCount]);
 
   function updateParam(key: string, value: string) {
@@ -129,41 +154,97 @@ export function Catalog() {
     setVisibleCount((c) => c + 8);
   }
 
-  const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length;
+  const activeFilterCount = [specialty, tag, imageTag, difficulty, access].filter(Boolean).length + (contentType !== "videos" ? 1 : 0);
 
   const gridClass =
     rows === "2"
       ? "grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4"
       : "mx-auto max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3";
 
-  const matchingImages = videos.flatMap((video) =>
+  const matchingImages = contentType === "images" ? videos.flatMap((video) =>
     (video.images ?? [])
       .filter((img) =>
-        (img.tags ?? []).some((t) => t.tag.slug === imageTag || t.tag.id === imageTag)
+        imageTag ? (img.tags ?? []).some((t) => t.tag.slug === imageTag || t.tag.id === imageTag) : true
       )
       .map((img) => ({ img, video }))
-  );
+  ) : [];
 
   const selectedImageTag = imageTags.find((t) => t.slug === imageTag || t.id === imageTag);
+
+  const contentTitle = contentType === "cases"
+    ? "Estudos de caso"
+    : contentType === "audios"
+      ? "Áudios"
+      : contentType === "images"
+        ? "Imagens"
+        : "Catálogo de vídeos";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-foreground">Catálogo de vídeos e imagens</h1>
+        <h1 className="font-display text-3xl font-bold text-foreground">{contentTitle}</h1>
         <p className="mt-1 text-muted-foreground">
-          {imageTag
-            ? `${matchingImages.length} ${matchingImages.length === 1 ? "imagem" : "imagens"} com a tag ${selectedImageTag ? `#${selectedImageTag.name}` : ""}`
-            : searchImages.length > 0
-              ? `${total} vídeos e ${searchImages.length} ${searchImages.length === 1 ? "imagem" : "imagens"} encontrada${searchImages.length === 1 ? "" : "s"} para "${search}"`
-              : `${total} conteúdos disponíveis`}
+          {contentType === "cases"
+            ? `${total} estudos de caso disponíveis`
+            : contentType === "audios"
+              ? `${videos.length} vídeos com áudio`
+              : contentType === "images"
+                ? `${matchingImages.length} imagens encontradas`
+                : imageTag
+                  ? `${matchingImages.length} ${matchingImages.length === 1 ? "imagem" : "imagens"} com a tag ${selectedImageTag ? `#${selectedImageTag.name}` : ""}`
+                  : searchImages.length > 0
+                    ? `${total} vídeos e ${searchImages.length} ${searchImages.length === 1 ? "imagem" : "imagens"} encontrada${searchImages.length === 1 ? "" : "s"} para "${search}"`
+                    : `${total} conteúdos disponíveis`}
         </p>
       </div>
 
       <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
-            Conteúdo:
+            Tipo:
           </span>
+          {([
+            { id: "videos" as ContentType, label: "Vídeos", icon: VideoIcon },
+            { id: "cases" as ContentType, label: "Estudos de Caso", icon: BookOpen },
+            { id: "audios" as ContentType, label: "Audios", icon: Music },
+            { id: "images" as ContentType, label: "Imagens", icon: ImageIcon },
+          ]).map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => updateParam("type", contentType === id ? "" : id)}
+              className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+                contentType === id
+                  ? id === "videos"
+                    ? "bg-primary-700 text-primary-foreground shadow-sm"
+                    : id === "cases"
+                      ? "bg-sky-700 text-white shadow-sm"
+                      : id === "audios"
+                        ? "bg-amber-600 text-white shadow-sm"
+                        : "bg-emerald-600 text-white shadow-sm"
+                  : "border border-border bg-surface text-foreground hover:bg-muted"
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  contentType === id
+                    ? "bg-surface"
+                    : id === "videos"
+                      ? "bg-primary-600"
+                      : id === "cases"
+                        ? "bg-sky-500"
+                        : id === "audios"
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
+                }`}
+              />
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
           <button
             type="button"
             onClick={() =>
@@ -275,7 +356,11 @@ export function Catalog() {
               )}
             </Button>
             {(search || activeFilterCount > 0) && (
-              <Button variant="ghost" onClick={() => setSearchParams({})}>
+              <Button variant="ghost" onClick={() => {
+                const next = new URLSearchParams();
+                next.set("type", contentType);
+                setSearchParams(next);
+              }}>
                 <X className="h-4 w-4" /> Limpar
               </Button>
             )}
@@ -333,7 +418,11 @@ export function Catalog() {
           <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
             Filtros ativos:
           </span>
-          <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>
+          <Button variant="ghost" size="sm" onClick={() => {
+            const next = new URLSearchParams();
+            next.set("type", contentType);
+            setSearchParams(next);
+          }}>
             Limpar filtros
           </Button>
         </div>
@@ -405,29 +494,75 @@ export function Catalog() {
         </div>
       ) : (
         <>
-          {searchImages.length > 0 && (
-            <section className="mb-10">
-              <h2 className="mb-4 text-lg font-bold text-foreground">
-                Imagens encontradas ({searchImages.length})
-              </h2>
+          {contentType === "cases" ? (
+            caseStudies.length === 0 ? (
+              <div className="flex flex-col items-center py-20 text-center">
+                <BookOpen className="h-10 w-10 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhum estudo de caso encontrado</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Tente ajustar os filtros ou buscar por outro termo.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className={gridClass}>
+                  {caseStudies.map((cs) => (
+                    <Link
+                      key={cs.id}
+                      to={`/estudo-de-caso/${cs.slug || cs.id}`}
+                      className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+                    >
+                      <div className="aspect-video bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center">
+                        <BookOpen className="h-12 w-12 text-white/60" />
+                      </div>
+                      <div className="p-3">
+                        <p className="truncate text-sm font-medium text-foreground">{cs.title}</p>
+                        <p className="text-xs text-muted-foreground">{cs.specialty?.name ?? "Sem especialidade"}</p>
+                        <div className="mt-2 flex gap-2">
+                          <Badge variant={cs.isFree ? "free" : "premium"}>{cs.isFree ? "FREE" : "Pago"}</Badge>
+                          <Badge variant={cs.status === "PUBLISHED" ? "default" : "outline"}>{cs.status}</Badge>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                {caseStudies.length < total && (
+                  <div className="mt-10 flex justify-center">
+                    <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+                      {loadingMore ? "Carregando..." : "Carregar mais"}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )
+          ) : contentType === "images" ? (
+            matchingImages.length === 0 ? (
+              <div className="flex flex-col items-center py-20 text-center">
+                <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhuma imagem encontrada</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Selecione uma tag de imagem nos filtros para ver as imagens.
+                </p>
+              </div>
+            ) : (
               <div className={gridClass}>
-                {searchImages.map((img) => (
+                {matchingImages.map(({ img, video }) => (
                   <Link
-                    key={img.id}
-                    to={`/video/${img.video.slug}`}
+                    key={`${video.id}-${img.id}`}
+                    to={`/video/${video.slug}`}
                     className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                   >
                     <div className="overflow-hidden">
                       <img
                         src={resolveImageUrl(img.url)}
-                        alt={img.video.title}
+                        alt={video.title}
                         className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
                       />
                     </div>
                     <div className="p-3">
-                      <p className="truncate text-sm font-medium text-foreground">{img.video.title}</p>
+                      <p className="truncate text-sm font-medium text-foreground">{video.title}</p>
                       <div className="mt-1.5 flex flex-wrap gap-1">
-                        {img.tags.map(({ tag }) => (
+                        {(img.tags ?? []).map(({ tag }) => (
                           <span
                             key={tag.id}
                             className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700"
@@ -440,21 +575,69 @@ export function Catalog() {
                   </Link>
                 ))}
               </div>
-            </section>
-          )}
-          {videos.length > 0 && (
+            )
+          ) : videos.length === 0 && searchImages.length === 0 ? (
+            <div className="flex flex-col items-center py-20 text-center">
+              <Search className="h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhum conteúdo encontrado</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Tente ajustar os filtros ou buscar por outro termo.
+              </p>
+            </div>
+          ) : (
             <>
-              <div className={gridClass}>
-                {videos.map((video) => (
-                  <VideoCard key={video.id} video={video} typeIcon={<VideoIcon className="h-3.5 w-3.5" />} />
-                ))}
-              </div>
-              {videos.length < total && (
-                <div className="mt-10 flex justify-center">
-                  <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
-                    {loadingMore ? "Carregando..." : "Carregar mais vídeos"}
-                  </Button>
-                </div>
+              {searchImages.length > 0 && (
+                <section className="mb-10">
+                  <h2 className="mb-4 text-lg font-bold text-foreground">
+                    Imagens encontradas ({searchImages.length})
+                  </h2>
+                  <div className={gridClass}>
+                    {searchImages.map((img) => (
+                      <Link
+                        key={img.id}
+                        to={`/video/${img.video.slug}`}
+                        className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+                      >
+                        <div className="overflow-hidden">
+                          <img
+                            src={resolveImageUrl(img.url)}
+                            alt={img.video.title}
+                            className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-3">
+                          <p className="truncate text-sm font-medium text-foreground">{img.video.title}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1">
+                            {img.tags.map(({ tag }) => (
+                              <span
+                                key={tag.id}
+                                className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700"
+                              >
+                                #{tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+              {videos.length > 0 && (
+                <>
+                  <div className={gridClass}>
+                    {videos.map((video) => (
+                      <VideoCard key={video.id} video={video} typeIcon={<VideoIcon className="h-3.5 w-3.5" />} />
+                    ))}
+                  </div>
+                  {videos.length < total && (
+                    <div className="mt-10 flex justify-center">
+                      <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+                        {loadingMore ? "Carregando..." : "Carregar mais"}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
