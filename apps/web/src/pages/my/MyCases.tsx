@@ -383,6 +383,11 @@ export function MyCases() {
 
       {editing && (
         <div className="mb-6 space-y-4">
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-surface px-5 py-3 shadow-card">
+            <Button variant="ghost" size="sm" onClick={cancelEdit}>
+              <X className="h-4 w-4" /> Fechar formulário
+            </Button>
+          </div>
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">{error}</div>
           )}
@@ -430,9 +435,11 @@ export function MyCases() {
           </div>
 
           {/* Block 2: Vídeos do caso */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
+          <div className="overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-card">
             <BlockHeader icon={VideoIcon} title="Vídeos do caso" subtitle="Importe do YouTube ou selecione seus vídeos" />
-            <YouTubeImport onInfo={importYouTubeVideo} />
+            <div className="overflow-hidden">
+              <YouTubeImport onInfo={importYouTubeVideo} />
+            </div>
             {(() => {
               const linkedVideos = myVideos.filter((v) => editing.videoIds.includes(v.id));
               if (linkedVideos.length === 0 && editing.videoIds.length === 0) {
