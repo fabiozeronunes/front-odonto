@@ -85,11 +85,15 @@ export function MyVideos() {
 
   function setEditingAndUrl(state: VideoFormState | null) {
     setEditing(state);
-    if (state?.id) {
-      setSearchParams({ edit: state.id }, { replace: true });
-    } else {
-      setSearchParams({}, { replace: true });
-    }
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (state?.id) {
+        next.set("edit", state.id);
+      } else {
+        next.delete("edit");
+      }
+      return next;
+    }, { replace: true });
   }
 
   function startCreate() {
@@ -318,7 +322,12 @@ export function MyVideos() {
               )}
             </Button>
             {(search || activeFilterCount > 0) && (
-              <Button variant="ghost" onClick={() => setSearchParams({})}>
+              <Button variant="ghost" onClick={() => setSearchParams((prev) => {
+                const tab = prev.get("tab");
+                const next = new URLSearchParams();
+                if (tab) next.set("tab", tab);
+                return next;
+              })}>
                 <X className="h-4 w-4" /> Limpar
               </Button>
             )}
@@ -357,7 +366,12 @@ export function MyVideos() {
           <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
             Filtros ativos:
           </span>
-          <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>
+          <Button variant="ghost" size="sm" onClick={() => setSearchParams((prev) => {
+            const tab = prev.get("tab");
+            const next = new URLSearchParams();
+            if (tab) next.set("tab", tab);
+            return next;
+          })}>
             Limpar filtros
           </Button>
         </div>
