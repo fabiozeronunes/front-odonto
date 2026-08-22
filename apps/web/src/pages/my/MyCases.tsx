@@ -427,18 +427,15 @@ export function MyCases() {
                 {myVideos.map((v) => {
                   const selected = editing.videoIds.includes(v.id);
                   return (
-                    <div
-                      key={v.id}
-                      className={`group relative overflow-hidden rounded-2xl border-2 transition-all ${
-                        selected
-                          ? "border-primary-700 shadow-md ring-2 ring-primary-200"
-                          : "border-border hover:-translate-y-0.5 hover:shadow-lift"
-                      }`}
-                    >
+                    <div key={v.id} className="flex flex-col">
                       <button
                         type="button"
                         onClick={() => toggleVideo(v.id)}
-                        className="w-full text-left"
+                        className={`w-full overflow-hidden rounded-2xl border-2 text-left transition-all ${
+                          selected
+                            ? "border-primary-700 shadow-md ring-2 ring-primary-200"
+                            : "border-border hover:-translate-y-0.5 hover:shadow-lift"
+                        }`}
                       >
                         <div className="relative aspect-video overflow-hidden bg-muted">
                           {v.thumbnailUrl ? (
@@ -459,13 +456,16 @@ export function MyCases() {
                           <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
                         </div>
                       </button>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev); }}
-                        className="absolute top-2 right-2 z-10 rounded-full bg-red-600 p-1.5 text-white shadow-md hover:bg-red-700"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      {selected && (
+                        <button
+                          type="button"
+                          onClick={() => setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev)}
+                          className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Remover
+                        </button>
+                      )}
                     </div>
                   );
                 })}
