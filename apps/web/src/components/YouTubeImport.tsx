@@ -130,7 +130,7 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-muted p-4">
+    <div className="overflow-hidden rounded-xl border border-border bg-muted p-4">
       <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
         <Youtube className="h-4 w-4 text-red-600" /> Importar do YouTube
       </p>
