@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music, FileText, Image as ImageIcon, Settings } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
@@ -76,6 +77,8 @@ function BlockHeader({ icon: Icon, title, subtitle }: { icon: typeof VideoIcon; 
 
 export function MyCases() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<TagType[]>([]);
@@ -115,7 +118,20 @@ export function MyCases() {
 
   useEffect(() => { load(); }, []);
 
-  function startCreate() { setEditing({ ...emptyForm }); setError(null); }
+  useEffect(() => {
+    if (editId && cases.length > 0) {
+      const c = cases.find((cs) => cs.id === editId);
+      if (c) {
+        startEdit(c);
+      }
+    }
+  }, [editId, cases]);
+
+  function startCreate() {
+    setEditing({ ...emptyForm });
+    setError(null);
+    setSearchParams({ tab: "cases", edit: "new" });
+  }
 
   function startEdit(c: CaseStudy) {
     setEditing({
@@ -140,6 +156,13 @@ export function MyCases() {
       })) ?? [],
     });
     setError(null);
+    setSearchParams({ tab: "cases", edit: c.id });
+  }
+
+  function cancelEdit() {
+    setEditing(null);
+    setError(null);
+    setSearchParams({ tab: "cases" });
   }
 
   async function save() {
@@ -170,6 +193,7 @@ export function MyCases() {
       } else {
         const res = await api<{ data: CaseStudy }>("/api/case-studies", { method: "POST", body: JSON.stringify(body) });
         setEditing((prev) => (prev ? { ...prev, id: res.data.id } : prev));
+        setSearchParams({ tab: "cases", edit: res.data.id });
       }
       setError(null);
       load();
@@ -403,35 +427,46 @@ export function MyCases() {
                 {myVideos.map((v) => {
                   const selected = editing.videoIds.includes(v.id);
                   return (
-                    <button
+                    <div
                       key={v.id}
-                      type="button"
-                      onClick={() => toggleVideo(v.id)}
-                      className={`group overflow-hidden rounded-2xl border-2 text-left transition-all ${
+                      className={`group relative overflow-hidden rounded-2xl border-2 transition-all ${
                         selected
                           ? "border-primary-700 shadow-md ring-2 ring-primary-200"
                           : "border-border hover:-translate-y-0.5 hover:shadow-lift"
                       }`}
                     >
-                      <div className="relative aspect-video overflow-hidden bg-muted">
-                        {v.thumbnailUrl ? (
-                          <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                        ) : (
-                          <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
-                            <VideoIcon className="h-10 w-10 text-white/60" />
-                          </div>
-                        )}
-                        {selected && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
-                            <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-3">
-                        <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
-                      </div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleVideo(v.id)}
+                        className="w-full text-left"
+                      >
+                        <div className="relative aspect-video overflow-hidden bg-muted">
+                          {v.thumbnailUrl ? (
+                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          ) : (
+                            <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
+                              <VideoIcon className="h-10 w-10 text-white/60" />
+                            </div>
+                          )}
+                          {selected && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
+                              <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3">
+                          <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
+                          <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev); }}
+                        className="absolute top-2 right-2 z-10 rounded-full bg-red-600 p-1.5 text-white shadow-md hover:bg-red-700"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -605,7 +640,7 @@ export function MyCases() {
 
           {/* Save/Cancel */}
           <div className="flex justify-end gap-2 rounded-2xl border border-border bg-surface p-4 shadow-card">
-            <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button variant="ghost" onClick={cancelEdit}>Cancelar</Button>
             <Button onClick={save} disabled={saving || !editing.title}>{saving ? "Salvando..." : "Salvar"}</Button>
           </div>
         </div>
