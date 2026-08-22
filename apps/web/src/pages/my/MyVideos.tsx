@@ -140,8 +140,10 @@ export function MyVideos() {
           <VideoForm
             initial={editing}
             specialties={specialties}
-            onDone={() => {
-              setEditingAndUrl(null);
+            onDone={(savedId) => {
+              if (savedId && !editing?.id) {
+                setEditingAndUrl({ ...editing!, id: savedId });
+              }
               load();
             }}
             onCancel={() => setEditingAndUrl(null)}

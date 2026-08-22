@@ -69,7 +69,7 @@ export const emptyVideoForm: VideoFormState = {
 interface VideoFormProps {
   initial: VideoFormState | null;
   specialties: Specialty[];
-  onDone: () => void;
+  onDone: (savedId?: string) => void;
   onCancel: () => void;
 }
 
@@ -84,11 +84,48 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
+  const lastSavedRef = useRef<string>("");
 
   useEffect(() => {
     setEditing(initial ?? emptyVideoForm);
     setError(null);
   }, [initial]);
+
+  useEffect(() => {
+    if (!editing.id) return;
+    const interval = setInterval(async () => {
+      const snapshot = JSON.stringify(editing);
+      if (snapshot === lastSavedRef.current) return;
+      if (saving) return;
+      setSaving(true);
+      try {
+        const body = {
+          title: editing.title,
+          description: editing.description || undefined,
+          videoUrl: editing.videoUrl,
+          thumbnailUrl: editing.thumbnailUrl || undefined,
+          specialtyId: editing.specialtyId || null,
+          difficulty: editing.difficulty,
+          isFree: editing.isFree,
+          source: editing.source,
+          status: editing.status,
+          author: editing.author || undefined,
+          institution: editing.institution || undefined,
+          observations: editing.observations || undefined,
+          audios: editing.audios.map((a) => ({ url: a.url, title: a.title })),
+          tagIds: editing.tagIds,
+          images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
+        };
+        await api(`/api/videos/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
+        lastSavedRef.current = snapshot;
+      } catch {
+        // silent auto-save failure
+      } finally {
+        setSaving(false);
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [editing.id, saving]);
 
   useEffect(() => {
     api<Paginated<Tag>>("/api/tags?perPage=50")
@@ -156,12 +193,15 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
     try {
+      let savedId = editing.id;
       if (editing.id) {
         await api(`/api/videos/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
       } else {
-        await api("/api/videos", { method: "POST", body: JSON.stringify(body) });
+        const res = await api<{ data: { id: string } }>("/api/videos", { method: "POST", body: JSON.stringify(body) });
+        savedId = res.data.id;
       }
-      onDone();
+      onDone(savedId);
+      lastSavedRef.current = JSON.stringify(editing);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao salvar");
     } finally {
