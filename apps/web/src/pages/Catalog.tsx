@@ -174,16 +174,7 @@ export function Catalog() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-foreground">{contentTitle}</h1>
-        <p className="mt-1 text-muted-foreground">
-          {contentType === "cases"
-            ? `${total} estudos de caso disponíveis`
-            : contentType === "audios"
-              ? `${videos.length} vídeos com áudio`
-              : contentType === "images"
-                ? `${matchingImages.length} imagens encontradas`
-                : `${total} conteúdos disponíveis`}
-        </p>
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{contentTitle}</h1>
       </div>
 
       <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
@@ -497,7 +488,7 @@ export function Catalog() {
                   {caseStudies.map((cs) => (
                     <Link
                       key={cs.id}
-                      to={`/estudo-de-caso/${cs.slug || cs.id}`}
+                      to={`/casos/${cs.slug || cs.id}`}
                       className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
                     >
                       <div className="aspect-video bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center">
