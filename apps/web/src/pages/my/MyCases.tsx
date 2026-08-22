@@ -13,6 +13,7 @@ import { Badge } from "../../components/ui/badge";
 import { ImagePicker } from "../../components/ImagePicker";
 import { YouTubeImport } from "../../components/YouTubeImport";
 import { AudioRecorder } from "../../components/AudioRecorder";
+import { AudioPlayer } from "../../components/AudioPlayer";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
@@ -462,40 +463,70 @@ export function MyCases() {
             })()}
           </div>
 
-          {/* Block 3: Áudio */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={Music} title="Áudio" subtitle="Grave ou importe áudio para o caso" />
-            <AudioRecorder
-              value={editing.audioUrl}
-              onChange={(audioUrl) => setEditing({ ...editing, audioUrl, ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }) })}
-              label="Áudio (gravar ou importar)"
-            />
-            {editing.audioUrl && (
-              <div className="mt-4 space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 p-4 dark:border-primary-800 dark:bg-primary-950/50">
-                <p className="text-sm font-semibold text-foreground">Detalhes do áudio</p>
-                <div className="space-y-2">
-                  <Label>Título do áudio</Label>
-                  <Input value={editing.audioTitle} onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })} placeholder="Ex.: Explicação do caso clínico" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tags do áudio</Label>
-                  <p className="text-xs text-muted-foreground">Tags específicas para o áudio.</p>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => {
-                      const selected = editing.audioTagIds.includes(tag.id);
-                      return (
-                        <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-accent-600 text-white" : "bg-muted text-muted-foreground"}`}>
-                          <button type="button" onClick={() => toggleAudioTag(tag.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}>
-                            #{tag.name}
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <TagCreator onCreate={createAudioTag} />
-                </div>
+          {/* Block 3: Áudios */}
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Music className="h-5 w-5 text-primary-600" />
+                Áudios
+              </h3>
+            </div>
+            <div className="space-y-4">
+              <div className="rounded-xl border border-border bg-muted/50 p-4">
+                <AudioRecorder
+                  value={editing.audioUrl}
+                  onChange={(audioUrl) => setEditing({ ...editing, audioUrl, ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }) })}
+                  label="Adicionar novo áudio (gravar ou importar)"
+                />
               </div>
-            )}
+
+              {editing.audioUrl && (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-border p-4 space-y-3">
+                    <AudioPlayer src={resolveImageUrl(editing.audioUrl) || ""} />
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1 space-y-1">
+                        <Label>Título do áudio</Label>
+                        <Input
+                          value={editing.audioTitle}
+                          onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })}
+                          placeholder="Ex.: Explicação do caso clínico"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditing({ ...editing, audioUrl: "", audioTitle: "", audioTagIds: [] })}
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
+                        title="Remover áudio"
+                        aria-label="Remover áudio"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-border p-4 space-y-3">
+                    <div className="space-y-2">
+                      <Label>Tags do áudio</Label>
+                      <p className="text-xs text-muted-foreground">Tags específicas para o áudio.</p>
+                      <div className="flex flex-wrap gap-2">
+                        {tags.map((tag) => {
+                          const selected = editing.audioTagIds.includes(tag.id);
+                          return (
+                            <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-accent-600 text-white" : "bg-muted text-muted-foreground"}`}>
+                              <button type="button" onClick={() => toggleAudioTag(tag.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}>
+                                #{tag.name}
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                      <TagCreator onCreate={createAudioTag} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Block 4: Descrição, Diagnóstico, Observações */}
