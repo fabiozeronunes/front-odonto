@@ -169,15 +169,7 @@ export function Catalog() {
       .map((img) => ({ img, video }))
   ) : [];
 
-  const selectedImageTag = imageTags.find((t) => t.slug === imageTag || t.id === imageTag);
-
-  const contentTitle = contentType === "cases"
-    ? "Estudos de caso"
-    : contentType === "audios"
-      ? "Áudios"
-      : contentType === "images"
-        ? "Imagens"
-        : "Catálogo de vídeos";
+  const contentTitle = "Catálogo de Conteúdos";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -190,11 +182,7 @@ export function Catalog() {
               ? `${videos.length} vídeos com áudio`
               : contentType === "images"
                 ? `${matchingImages.length} imagens encontradas`
-                : imageTag
-                  ? `${matchingImages.length} ${matchingImages.length === 1 ? "imagem" : "imagens"} com a tag ${selectedImageTag ? `#${selectedImageTag.name}` : ""}`
-                  : searchImages.length > 0
-                    ? `${total} vídeos e ${searchImages.length} ${searchImages.length === 1 ? "imagem" : "imagens"} encontrada${searchImages.length === 1 ? "" : "s"} para "${search}"`
-                    : `${total} conteúdos disponíveis`}
+                : `${total} conteúdos disponíveis`}
         </p>
       </div>
 
