@@ -259,11 +259,6 @@ export function MyCases() {
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao excluir tag"); }
   }
 
-  function toggleVideo(id: string) {
-    if (!editing) return;
-    setEditing({ ...editing, videoIds: editing.videoIds.includes(id) ? editing.videoIds.filter((t) => t !== id) : [...editing.videoIds, id] });
-  }
-
   async function importYouTubeVideo(info: { title?: string; author?: string; thumbnailUrl?: string; videoUrl: string }) {
     if (!editing) return;
     setError(null);
@@ -422,57 +417,49 @@ export function MyCases() {
           <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
             <BlockHeader icon={VideoIcon} title="Vídeos do caso" subtitle="Importe do YouTube ou selecione seus vídeos" />
             <YouTubeImport onInfo={importYouTubeVideo} />
-            {myVideos.length > 0 ? (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {myVideos.map((v) => {
-                  const selected = editing.videoIds.includes(v.id);
-                  return (
+            {(() => {
+              const linkedVideos = myVideos.filter((v) => editing.videoIds.includes(v.id));
+              if (linkedVideos.length === 0 && editing.videoIds.length === 0) {
+                return <p className="mt-3 text-sm text-muted-foreground">Nenhum vídeo vinculado. Importe do YouTube acima.</p>;
+              }
+              if (linkedVideos.length === 0 && editing.videoIds.length > 0) {
+                return <p className="mt-3 text-sm text-muted-foreground">Vídeos vinculados não encontrados nos seus uploads.</p>;
+              }
+              return (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {linkedVideos.map((v) => (
                     <div key={v.id} className="flex flex-col">
-                      <button
-                        type="button"
-                        onClick={() => toggleVideo(v.id)}
-                        className={`w-full overflow-hidden rounded-2xl border-2 text-left transition-all ${
-                          selected
-                            ? "border-primary-700 shadow-md ring-2 ring-primary-200"
-                            : "border-border hover:-translate-y-0.5 hover:shadow-lift"
-                        }`}
-                      >
+                      <div className="overflow-hidden rounded-2xl border-2 border-primary-700 shadow-md ring-2 ring-primary-200">
                         <div className="relative aspect-video overflow-hidden bg-muted">
                           {v.thumbnailUrl ? (
-                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover" />
                           ) : (
                             <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
                               <VideoIcon className="h-10 w-10 text-white/60" />
                             </div>
                           )}
-                          {selected && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
-                              <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
-                            </div>
-                          )}
+                          <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
+                            <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
+                          </div>
                         </div>
                         <div className="p-3">
                           <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
                           <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
                         </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev)}
+                        className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Remover
                       </button>
-                      {selected && (
-                        <button
-                          type="button"
-                          onClick={() => setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev)}
-                          className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          Remover
-                        </button>
-                      )}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="mt-3 text-sm text-muted-foreground">Nenhum vídeo seu ainda. Use a importação do YouTube acima.</p>
-            )}
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Block 3: Áudio */}
