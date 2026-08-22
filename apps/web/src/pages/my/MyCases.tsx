@@ -216,6 +216,21 @@ export function MyCases() {
     load();
   }
 
+  async function removeVideo(videoId: string) {
+    const newVideoIds = editing?.videoIds.filter((id) => id !== videoId) ?? [];
+    setEditing((prev) => prev ? { ...prev, videoIds: newVideoIds } : prev);
+    if (editing?.id) {
+      try {
+        await api(`/api/case-studies/${editing.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ videoIds: newVideoIds }),
+        });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Erro ao remover vídeo");
+      }
+    }
+  }
+
   function toggleTag(id: string) {
     if (!editing) return;
     setEditing({ ...editing, tagIds: editing.tagIds.includes(id) ? editing.tagIds.filter((t) => t !== id) : [...editing.tagIds, id] });
@@ -450,7 +465,7 @@ export function MyCases() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => setEditing((prev) => prev ? { ...prev, videoIds: prev.videoIds.filter((id) => id !== v.id) } : prev)}
+                        onClick={() => removeVideo(v.id)}
                         className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
