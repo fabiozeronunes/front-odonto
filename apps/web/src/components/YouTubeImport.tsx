@@ -149,11 +149,11 @@ export function YouTubeImport({ onInfo }: YouTubeImportProps) {
       {message && <p className="mt-2 text-sm text-amber-700">{message}</p>}
 
       {info && (
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center overflow-hidden">
           {info.thumbnailUrl && (
-            <img src={info.thumbnailUrl} alt="" className="h-24 w-40 rounded-lg object-cover" />
+            <img src={info.thumbnailUrl} alt="" className="h-24 w-40 shrink-0 rounded-lg object-cover" />
           )}
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-foreground">{info.title}</p>
             <p className="text-xs text-muted-foreground">{info.author}</p>
             <div className="mt-2 flex flex-wrap gap-2">
