@@ -437,9 +437,7 @@ export function MyCases() {
           {/* Block 2: Vídeos do caso */}
           <div className="overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-card">
             <BlockHeader icon={VideoIcon} title="Vídeos do caso" subtitle="Importe do YouTube ou selecione seus vídeos" />
-            <div className="overflow-hidden">
-              <YouTubeImport onInfo={importYouTubeVideo} />
-            </div>
+            <YouTubeImport onInfo={importYouTubeVideo} />
             {(() => {
               const linkedVideos = myVideos.filter((v) => editing.videoIds.includes(v.id));
               if (linkedVideos.length === 0 && editing.videoIds.length === 0) {
@@ -451,11 +449,11 @@ export function MyCases() {
               return (
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {linkedVideos.map((v) => (
-                    <div key={v.id} className="flex flex-col">
+                    <div key={v.id} className="flex flex-col overflow-hidden">
                       <div className="overflow-hidden rounded-2xl border-2 border-primary-700 shadow-md ring-2 ring-primary-200">
-                        <div className="relative aspect-video overflow-hidden bg-muted">
+                        <div className="relative w-full max-h-48 overflow-hidden bg-muted">
                           {v.thumbnailUrl ? (
-                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover" />
+                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover" style={{ maxHeight: '12rem' }} />
                           ) : (
                             <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
                               <VideoIcon className="h-10 w-10 text-white/60" />
