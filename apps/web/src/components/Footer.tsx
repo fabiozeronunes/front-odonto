@@ -32,7 +32,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link className={linkClass} to="/catalogo">Catálogo</Link></li>
               <li><Link className={linkClass} to="/especialidades">Especialidades</Link></li>
-              <li><Link className={linkClass} to="/casos">Estudos de caso</Link></li>
               <li><Link className={linkClass} to="/planos">Planos</Link></li>
             </ul>
           </div>

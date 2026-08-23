@@ -3,7 +3,6 @@ import {
   Home as HomeIcon,
   User as UserIcon,
   Search,
-  BookOpen,
   Sparkles,
   ShoppingCart,
   Shield,
@@ -17,7 +16,6 @@ const CAROUSEL_ITEMS = [
   { to: "/", label: "Home", icon: HomeIcon, end: true },
   { to: "/dashboard", label: "Minha Área", icon: UserIcon },
   { to: "/catalogo", label: "Catálogo", icon: Search },
-  { to: "/casos", label: "Estudos Casos", icon: BookOpen },
   { to: "/planos", label: "Planos", icon: Sparkles },
   { to: "/loja", label: "Shop", icon: ShoppingCart },
 ];

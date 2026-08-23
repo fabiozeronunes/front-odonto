@@ -50,8 +50,8 @@ export function CaseStudyDetail() {
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold text-foreground">Erro</h1>
         <p className="mt-2 text-muted-foreground">{error}</p>
-        <Link to="/casos" className="mt-4 inline-block">
-          <Button variant="outline">Voltar aos casos</Button>
+        <Link to="/catalogo?type=cases" className="mt-4 inline-block">
+          <Button variant="outline">Voltar ao catálogo</Button>
         </Link>
       </div>
     );
@@ -83,8 +83,8 @@ export function CaseStudyDetail() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <Link to="/casos" className="text-sm font-medium text-primary-700 hover:text-primary-800">
-        ← Voltar aos estudos de caso
+      <Link to="/catalogo?type=cases" className="text-sm font-medium text-primary-700 hover:text-primary-800">
+        ← Voltar ao catálogo
       </Link>
 
       <div className="mt-4 rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">

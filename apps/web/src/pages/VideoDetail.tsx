@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Heart, Eye, Clock, User, Building2, Calendar, Tag as TagIcon, X, PlayCircle, Video as VideoIcon } from "lucide-react";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { api, ApiRequestError } from "../lib/api";
@@ -20,8 +20,6 @@ export function VideoDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const fromCaseStudies = (location.state as { fromCaseStudies?: boolean } | null)?.fromCaseStudies === true;
   const [data, setData] = useState<VideoDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [favorited, setFavorited] = useState(false);
@@ -73,16 +71,9 @@ export function VideoDetail() {
         <h1 className="text-2xl font-bold text-foreground">Erro</h1>
         <p className="mt-2 text-muted-foreground">{error}</p>
         <div className="mt-4 flex items-center justify-center gap-2">
-          <Link to={fromCaseStudies ? "/casos" : "/catalogo"} className="inline-block">
-            <Button variant="outline">
-              {fromCaseStudies ? "Voltar aos estudos de casos" : "Voltar ao catálogo"}
-            </Button>
+          <Link to="/catalogo?type=cases" className="inline-block">
+            <Button variant="outline">Voltar ao catálogo</Button>
           </Link>
-          {fromCaseStudies && (
-            <Link to="/catalogo" className="inline-block">
-              <Button variant="ghost">Ver catálogo</Button>
-            </Link>
-          )}
         </div>
       </div>
     );

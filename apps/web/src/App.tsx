@@ -8,7 +8,6 @@ import { Home } from "./pages/Home";
 import { Catalog } from "./pages/Catalog";
 import { VideoDetail } from "./pages/VideoDetail";
 import { Specialties } from "./pages/Specialties";
-import { CaseStudies } from "./pages/CaseStudies";
 import { CaseStudyDetail } from "./pages/CaseStudyDetail";
 import { Plans } from "./pages/Plans";
 import { Shop } from "./pages/Shop";
@@ -55,7 +54,6 @@ export default function App() {
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/video/:slug" element={<VideoDetail />} />
           <Route path="/especialidades" element={<Specialties />} />
-          <Route path="/casos" element={<CaseStudies />} />
           <Route path="/casos/:slug" element={<CaseStudyDetail />} />
           <Route path="/planos" element={<Plans />} />
           <Route path="/loja" element={<Shop />} />
