@@ -255,7 +255,7 @@ export function MyCases() {
     load();
   }
 
-  function applyYouTube(info: { title?: string; author?: string; thumbnailUrl?: string; videoUrl: string }) {
+  async function applyYouTube(info: { title?: string; author?: string; thumbnailUrl?: string; videoUrl: string }) {
     importedVideoUrl.current = info.videoUrl;
     setEditing((prev) => {
       if (!prev) return prev;
@@ -267,6 +267,26 @@ export function MyCases() {
         author: prev.author || info.author || "",
       };
     });
+    try {
+      const res = await api<{ data: { id: string } }>("/api/videos", {
+        method: "POST",
+        body: JSON.stringify({
+          title: info.title || "Vídeo importado",
+          videoUrl: info.videoUrl,
+          thumbnailUrl: info.thumbnailUrl || undefined,
+          author: info.author || undefined,
+          isFree: true,
+          status: "PUBLISHED",
+        }),
+      });
+      setEditing((prev) => {
+        if (!prev) return prev;
+        if (prev.videoIds.includes(res.data.id)) return prev;
+        return { ...prev, videoIds: [...prev.videoIds, res.data.id] };
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao importar vídeo");
+    }
   }
 
   function handleAudioTitleChange(index: number) {
