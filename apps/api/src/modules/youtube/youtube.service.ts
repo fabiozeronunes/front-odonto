@@ -139,6 +139,39 @@ function getYouTubeClient() {
   return google.youtube({ version: "v3", auth: oauth2Client });
 }
 
+export function getYouTubeAuthUrl(redirectUri: string): string {
+  if (!env.youtubeClientId) {
+    throw new ApiError(501, "YOUTUBE_CLIENT_ID não configurado");
+  }
+  const oauth2Client = new google.auth.OAuth2(
+    env.youtubeClientId,
+    env.youtubeClientSecret,
+    redirectUri
+  );
+  return oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent",
+    scope: ["https://www.googleapis.com/auth/youtube.upload"],
+  });
+}
+
+export async function exchangeYouTubeCode(code: string, redirectUri: string) {
+  if (!env.youtubeClientId || !env.youtubeClientSecret) {
+    throw new ApiError(501, "YOUTUBE_CLIENT_ID e YOUTUBE_CLIENT_SECRET não configurados");
+  }
+  const oauth2Client = new google.auth.OAuth2(
+    env.youtubeClientId,
+    env.youtubeClientSecret,
+    redirectUri
+  );
+  const { tokens } = await oauth2Client.getToken(code);
+  return {
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token,
+    expiryDate: tokens.expiry_date,
+  };
+}
+
 export interface YouTubeUploadResult {
   videoId: string;
   embedUrl: string;

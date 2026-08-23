@@ -16,6 +16,10 @@ const upload = multer({
   },
 });
 
+// Rotas públicas (setup inicial)
+youtubeRouter.get("/auth", ctrl.auth);
+youtubeRouter.get("/callback", ctrl.callback);
+
 youtubeRouter.use(authenticate);
 
 youtubeRouter.get(
