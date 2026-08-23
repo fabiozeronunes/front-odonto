@@ -8,6 +8,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
 import { resolveImageUrl, cn } from "../lib/utils";
 
 interface ImageSearchItem {
@@ -485,25 +486,52 @@ export function Catalog() {
             ) : (
               <>
                 <div className={gridClass}>
-                  {caseStudies.map((cs) => (
+                  {caseStudies.map((cs) => {
+                    const thumbUrl = cs.videoCases?.[0]?.video.thumbnailUrl;
+                    return (
                     <Link
                       key={cs.id}
                       to={`/casos/${cs.slug || cs.id}`}
-                      className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+                      className="group block"
                     >
-                      <div className="aspect-video bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center">
-                        <BookOpen className="h-12 w-12 text-white/60" />
-                      </div>
-                      <div className="p-3">
-                        <p className="truncate text-sm font-medium text-foreground">{cs.title}</p>
-                        <p className="text-xs text-muted-foreground">{cs.specialty?.name ?? "Sem especialidade"}</p>
-                        <div className="mt-2 flex gap-2">
-                          <Badge variant={cs.isFree ? "free" : "premium"}>{cs.isFree ? "FREE" : "Pago"}</Badge>
-                          <Badge variant={cs.status === "PUBLISHED" ? "default" : "outline"}>{cs.status}</Badge>
+                      <Card className="overflow-hidden transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+                        <div className="relative aspect-video overflow-hidden bg-muted">
+                          {thumbUrl ? (
+                            <img
+                              src={resolveImageUrl(thumbUrl)}
+                              alt={cs.title}
+                              loading="lazy"
+                              className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 to-blue-600">
+                              <BookOpen className="h-12 w-12 text-white/60" />
+                            </div>
+                          )}
+                          <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+                            <Badge variant={cs.isFree ? "free" : "premium"} className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
+                              {cs.isFree ? "Gratuito" : "Pago"}
+                            </Badge>
+                            {cs.difficulty && (
+                              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1">
+                                {cs.difficulty === "BASICO" ? "Básico" : cs.difficulty === "INTERMEDIARIO" ? "Intermediário" : "Avançado"}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                        <CardContent className="p-4">
+                          <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
+                            {cs.title}
+                          </h3>
+                          <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{cs.specialty?.name ?? "Geral"}</span>
+                            <span>{cs.author ?? ""}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
                 {caseStudies.length < total && (
                   <div className="mt-10 flex justify-center">
