@@ -125,11 +125,9 @@ export function MySchedule() {
     openNew(next);
   }
 
-  function formatPeriod(p1s: string, p1e: string, p2s: string, p2e: string) {
-    const parts: string[] = [];
-    if (p1s && p1e) parts.push(`${p1s}–${p1e}`);
-    if (p2s && p2e) parts.push(`${p2s}–${p2e}`);
-    return parts.join(" / ") || "—";
+  function formatPeriod(start: string, end: string) {
+    if (start && end) return `${start}–${end}`;
+    return "—";
   }
 
   return (
@@ -179,12 +177,13 @@ export function MySchedule() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-t border-border bg-muted/30">
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Turma</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Curso</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Professor</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Disciplina</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Horário</th>
+                      <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground uppercase">1º Período</th>
+                      <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground uppercase">2º Período</th>
                       <th className="px-3 py-2 w-16"></th>
                     </tr>
                   </thead>
@@ -194,6 +193,7 @@ export function MySchedule() {
                       if (dayItems.length === 0) return null;
                       return dayItems.map((d, idx) => (
                         <tr key={d.id} className={`border-t border-border ${idx === 0 && d.day !== periodItems[0]?.day ? "border-t-2 border-t-muted" : ""}`}>
+                          <td className="px-3 py-2.5 text-muted-foreground">{d.day}</td>
                           <td className="px-3 py-2.5 font-medium text-foreground">{d.turma || "—"}</td>
                           <td className="px-3 py-2.5 text-muted-foreground">{d.curso || "—"}</td>
                           <td className="px-3 py-2.5 text-foreground">{d.professor || "—"}</td>
@@ -202,11 +202,16 @@ export function MySchedule() {
                               {d.name}
                             </span>
                           </td>
-                          <td className="px-3 py-2.5 text-muted-foreground">{d.day}</td>
-                          <td className="px-3 py-2.5">
-                            <span className="flex items-center gap-1 text-muted-foreground">
+                          <td className="px-3 py-2.5 text-center">
+                            <span className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              {formatPeriod(d.period1Start, d.period1End, d.period2Start, d.period2End)}
+                              {formatPeriod(d.period1Start, d.period1End)}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-center">
+                            <span className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatPeriod(d.period2Start, d.period2End)}
                             </span>
                           </td>
                           <td className="px-3 py-2.5">
@@ -269,6 +274,18 @@ export function MySchedule() {
                 />
               </div>
               <div className="space-y-1">
+                <Label>Dia da semana</Label>
+                <select
+                  value={editing.day}
+                  onChange={(e) => setEditing({ ...editing, day: e.target.value })}
+                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                >
+                  {DAYS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1">
                 <Label>Nº Turma</Label>
                 <Input
                   value={editing.turma}
@@ -311,18 +328,6 @@ export function MySchedule() {
                   placeholder="Ex.: Anatomia"
                   autoFocus
                 />
-              </div>
-              <div className="space-y-1">
-                <Label>Dia da semana</Label>
-                <select
-                  value={editing.day}
-                  onChange={(e) => setEditing({ ...editing, day: e.target.value })}
-                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-                >
-                  {DAYS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
               </div>
 
               <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
