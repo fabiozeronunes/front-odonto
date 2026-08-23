@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music, FileText, Image as ImageIcon, Settings } from "lucide-react";
 import { api } from "../../lib/api";
@@ -91,6 +91,7 @@ export function MyCases() {
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
+  const lastSavedRef = useRef<string>("");
 
   async function load() {
     setLoading(true);
@@ -127,6 +128,43 @@ export function MyCases() {
       }
     }
   }, [editId, cases]);
+
+  useEffect(() => {
+    if (!editing?.id) return;
+    const interval = setInterval(async () => {
+      const snapshot = JSON.stringify(editing);
+      if (snapshot === lastSavedRef.current) return;
+      if (saving) return;
+      setSaving(true);
+      try {
+        const body = {
+          title: editing.title,
+          description: editing.description || undefined,
+          diagnosis: editing.diagnosis || undefined,
+          specialtyId: editing.specialtyId || null,
+          difficulty: editing.difficulty,
+          isFree: editing.isFree,
+          status: editing.status,
+          author: editing.author || undefined,
+          institution: editing.institution || undefined,
+          observations: editing.observations || undefined,
+          audioUrl: editing.audioUrl || undefined,
+          audioTitle: editing.audioTitle || undefined,
+          audioTagIds: editing.audioTagIds,
+          tagIds: editing.tagIds,
+          videoIds: editing.videoIds,
+          images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
+        };
+        await api(`/api/case-studies/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
+        lastSavedRef.current = snapshot;
+      } catch {
+        // silent auto-save failure
+      } finally {
+        setSaving(false);
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [editing?.id, saving]);
 
   function startCreate() {
     setEditing({ ...emptyForm });
@@ -197,6 +235,7 @@ export function MyCases() {
         setSearchParams({ tab: "cases", edit: res.data.id });
       }
       setError(null);
+      lastSavedRef.current = JSON.stringify(editing);
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao salvar");
