@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronRight, Loader2, Send, Trash2, Headphones } from "lucide-react";
+import { BookOpen, ChevronRight, Loader2, Send, Trash2, Headphones, Table } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import type { StudyResource } from "../types";
 import { Button } from "../components/ui/button";
@@ -69,9 +69,16 @@ export function MeusEstudos() {
             Materiais que você gerou com IA, salvos direto na sua área pessoal.
           </p>
         </div>
-        <Link to="/catalogo">
-          <Button variant="outline">Gerar novos estudos</Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/catalogo">
+            <Button variant="outline">Gerar novos estudos</Button>
+          </Link>
+          <Link to="/meus-conteudos?tab=grade">
+            <Button variant="outline">
+              <Table className="h-4 w-4" /> Grade disciplinas
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {error && (

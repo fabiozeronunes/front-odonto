@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
+import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon, Table } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Product, Video } from "../types";
@@ -98,6 +98,11 @@ export function Dashboard() {
           <Link to="/meus-estudos">
             <Button variant="outline">
               <BookOpen className="h-4 w-4" /> Meus estudos
+            </Button>
+          </Link>
+          <Link to="/meus-conteudos?tab=grade">
+            <Button variant="outline">
+              <Table className="h-4 w-4" /> Grade disciplinas
             </Button>
           </Link>
           <Button variant="outline" onClick={logout} className="text-red-600 hover:text-red-700">
