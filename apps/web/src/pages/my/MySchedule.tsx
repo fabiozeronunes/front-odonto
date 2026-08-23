@@ -247,11 +247,13 @@ export function MySchedule() {
 
       {showForm && editing && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-4">
-          <div className="w-full max-w-md rounded-t-2xl border border-border bg-surface p-6 shadow-lg max-h-[85vh] overflow-y-auto sm:rounded-2xl">
-            <h3 className="mb-4 text-lg font-bold text-foreground">
-              {editing.id ? "Editar disciplina" : "Nova disciplina"}
-            </h3>
-            <div className="space-y-3">
+          <div className="w-full max-w-md rounded-t-2xl border border-border bg-surface shadow-lg max-h-[85vh] overflow-y-auto sm:rounded-2xl sm:max-h-[90vh]">
+            <div className="sticky top-0 z-10 border-b border-border bg-surface px-6 py-4">
+              <h3 className="text-lg font-bold text-foreground">
+                {editing.id ? "Editar disciplina" : "Nova disciplina"}
+              </h3>
+            </div>
+            <div className="px-6 py-4 space-y-3">
               <div className="space-y-1">
                 <Label>Período</Label>
                 <Input
@@ -351,7 +353,7 @@ export function MySchedule() {
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="sticky bottom-0 border-t border-border bg-surface px-6 py-3 flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={closeForm}>Cancelar</Button>
               <Button size="sm" onClick={saveDiscipline} disabled={!editing.name.trim()}>Salvar</Button>
             </div>
