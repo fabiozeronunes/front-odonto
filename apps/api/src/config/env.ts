@@ -54,4 +54,8 @@ export const env = {
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   emailFrom: process.env.EMAIL_FROM ?? "noreply@odonto.study",
   corsOrigins: process.env.CORS_ORIGINS ?? "",
+  youtubeClientId: process.env.YOUTUBE_CLIENT_ID ?? "",
+  youtubeClientSecret: process.env.YOUTUBE_CLIENT_SECRET ?? "",
+  youtubeRefreshToken: process.env.YOUTUBE_REFRESH_TOKEN ?? "",
+  youtubeCategoryId: process.env.YOUTUBE_CATEGORY_ID ?? "27", // Education
 };

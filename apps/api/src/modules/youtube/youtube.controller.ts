@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/errors.js";
 import { env } from "../../config/env.js";
-import { downloadVideo, getInfo, ytDlpAvailable } from "./youtube.service.js";
+import { downloadVideo, getInfo, ytDlpAvailable, uploadToYouTube } from "./youtube.service.js";
 
 export const info = asyncHandler(async (req: Request, res: Response) => {
   const url = String(req.query.url ?? "");
@@ -31,4 +31,27 @@ export const importFromUrl = asyncHandler(async (req: Request, res: Response) =>
       downloaded: true,
     },
   });
+});
+
+export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
+  const file = req.file;
+  if (!file) {
+    throw new ApiError(400, "Nenhum arquivo de vídeo enviado");
+  }
+
+  const title = String(req.body.title ?? "Aula gravada").slice(0, 100);
+  const description = String(req.body.description ?? "").slice(0, 5000);
+  const tags = req.body.tags
+    ? String(req.body.tags).split(",").map((t: string) => t.trim()).filter(Boolean)
+    : [];
+
+  const result = await uploadToYouTube(
+    file.buffer,
+    file.originalname,
+    title,
+    description,
+    tags
+  );
+
+  res.status(201).json({ data: result });
 });

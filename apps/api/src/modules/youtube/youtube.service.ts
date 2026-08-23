@@ -1,7 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execSync, spawn } from "node:child_process";
+import { google } from "googleapis";
+import { Readable } from "node:stream";
 import { ApiError } from "../../utils/errors.js";
+import { env } from "../../config/env.js";
 
 const CLEANUP_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 let cleanupTimer: NodeJS.Timeout | null = null;
@@ -122,4 +125,73 @@ export function startCleanupSchedule() {
   cleanupTimer = setInterval(cleanupOldDownloads, 6 * 60 * 60 * 1000);
   // Run once on startup (after 5 minutes)
   setTimeout(cleanupOldDownloads, 5 * 60 * 1000);
+}
+
+function getYouTubeClient() {
+  if (!env.youtubeClientId || !env.youtubeClientSecret || !env.youtubeRefreshToken) {
+    throw new ApiError(501, "Upload para YouTube não configurado. Defina YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET e YOUTUBE_REFRESH_TOKEN.");
+  }
+  const oauth2Client = new google.auth.OAuth2(
+    env.youtubeClientId,
+    env.youtubeClientSecret
+  );
+  oauth2Client.setCredentials({ refresh_token: env.youtubeRefreshToken });
+  return google.youtube({ version: "v3", auth: oauth2Client });
+}
+
+export interface YouTubeUploadResult {
+  videoId: string;
+  embedUrl: string;
+  watchUrl: string;
+  thumbnailUrl: string;
+  title: string;
+}
+
+export async function uploadToYouTube(
+  videoBuffer: Buffer,
+  filename: string,
+  title: string,
+  description: string,
+  tags: string[]
+): Promise<YouTubeUploadResult> {
+  const youtube = getYouTubeClient();
+
+  const res = await youtube.videos.insert(
+    {
+      part: ["snippet", "status"],
+      requestBody: {
+        snippet: {
+          title,
+          description,
+          tags,
+          categoryId: env.youtubeCategoryId,
+          defaultLanguage: "pt-BR",
+        },
+        status: {
+          privacyStatus: "unlisted",
+          selfDeclaredMadeForKids: false,
+        },
+      },
+      media: {
+        mimeType: filename.endsWith(".mp4") ? "video/mp4" : "video/webm",
+        body: Readable.from(videoBuffer),
+      },
+    },
+    {
+      timeout: 300_000,
+    }
+  );
+
+  const videoId = res.data.id;
+  if (!videoId) {
+    throw new ApiError(502, "Falha ao enviar vídeo para YouTube");
+  }
+
+  return {
+    videoId,
+    embedUrl: `https://www.youtube.com/embed/${videoId}`,
+    watchUrl: `https://www.youtube.com/watch?v=${videoId}`,
+    thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    title,
+  };
 }
