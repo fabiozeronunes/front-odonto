@@ -201,9 +201,6 @@ export function MySchedule() {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <Badge className={`${d.color} text-xs font-medium`}>{d.name}</Badge>
-                                    {d.turma && (
-                                      <Badge variant="outline" className="text-xs">Turma {d.turma}</Badge>
-                                    )}
                                     <div className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
                                       <Clock className="h-3 w-3" />
                                       <span className="font-mono text-sm">{formatPeriod(d.period1Start, d.period1End)}</span>
@@ -217,28 +214,24 @@ export function MySchedule() {
                                   <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                     {d.turma && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
-                                        <span className="font-medium">{d.turma}</span>
-                                        <span>Turma</span>
+                                        <span className="font-medium">Turma {d.turma}</span>
                                       </span>
                                     )}
                                     {d.bloco && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
-                                        <span className="font-medium">{d.bloco}</span>
-                                        <span>Bloco</span>
+                                        <span className="font-medium">Bloco {d.bloco}</span>
                                       </span>
                                     )}
                                     {d.sala && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
-                                        <span className="font-medium">{d.sala}</span>
-                                        <span>Sala</span>
+                                        <span className="font-medium">Sala {d.sala}</span>
                                       </span>
                                     )}
                                   </div>
                                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                     {d.curso && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
-                                        <span className="font-medium">{d.curso}</span>
-                                        <span>Curso</span>
+                                        <span className="font-medium">Curso {d.curso}</span>
                                       </span>
                                     )}
                                     {d.turno && (
@@ -247,8 +240,7 @@ export function MySchedule() {
                                   </div>
                                   {d.professor && (
                                     <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                                      <span className="font-medium">{d.professor}</span>
-                                      <span>Professor</span>
+                                      <span className="font-medium">Professor {d.professor}</span>
                                     </div>
                                   )}
                                 </div>
