@@ -248,127 +248,135 @@ export function MySchedule() {
       })}
 
       {showForm && editing && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-4">
-          <div className="w-full max-w-md rounded-t-2xl border border-border bg-surface shadow-lg max-h-[85vh] overflow-y-auto sm:rounded-2xl sm:max-h-[90vh]">
-            <div className="sticky top-0 z-10 border-b border-border bg-surface px-6 py-4">
-              <h3 className="text-lg font-bold text-foreground">
-                {editing.id ? "Editar disciplina" : "Nova disciplina"}
-              </h3>
-            </div>
-            <div className="px-6 py-4 space-y-3">
-              <div className="space-y-1">
-                <Label>Período</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={editing.period}
-                  onChange={(e) => setEditing({ ...editing, period: Number(e.target.value) || 1 })}
-                />
+        <div className="fixed inset-0 z-[100] bg-black/50 flex flex-col" onClick={closeForm}>
+          <div
+            className="flex-1 overflow-y-auto bg-surface"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto max-w-md px-6 py-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">
+                  {editing.id ? "Editar disciplina" : "Nova disciplina"}
+                </h3>
+                <button type="button" onClick={closeForm} className="text-muted-foreground hover:text-foreground">
+                  ✕
+                </button>
               </div>
-              <div className="space-y-1">
-                <Label>Nº Turma</Label>
-                <Input
-                  value={editing.turma}
-                  onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
-                  placeholder="Ex.: 001"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Nome do professor</Label>
-                <Input
-                  value={editing.professor}
-                  onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
-                  placeholder="Ex.: Dr. João Silva"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Curso</Label>
-                <Input
-                  value={editing.curso}
-                  onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
-                  placeholder="Ex.: Odontologia"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Turno</Label>
-                <select
-                  value={editing.turno}
-                  onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
-                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-                >
-                  <option value="Integral">Integral</option>
-                  <option value="Noturno">Noturno</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label>Nome da disciplina</Label>
-                <Input
-                  value={editing.name}
-                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                  placeholder="Ex.: Anatomia"
-                  autoFocus
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Dia da semana</Label>
-                <select
-                  value={editing.day}
-                  onChange={(e) => setEditing({ ...editing, day: e.target.value })}
-                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-                >
-                  {DAYS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label>Período</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={editing.period}
+                    onChange={(e) => setEditing({ ...editing, period: Number(e.target.value) || 1 })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Nº Turma</Label>
+                  <Input
+                    value={editing.turma}
+                    onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
+                    placeholder="Ex.: 001"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Curso</Label>
+                  <Input
+                    value={editing.curso}
+                    onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
+                    placeholder="Ex.: Odontologia"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Turno</Label>
+                  <select
+                    value={editing.turno}
+                    onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
+                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                  >
+                    <option value="Integral">Integral</option>
+                    <option value="Noturno">Noturno</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label>Nome do professor</Label>
+                  <Input
+                    value={editing.professor}
+                    onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
+                    placeholder="Ex.: Dr. João Silva"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Nome da disciplina</Label>
+                  <Input
+                    value={editing.name}
+                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                    placeholder="Ex.: Anatomia"
+                    autoFocus
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Dia da semana</Label>
+                  <select
+                    value={editing.day}
+                    onChange={(e) => setEditing({ ...editing, day: e.target.value })}
+                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                  >
+                    {DAYS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">1º Período</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Início</Label>
-                    <Input
-                      type="time"
-                      value={editing.period1Start}
-                      onChange={(e) => setEditing({ ...editing, period1Start: e.target.value })}
-                    />
+                <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">1º Período</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Início</Label>
+                      <Input
+                        type="time"
+                        value={editing.period1Start}
+                        onChange={(e) => setEditing({ ...editing, period1Start: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Fim</Label>
+                      <Input
+                        type="time"
+                        value={editing.period1End}
+                        onChange={(e) => setEditing({ ...editing, period1End: e.target.value })}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Fim</Label>
-                    <Input
-                      type="time"
-                      value={editing.period1End}
-                      onChange={(e) => setEditing({ ...editing, period1End: e.target.value })}
-                    />
+                </div>
+
+                <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">2º Período</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Início</Label>
+                      <Input
+                        type="time"
+                        value={editing.period2Start}
+                        onChange={(e) => setEditing({ ...editing, period2Start: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Fim</Label>
+                      <Input
+                        type="time"
+                        value={editing.period2End}
+                        onChange={(e) => setEditing({ ...editing, period2End: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">2º Período</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Início</Label>
-                    <Input
-                      type="time"
-                      value={editing.period2Start}
-                      onChange={(e) => setEditing({ ...editing, period2Start: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Fim</Label>
-                    <Input
-                      type="time"
-                      value={editing.period2End}
-                      onChange={(e) => setEditing({ ...editing, period2End: e.target.value })}
-                    />
-                  </div>
-                </div>
+              <div className="flex justify-end gap-2 pt-2 pb-4">
+                <Button variant="ghost" size="sm" onClick={closeForm}>Cancelar</Button>
+                <Button size="sm" onClick={saveDiscipline} disabled={!editing.name.trim()}>Salvar</Button>
               </div>
-            </div>
-            <div className="sticky bottom-0 border-t border-border bg-surface px-6 py-3 flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={closeForm}>Cancelar</Button>
-              <Button size="sm" onClick={saveDiscipline} disabled={!editing.name.trim()}>Salvar</Button>
             </div>
           </div>
         </div>
