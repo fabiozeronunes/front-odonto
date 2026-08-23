@@ -8,6 +8,7 @@ interface Discipline {
   id: string;
   turma: string;
   curso: string;
+  turno: string;
   professor: string;
   name: string;
   period: number;
@@ -76,6 +77,7 @@ export function MySchedule() {
       id: "",
       turma: "",
       curso: "",
+      turno: "Noturno",
       professor: "",
       name: "",
       period,
@@ -286,6 +288,17 @@ export function MySchedule() {
                   onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
                   placeholder="Ex.: Odontologia"
                 />
+              </div>
+              <div className="space-y-1">
+                <Label>Turno</Label>
+                <select
+                  value={editing.turno}
+                  onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
+                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                >
+                  <option value="Integral">Integral</option>
+                  <option value="Noturno">Noturno</option>
+                </select>
               </div>
               <div className="space-y-1">
                 <Label>Nome da disciplina</Label>
