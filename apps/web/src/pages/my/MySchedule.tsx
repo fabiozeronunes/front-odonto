@@ -7,6 +7,8 @@ import { Label } from "../../components/ui/label";
 interface Discipline {
   id: string;
   turma: string;
+  bloco: string;
+  sala: string;
   curso: string;
   turno: string;
   professor: string;
@@ -76,6 +78,8 @@ export function MySchedule() {
     setEditing({
       id: "",
       turma: "",
+      bloco: "",
+      sala: "",
       curso: "",
       turno: "Noturno",
       professor: "",
@@ -291,6 +295,22 @@ export function MySchedule() {
                   value={editing.turma}
                   onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
                   placeholder="Ex.: 001"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Bloco</Label>
+                <Input
+                  value={editing.bloco}
+                  onChange={(e) => setEditing({ ...editing, bloco: e.target.value })}
+                  placeholder="Ex.: A"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Sala</Label>
+                <Input
+                  value={editing.sala}
+                  onChange={(e) => setEditing({ ...editing, sala: e.target.value })}
+                  placeholder="Ex.: 101"
                 />
               </div>
               <div className="space-y-1">
