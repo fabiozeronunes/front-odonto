@@ -97,12 +97,12 @@ export async function listMyUploads(userId: string): Promise<{ url: string; name
     }));
 }
 
-export function generateSignedUploadUrl(userId: string, filename: string, contentType: string) {
+export async function generateSignedUploadUrl(userId: string, filename: string, contentType: string) {
   const ext = ALLOWED_MIMES[contentType] ?? ".bin";
   const uniqueName = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
   const path = `${userId}/${uniqueName}`;
 
-  const { data, error } = storage.storage.from(STORAGE_BUCKET).createSignedUploadUrl(path);
+  const { data, error } = await storage.storage.from(STORAGE_BUCKET).createSignedUploadUrl(path);
   if (error) throw new Error(`Falha ao gerar URL de upload: ${error.message}`);
 
   return {
