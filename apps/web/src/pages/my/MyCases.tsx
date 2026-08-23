@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music, FileText, Image as ImageIcon, Settings } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import type { CaseStudy, Paginated, Specialty, Tag as TagType, Video } from "../../types";
@@ -62,20 +62,6 @@ const emptyForm: CaseFormState = {
   images: [],
 };
 
-function BlockHeader({ icon: Icon, title, subtitle }: { icon: typeof VideoIcon; title: string; subtitle?: string }) {
-  return (
-    <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950">
-        <Icon className="h-4 w-4 text-primary-700" />
-      </div>
-      <div>
-        <h3 className="text-sm font-bold text-foreground">{title}</h3>
-        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-      </div>
-    </div>
-  );
-}
-
 export function MyCases() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -91,6 +77,7 @@ export function MyCases() {
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
+  const [tagSearch, setTagSearch] = useState("");
   const lastSavedRef = useRef<string>("");
 
   async function load() {
@@ -394,24 +381,6 @@ export function MyCases() {
     return tagId;
   }
 
-  async function deleteTag(tagId: string) {
-    if (!editing) return;
-    const tag = tags.find((t) => t.id === tagId);
-    if (!tag) return;
-    if (!confirm(`Excluir a tag #${tag.name} definitivamente? Ela será removida de todos os conteúdos.`)) return;
-    try {
-      await api(`/api/tags/${tagId}`, { method: "DELETE" });
-      setTags((prev) => prev.filter((t) => t.id !== tagId));
-      setEditing((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          tagIds: prev.tagIds.filter((t) => t !== tagId),
-          images: prev.images.map((img) => ({ ...img, tagIds: img.tagIds.filter((t) => t !== tagId) })),
-        };
-      });
-    } catch (e) { setError(e instanceof Error ? e.message : "Erro ao excluir tag"); }
-  }
 
   return (
     <div>
@@ -421,19 +390,12 @@ export function MyCases() {
       </div>
 
       {editing && (
-        <div className="mb-6 space-y-4">
-          <div className="flex items-center justify-between rounded-2xl border border-border bg-surface px-5 py-3 shadow-card">
-            <Button variant="ghost" size="sm" onClick={cancelEdit}>
-              <X className="h-4 w-4" /> Fechar formulário
-            </Button>
-          </div>
-          {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">{error}</div>
-          )}
+        <div className="mb-6 space-y-5">
+          {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
           {/* Block 1: Informações do caso */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={FileText} title="Informações do caso" subtitle="Título, especialidade e metadados" />
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Informações do caso</h3>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Título *</Label>
@@ -474,8 +436,14 @@ export function MyCases() {
           </div>
 
           {/* Block 2: Vídeos do caso */}
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={VideoIcon} title="Vídeos do caso" subtitle="Importe do YouTube ou selecione seus vídeos" />
+          <div className="overflow-hidden rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
+              <VideoIcon className="h-5 w-5 text-primary-600" />
+              Vídeos do caso
+            </h3>
+            <p className="mb-3 text-sm text-muted-foreground">
+              Importe do YouTube ou selecione seus vídeos existentes.
+            </p>
             <YouTubeImport onInfo={importYouTubeVideo} />
             {(() => {
               const linkedVideos = myVideos.filter((v) => editing.videoIds.includes(v.id));
@@ -523,7 +491,7 @@ export function MyCases() {
           </div>
 
           {/* Block 3: Áudios */}
-          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Music className="h-5 w-5 text-primary-600" />
@@ -564,6 +532,7 @@ export function MyCases() {
                     </div>
                   </div>
 
+                  {/* Tags do áudio */}
                   <div className="rounded-xl border border-border p-4 space-y-3">
                     <div className="space-y-2">
                       <Label>Tags do áudio</Label>
@@ -572,7 +541,7 @@ export function MyCases() {
                         {tags.map((tag) => {
                           const selected = editing.audioTagIds.includes(tag.id);
                           return (
-                            <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-accent-600 text-white" : "bg-muted text-muted-foreground"}`}>
+                            <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-primary-700 text-white" : "bg-muted text-muted-foreground"}`}>
                               <button type="button" onClick={() => toggleAudioTag(tag.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}>
                                 #{tag.name}
                               </button>
@@ -589,8 +558,8 @@ export function MyCases() {
           </div>
 
           {/* Block 4: Descrição, Diagnóstico, Observações */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={FileText} title="Descrição e observações" subtitle="Descreva, diagnostique e anote observações" />
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Descrição e observações</h3>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Descrição</Label>
@@ -607,9 +576,9 @@ export function MyCases() {
             </div>
           </div>
 
-          {/* Block 5: Galeria de imagens + Tags de imagem */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={ImageIcon} title="Galeria de imagens e tags" subtitle="Upload ou link, máximo 5 imagens com tags" />
+          {/* Block 5: Galeria de imagens */}
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Galeria de imagens</h3>
             <ImagePicker
               value={editing.images.map((img) => img.url)}
               onChange={(urls) => setEditing((prev) => {
@@ -631,92 +600,163 @@ export function MyCases() {
                 {editing.images.length} {editing.images.length === 1 ? "imagem selecionada" : "imagens selecionadas"} (máx. 5)
               </p>
             )}
-            {editing.images.length > 0 && (
-              <div className="mt-4 space-y-4">
+          </div>
+
+          {/* Block 6: Tags de cada imagem */}
+          {editing.images.length > 0 && (
+            <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+              <h3 className="mb-4 text-lg font-bold text-foreground">Tags de cada imagem</h3>
+              <p className="mb-4 text-xs text-muted-foreground">
+                Tags específicas para cada imagem, independentes das tags do caso.
+              </p>
+              <div className="space-y-5">
                 {editing.images.map((img, index) => {
                   const imageTags = tags.filter((tag) => img.tagIds.includes(tag.id));
                   return (
-                    <div key={img.id} className="rounded-xl border border-border p-4">
-                      <div className="mb-3 flex items-center gap-3">
-                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border">
+                    <div key={img.id} className="rounded-xl border border-border p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border">
                           <img src={resolveImageUrl(img.url)} alt="" className="h-full w-full object-cover" />
                         </div>
-                        <div>
-                          <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-800 dark:bg-primary-950 dark:text-primary-200">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground">
                             Imagem {index + 1}
-                          </span>
-                          <p className="mt-1 text-sm font-semibold text-foreground">Tags da imagem {index + 1}</p>
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {imageTags.length} {imageTags.length === 1 ? "tag" : "tags"}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {imageTags.map((tag) => (
-                          <span key={tag.id} className="inline-flex items-center gap-1 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white">
-                            {editingTagId === tag.id ? (
-                              <input type="text" value={editingTagName} onChange={(e) => setEditingTagName(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === "Enter") saveRenameTag(tag.id); if (e.key === "Escape") cancelRenameTag(); }}
-                                onBlur={() => saveRenameTag(tag.id)} className="w-20 bg-white/20 text-white placeholder-white/50 rounded px-1 outline-none" autoFocus />
-                            ) : (
-                              <span onClick={() => canEditOrDeleteTag(tag) && startRenameTag(tag)} className={canEditOrDeleteTag(tag) ? "cursor-pointer hover:underline" : ""}>#{tag.name}</span>
-                            )}
-                            {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
-                              <button type="button" onClick={() => startRenameTag(tag)} className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40" title="Editar">
-                                <Pencil className="h-2.5 w-2.5" />
-                              </button>
-                            )}
-                            {canEditOrDeleteTag(tag) && (
-                              <button type="button" onClick={() => setDeleteConfirmTagId(tag.id)} className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500/50 text-white transition-colors hover:bg-red-500" title="Excluir">
-                                <Trash2 className="h-2.5 w-2.5" />
-                              </button>
-                            )}
-                          </span>
-                        ))}
-                        {imageTags.length === 0 && (<p className="text-sm text-muted-foreground">Nenhuma tag nesta imagem.</p>)}
-                      </div>
-                      <div className="mt-2">
+
+                      {imageTags.length > 0 && (
+                        <div className="space-y-2">
+                          {imageTags.map((tag) => (
+                            <div key={tag.id} className="flex items-center gap-2">
+                              <div className="flex-1 min-w-0">
+                                {editingTagId === tag.id ? (
+                                  <input
+                                    type="text"
+                                    value={editingTagName}
+                                    onChange={(e) => setEditingTagName(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") saveRenameTag(tag.id);
+                                      if (e.key === "Escape") cancelRenameTag();
+                                    }}
+                                    onBlur={() => saveRenameTag(tag.id)}
+                                    className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary-600"
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <span className="text-sm font-medium text-foreground">
+                                    #{tag.name}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                {canEditOrDeleteTag(tag) && editingTagId !== tag.id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => startRenameTag(tag)}
+                                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                    title="Editar nome da tag"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </button>
+                                )}
+                                {canEditOrDeleteTag(tag) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteConfirmTagId(tag.id)}
+                                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                    title="Excluir tag permanentemente"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div>
                         <TagCreator onCreate={(name) => createImageTag(name, img.id)} />
                       </div>
                     </div>
                   );
                 })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Block 6: Acesso e tags */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-            <BlockHeader icon={Settings} title="Acesso e tags" subtitle="Configure a visibilidade e categorização" />
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Tipo de acesso</Label>
-                <Select value={editing.isFree ? "gratuito" : "pago"} onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}>
-                  <option value="gratuito">Gratuito</option>
-                  <option value="pago">Pago</option>
-                </Select>
+          {/* Block 7: Acesso, origem e tags */}
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Acesso e tags</h3>
+
+            <div className="flex items-center gap-4">
+              <Label>Tipo de acesso</Label>
+              <Select
+                value={editing.isFree ? "gratuito" : "pago"}
+                onChange={(e) => setEditing({ ...editing, isFree: e.target.value === "gratuito" })}
+              >
+                <option value="gratuito">Gratuito</option>
+                <option value="pago">Pago</option>
+              </Select>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <Label>Tags</Label>
+              <div className="mb-2">
+                <Input
+                  placeholder="Buscar tag pelo nome..."
+                  value={tagSearch}
+                  onChange={(e) => setTagSearch(e.target.value)}
+                  className="max-w-xs"
+                />
               </div>
-              <div className="space-y-2">
-                <Label>Tags</Label>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => {
+              <div className="flex flex-wrap gap-2">
+                {tags
+                  .filter((tag) => tag.name.toLowerCase().includes(tagSearch.toLowerCase()))
+                  .map((tag) => {
                     const selected = editing.tagIds.includes(tag.id);
                     return (
-                      <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-primary-700 text-white" : "bg-muted text-muted-foreground"}`}>
-                        <button type="button" onClick={() => toggleTag(tag.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}>
+                      <span
+                        key={tag.id}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                          selected
+                            ? "bg-primary-700 text-white"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleTag(tag.id)}
+                          className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}
+                          title={selected ? "Remover tag do caso" : "Adicionar tag ao caso"}
+                        >
                           #{tag.name}
                         </button>
-                        <button type="button" onClick={() => deleteTag(tag.id)} className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${selected ? "bg-white/25 text-white hover:bg-white/40" : "text-muted-foreground hover:bg-muted/70 hover:text-red-600"}`} title="Excluir tag">
-                          <X className="h-3 w-3" />
-                        </button>
+                        {selected && (
+                          <button
+                            type="button"
+                            onClick={() => toggleTag(tag.id)}
+                            className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/40"
+                            title="Remover tag do caso"
+                            aria-label={`Remover tag ${tag.name} do caso`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
                       </span>
                     );
                   })}
-                </div>
-                <TagCreator onCreate={createTag} />
               </div>
+              <TagCreator onCreate={createTag} />
             </div>
           </div>
 
           {/* Save/Cancel */}
-          <div className="flex justify-end gap-2 rounded-2xl border border-border bg-surface p-4 shadow-card">
+          <div className="flex justify-end gap-2 border-t border-border pt-4">
             <Button variant="ghost" onClick={cancelEdit}>Cancelar</Button>
             <Button onClick={save} disabled={saving || !editing.title}>{saving ? "Salvando..." : "Salvar"}</Button>
           </div>
