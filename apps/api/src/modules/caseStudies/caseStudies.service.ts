@@ -39,6 +39,7 @@ const caseStudySelect = {
   },
   createdBy: { select: { id: true, name: true, email: true, role: true } },
   videoCases: {
+    orderBy: { video: { createdAt: "asc" as const } },
     select: {
       video: {
         select: {

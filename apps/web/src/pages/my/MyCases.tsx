@@ -179,14 +179,14 @@ export function MyCases() {
 
   function startEdit(c: CaseStudy) {
     importedVideoUrl.current = null;
-    const linkedVideoUrl = c.videoCases?.[0]?.video.videoUrl ?? "";
+    const lastVideo = c.videoCases?.[c.videoCases.length - 1]?.video;
     setEditing({
       id: c.id,
       title: c.title,
       description: c.description ?? "",
       diagnosis: c.diagnosis ?? "",
-      videoUrl: linkedVideoUrl,
-      thumbnailUrl: c.videoCases?.[0]?.video.thumbnailUrl ?? "",
+      videoUrl: lastVideo?.videoUrl ?? "",
+      thumbnailUrl: lastVideo?.thumbnailUrl ?? "",
       specialtyId: c.specialty?.id ?? "",
       difficulty: c.difficulty,
       isFree: c.isFree,
