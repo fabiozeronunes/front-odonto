@@ -1,12 +1,20 @@
 import { useRef, useState } from "react";
-import { Camera, Trash2, RotateCcw, Video } from "lucide-react";
+import { Camera, Trash2, RotateCcw, Video, Loader2, ExternalLink } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+interface YouTubeUploadResult {
+  videoId: string;
+  embedUrl: string;
+  watchUrl: string;
+  thumbnailUrl: string;
+  title: string;
+}
+
 interface VideoRecorderProps {
-  onRecorded: (url: string, title: string) => void;
+  onRecorded: (url: string, title: string, youtube?: YouTubeUploadResult) => void;
   onRemoved: () => void;
 }
 
@@ -18,8 +26,9 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedMeta, setRecordedMeta] = useState<{ date: string; dayWeek: string; hour: string } | null>(null);
   const [title, setTitle] = useState("");
-  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [youtubeResult, setYoutubeResult] = useState<YouTubeUploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string>("");
 
   function openCamera() {
     setError(null);
@@ -55,27 +64,35 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     e.target.value = "";
   }
 
-  async function uploadAndConfirm() {
+  async function uploadVideo() {
     if (!recordedBlob) return;
     setPhase("uploading");
+    setUploadProgress("Preparando vídeo...");
     try {
-      const ext = recordedBlob.type.includes("mp4") ? ".mp4" : ".webm";
       const form = new FormData();
-      form.append("image", recordedBlob, `gravacao-aula${ext}`);
-      const uploadRes = await api<{ data: { url: string } }>("/api/uploads", {
+      form.append("video", recordedBlob, `gravacao-aula-${Date.now()}.webm`);
+      form.append("title", title);
+      form.append("description", `Aula gravada em ${recordedMeta?.date} ${recordedMeta?.hour}`);
+
+      setUploadProgress("Enviando para YouTube...");
+      const uploadRes = await api<{ data: YouTubeUploadResult }>("/api/youtube/upload", {
         method: "POST",
         body: form,
       });
-      setUploadedUrl(uploadRes.data.url);
-      onRecorded(uploadRes.data.url, title);
+
+      const yt = uploadRes.data;
+      setYoutubeResult(yt);
+      onRecorded(yt.embedUrl, title, yt);
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setRecordedBlob(null);
       setPreviewUrl(null);
       setRecordedMeta(null);
       setPhase("done");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha no upload do video");
+      setError(e instanceof Error ? e.message : "Falha no upload. Tente novamente.");
       setPhase("preview");
+    } finally {
+      setUploadProgress("");
     }
   }
 
@@ -85,11 +102,12 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     setPreviewUrl(null);
     setRecordedMeta(null);
     setTitle("");
+    setYoutubeResult(null);
     setPhase("idle");
   }
 
   function removeUploaded() {
-    setUploadedUrl(null);
+    setYoutubeResult(null);
     setPhase("idle");
     onRemoved();
   }
@@ -124,22 +142,36 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
             </div>
           )}
           <div className="space-y-1">
-            <Label>Titulo do video</Label>
+            <Label>Título do vídeo</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Aula sobre endodontia" />
           </div>
         </div>
       )}
 
-      {phase === "done" && uploadedUrl && (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <video controls src={uploadedUrl} className="w-full" preload="metadata" />
+      {phase === "done" && youtubeResult && (
+        <div className="space-y-2">
+          <div className="rounded-xl border border-border overflow-hidden">
+            <iframe
+              src={youtubeResult.embedUrl}
+              className="w-full aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title={youtubeResult.title}
+            />
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-green-100 text-green-700 px-2 py-0.5 font-medium">No YouTube</span>
+            <a href={youtubeResult.watchUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-foreground">
+              <ExternalLink className="h-3 w-3" /> Abrir
+            </a>
+          </div>
         </div>
       )}
 
       {phase === "uploading" && (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 p-6">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm text-muted-foreground">Enviando video...</span>
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          <span className="text-sm text-muted-foreground">{uploadProgress || "Enviando..."}</span>
         </div>
       )}
 
@@ -152,7 +184,7 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
 
         {phase === "preview" && (
           <>
-            <Button type="button" variant="default" size="sm" onClick={uploadAndConfirm}>
+            <Button type="button" size="sm" onClick={uploadVideo} disabled={!title.trim()}>
               <Video className="h-3.5 w-3.5" /> Enviar e usar
             </Button>
             <Button type="button" variant="ghost" size="sm" onClick={discard}>
