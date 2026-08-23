@@ -197,15 +197,30 @@ export function MySchedule() {
                         {dayItems.map((d) => (
                           <Card key={d.id} className="border border-border bg-white hover:border-primary/30 transition-colors">
                             <CardContent className="p-3 space-y-2">
-                              <div className="flex items-start gap-3">
+                              <div className="flex items-center justify-between gap-3">
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <Badge className={`${d.color} text-xs font-medium`}>{d.name}</Badge>
                                     {d.turma && (
                                       <Badge variant="outline" className="text-xs">Turma {d.turma}</Badge>
                                     )}
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
+                                      <Clock className="h-3 w-3" />
+                                      <span className="font-mono text-sm">{formatPeriod(d.period1Start, d.period1End)}</span>
+                                      <span className="text-muted-foreground">1º</span>
+                                      <span className="mx-1">|</span>
+                                      <Clock className="h-3 w-3" />
+                                      <span className="font-mono text-sm">{formatPeriod(d.period2Start, d.period2End)}</span>
+                                      <span className="text-muted-foreground">2º</span>
+                                    </div>
                                   </div>
                                   <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                    {d.turma && (
+                                      <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
+                                        <span className="font-medium">{d.turma}</span>
+                                        <span>Turma</span>
+                                      </span>
+                                    )}
                                     {d.bloco && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
                                         <span className="font-medium">{d.bloco}</span>
@@ -218,6 +233,8 @@ export function MySchedule() {
                                         <span>Sala</span>
                                       </span>
                                     )}
+                                  </div>
+                                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                     {d.curso && (
                                       <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
                                         <span className="font-medium">{d.curso}</span>
@@ -234,18 +251,6 @@ export function MySchedule() {
                                       <span>Professor</span>
                                     </div>
                                   )}
-                                </div>
-                                <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <Clock className="h-3 w-3" />
-                                    <span className="font-mono text-sm">{formatPeriod(d.period1Start, d.period1End)}</span>
-                                    <span className="text-muted-foreground">1º</span>
-                                  </div>
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <Clock className="h-3 w-3" />
-                                    <span className="font-mono text-sm">{formatPeriod(d.period2Start, d.period2End)}</span>
-                                    <span className="text-muted-foreground">2º</span>
-                                  </div>
                                 </div>
                               </div>
                               <div className="flex justify-end gap-1 pt-1 border-t border-border">
