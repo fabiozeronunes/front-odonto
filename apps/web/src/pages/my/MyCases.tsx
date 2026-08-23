@@ -91,6 +91,10 @@ export function MyCases() {
   const [tagSearch, setTagSearch] = useState("");
   const lastSavedRef = useRef<string>("");
   const importedVideoUrl = useRef<string | null>(null);
+  const savingRef = useRef(false);
+  const editingRef = useRef<CaseFormState | null>(null);
+
+  editingRef.current = editing;
 
   async function load() {
     setLoading(true);
@@ -129,39 +133,43 @@ export function MyCases() {
   useEffect(() => {
     if (!editing?.id) return;
     const interval = setInterval(async () => {
-      const snapshot = JSON.stringify(editing);
+      const current = editingRef.current;
+      if (!current?.id) return;
+      const snapshot = JSON.stringify(current);
       if (snapshot === lastSavedRef.current) return;
-      if (saving) return;
+      if (savingRef.current) return;
+      savingRef.current = true;
       setSaving(true);
       try {
         const body = {
-          title: editing.title,
-          description: editing.description || undefined,
-          diagnosis: editing.diagnosis || undefined,
-          specialtyId: editing.specialtyId || null,
-          difficulty: editing.difficulty,
-          isFree: editing.isFree,
-          status: editing.status,
-          author: editing.author || undefined,
-          institution: editing.institution || undefined,
-          observations: editing.observations || undefined,
-          audioUrl: editing.audios[0]?.url || undefined,
-          audioTitle: editing.audios[0]?.title || undefined,
-          audioTagIds: editing.audioTagIds,
-          tagIds: editing.tagIds,
-          videoIds: editing.videoIds,
-          images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
+          title: current.title,
+          description: current.description || undefined,
+          diagnosis: current.diagnosis || undefined,
+          specialtyId: current.specialtyId || null,
+          difficulty: current.difficulty,
+          isFree: current.isFree,
+          status: current.status,
+          author: current.author || undefined,
+          institution: current.institution || undefined,
+          observations: current.observations || undefined,
+          audioUrl: current.audios[0]?.url || undefined,
+          audioTitle: current.audios[0]?.title || undefined,
+          audioTagIds: current.audioTagIds,
+          tagIds: current.tagIds,
+          videoIds: current.videoIds,
+          images: current.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
         };
-        await api(`/api/case-studies/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
+        await api(`/api/case-studies/${current.id}`, { method: "PUT", body: JSON.stringify(body) });
         lastSavedRef.current = snapshot;
       } catch {
         // silent auto-save failure
       } finally {
+        savingRef.current = false;
         setSaving(false);
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [editing?.id, saving]);
+  }, [editing?.id]);
 
   function startCreate() {
     setEditing({ ...emptyForm });
@@ -205,41 +213,45 @@ export function MyCases() {
   }
 
   async function save() {
-    if (!editing) return;
+    const current = editingRef.current;
+    if (!current) return;
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     setError(null);
     const body = {
-      title: editing.title,
-      description: editing.description || undefined,
-      diagnosis: editing.diagnosis || undefined,
-      specialtyId: editing.specialtyId || null,
-      difficulty: editing.difficulty,
-      isFree: editing.isFree,
-      status: editing.status,
-      author: editing.author || undefined,
-      institution: editing.institution || undefined,
-      observations: editing.observations || undefined,
-      audioUrl: editing.audios[0]?.url || undefined,
-      audioTitle: editing.audios[0]?.title || undefined,
-      audioTagIds: editing.audioTagIds,
-      tagIds: editing.tagIds,
-      videoIds: editing.videoIds,
-      images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
+      title: current.title,
+      description: current.description || undefined,
+      diagnosis: current.diagnosis || undefined,
+      specialtyId: current.specialtyId || null,
+      difficulty: current.difficulty,
+      isFree: current.isFree,
+      status: current.status,
+      author: current.author || undefined,
+      institution: current.institution || undefined,
+      observations: current.observations || undefined,
+      audioUrl: current.audios[0]?.url || undefined,
+      audioTitle: current.audios[0]?.title || undefined,
+      audioTagIds: current.audioTagIds,
+      tagIds: current.tagIds,
+      videoIds: current.videoIds,
+      images: current.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
     try {
-      if (editing.id) {
-        await api(`/api/case-studies/${editing.id}`, { method: "PUT", body: JSON.stringify(body) });
+      if (current.id) {
+        await api(`/api/case-studies/${current.id}`, { method: "PUT", body: JSON.stringify(body) });
       } else {
         const res = await api<{ data: CaseStudy }>("/api/case-studies", { method: "POST", body: JSON.stringify(body) });
         setEditing((prev) => (prev ? { ...prev, id: res.data.id } : prev));
         setSearchParams({ tab: "cases", edit: res.data.id });
       }
       setError(null);
-      lastSavedRef.current = JSON.stringify(editing);
+      lastSavedRef.current = JSON.stringify(current);
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao salvar");
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
