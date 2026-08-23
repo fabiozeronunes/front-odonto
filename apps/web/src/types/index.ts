@@ -132,6 +132,7 @@ export interface CaseStudy {
       id: string;
       title: string;
       slug: string;
+      videoUrl: string;
       thumbnailUrl?: string | null;
       durationSeconds?: number | null;
       isFree: boolean;
@@ -247,6 +248,7 @@ export interface VideoDetail {
         id: string;
         title: string;
         slug: string;
+        videoUrl: string;
         thumbnailUrl?: string | null;
         isFree: boolean;
       };

@@ -45,6 +45,7 @@ const caseStudySelect = {
           id: true,
           title: true,
           slug: true,
+          videoUrl: true,
           thumbnailUrl: true,
           isFree: true,
           source: true,
