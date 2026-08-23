@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Video as VideoIcon, Music } from "lucide-react";
+import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Music, Camera } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
-import type { CaseStudy, Paginated, Specialty, Tag as TagType, Video } from "../../types";
+import type { CaseStudy, Paginated, Specialty, Tag as TagType } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -14,6 +14,7 @@ import { ImagePicker } from "../../components/ImagePicker";
 import { YouTubeImport } from "../../components/YouTubeImport";
 import { AudioRecorder } from "../../components/AudioRecorder";
 import { AudioPlayer } from "../../components/AudioPlayer";
+import { VideoRecorder } from "../../components/VideoRecorder";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
 
@@ -23,20 +24,29 @@ interface ImageDraft {
   tagIds: string[];
 }
 
+interface AudioDraft {
+  id: string;
+  url: string;
+  title: string;
+  createdAt?: string;
+}
+
 interface CaseFormState {
   id?: string;
   title: string;
   description: string;
   diagnosis: string;
+  videoUrl: string;
+  thumbnailUrl: string;
   specialtyId: string;
   difficulty: string;
   isFree: boolean;
+  source: "FRONTODONTUS" | "STUDENT";
   status: string;
   author: string;
   institution: string;
   observations: string;
-  audioUrl: string;
-  audioTitle: string;
+  audios: AudioDraft[];
   audioTagIds: string[];
   tagIds: string[];
   videoIds: string[];
@@ -47,15 +57,17 @@ const emptyForm: CaseFormState = {
   title: "",
   description: "",
   diagnosis: "",
+  videoUrl: "",
+  thumbnailUrl: "",
   specialtyId: "",
   difficulty: "BASICO",
   isFree: true,
+  source: "STUDENT",
   status: "DRAFT",
   author: "",
   institution: "",
   observations: "",
-  audioUrl: "",
-  audioTitle: "",
+  audios: [],
   audioTagIds: [],
   tagIds: [],
   videoIds: [],
@@ -69,7 +81,6 @@ export function MyCases() {
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [tags, setTags] = useState<TagType[]>([]);
-  const [myVideos, setMyVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CaseFormState | null>(null);
   const [saving, setSaving] = useState(false);
@@ -79,15 +90,15 @@ export function MyCases() {
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
   const [tagSearch, setTagSearch] = useState("");
   const lastSavedRef = useRef<string>("");
+  const importedVideoUrl = useRef<string | null>(null);
 
   async function load() {
     setLoading(true);
     try {
-      const [c, s, tagsPage, v] = await Promise.all([
+      const [c, s, tagsPage] = await Promise.all([
         api<Paginated<CaseStudy>>("/api/case-studies/me?perPage=50"),
         api<{ data: Specialty[] }>("/api/specialties"),
         api<Paginated<TagType>>("/api/tags?perPage=50"),
-        api<Paginated<Video>>("/api/videos/me?perPage=50"),
       ]);
       let allTags = tagsPage.data;
       if (tagsPage.pagination.total > allTags.length) {
@@ -99,7 +110,6 @@ export function MyCases() {
       setCases(c.data);
       setSpecialties(s.data);
       setTags(allTags);
-      setMyVideos(v.data);
     } finally {
       setLoading(false);
     }
@@ -135,8 +145,8 @@ export function MyCases() {
           author: editing.author || undefined,
           institution: editing.institution || undefined,
           observations: editing.observations || undefined,
-          audioUrl: editing.audioUrl || undefined,
-          audioTitle: editing.audioTitle || undefined,
+          audioUrl: editing.audios[0]?.url || undefined,
+          audioTitle: editing.audios[0]?.title || undefined,
           audioTagIds: editing.audioTagIds,
           tagIds: editing.tagIds,
           videoIds: editing.videoIds,
@@ -160,20 +170,23 @@ export function MyCases() {
   }
 
   function startEdit(c: CaseStudy) {
+    importedVideoUrl.current = null;
     setEditing({
       id: c.id,
       title: c.title,
       description: c.description ?? "",
       diagnosis: c.diagnosis ?? "",
+      videoUrl: "",
+      thumbnailUrl: "",
       specialtyId: c.specialty?.id ?? "",
       difficulty: c.difficulty,
       isFree: c.isFree,
+      source: "STUDENT",
       status: c.status,
       author: c.author ?? "",
       institution: c.institution ?? "",
       observations: c.observations ?? "",
-      audioUrl: c.audioUrl ?? "",
-      audioTitle: c.audioTitle ?? "",
+      audios: c.audioUrl ? [{ id: crypto.randomUUID(), url: c.audioUrl, title: c.audioTitle ?? "" }] : [],
       audioTagIds: c.audioTags?.map((t) => t.tag.id) ?? [],
       tagIds: c.tags.map((t) => t.tag.id),
       videoIds: c.videoCases?.map((vc) => vc.video.id) ?? c.videoIds ?? [],
@@ -206,8 +219,8 @@ export function MyCases() {
       author: editing.author || undefined,
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
-      audioUrl: editing.audioUrl || undefined,
-      audioTitle: editing.audioTitle || undefined,
+      audioUrl: editing.audios[0]?.url || undefined,
+      audioTitle: editing.audios[0]?.title || undefined,
       audioTagIds: editing.audioTagIds,
       tagIds: editing.tagIds,
       videoIds: editing.videoIds,
@@ -242,19 +255,32 @@ export function MyCases() {
     load();
   }
 
-  async function removeVideo(videoId: string) {
-    const newVideoIds = editing?.videoIds.filter((id) => id !== videoId) ?? [];
-    setEditing((prev) => prev ? { ...prev, videoIds: newVideoIds } : prev);
-    if (editing?.id) {
-      try {
-        await api(`/api/case-studies/${editing.id}`, {
-          method: "PUT",
-          body: JSON.stringify({ videoIds: newVideoIds }),
-        });
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Erro ao remover vídeo");
-      }
-    }
+  function applyYouTube(info: { title?: string; author?: string; thumbnailUrl?: string; videoUrl: string }) {
+    importedVideoUrl.current = info.videoUrl;
+    setEditing((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        videoUrl: info.videoUrl,
+        thumbnailUrl: info.thumbnailUrl ?? prev.thumbnailUrl,
+        title: prev.title || info.title || "",
+        author: prev.author || info.author || "",
+      };
+    });
+  }
+
+  function handleAudioTitleChange(index: number) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEditing((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          audios: prev.audios.map((a, i) =>
+            i === index ? { ...a, title: e.target.value } : a
+          ),
+        };
+      });
+    };
   }
 
   function toggleTag(id: string) {
@@ -301,30 +327,6 @@ export function MyCases() {
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao excluir tag"); }
   }
 
-  async function importYouTubeVideo(info: { title?: string; author?: string; thumbnailUrl?: string; videoUrl: string }) {
-    if (!editing) return;
-    setError(null);
-    try {
-      const existing = myVideos.find((v) => v.videoUrl === info.videoUrl);
-      if (existing) {
-        setEditing((prev) => {
-          if (!prev) return prev;
-          return { ...prev, videoIds: prev.videoIds.includes(existing.id) ? prev.videoIds : [...prev.videoIds, existing.id] };
-        });
-        return;
-      }
-      const res = await api<{ data: Video }>("/api/videos", {
-        method: "POST",
-        body: JSON.stringify({ title: info.title || "Vídeo importado", videoUrl: info.videoUrl, thumbnailUrl: info.thumbnailUrl || undefined, author: info.author || undefined, isFree: true, status: "PUBLISHED" }),
-      });
-      setMyVideos((prev) => prev.some((v) => v.id === res.data.id) ? prev : [res.data, ...prev]);
-      setEditing((prev) => {
-        if (!prev) return prev;
-        return { ...prev, videoIds: prev.videoIds.includes(res.data.id) ? prev.videoIds : [...prev.videoIds, res.data.id] };
-      });
-    } catch (e) { setError(e instanceof Error ? e.message : "Falha ao importar vídeo"); }
-  }
-
   async function createTag(name: string) {
     if (!editing || !name.trim()) return null;
     const trimmed = name.trim();
@@ -337,27 +339,6 @@ export function MyCases() {
       const res = await api<{ data: TagType }>("/api/tags", { method: "POST", body: JSON.stringify({ name: trimmed }) });
       setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
       setEditing({ ...editing, tagIds: [...editing.tagIds, res.data.id] });
-      return res.data.id;
-    } catch (e) { setError(e instanceof Error ? e.message : "Falha ao criar tag"); return null; }
-  }
-
-  function toggleAudioTag(id: string) {
-    if (!editing) return;
-    setEditing({ ...editing, audioTagIds: editing.audioTagIds.includes(id) ? editing.audioTagIds.filter((t) => t !== id) : [...editing.audioTagIds, id] });
-  }
-
-  async function createAudioTag(name: string) {
-    if (!editing || !name.trim()) return null;
-    const trimmed = name.trim();
-    const existing = tags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
-    if (existing) {
-      if (!editing.audioTagIds.includes(existing.id)) setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, existing.id] });
-      return existing.id;
-    }
-    try {
-      const res = await api<{ data: TagType }>("/api/tags", { method: "POST", body: JSON.stringify({ name: trimmed }) });
-      setTags((prev) => [...prev.filter((t) => t.id !== res.data.id), res.data]);
-      setEditing({ ...editing, audioTagIds: [...editing.audioTagIds, res.data.id] });
       return res.data.id;
     } catch (e) { setError(e instanceof Error ? e.message : "Falha ao criar tag"); return null; }
   }
@@ -393,101 +374,68 @@ export function MyCases() {
         <div className="mb-6 space-y-5">
           {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
-          {/* Block 1: Informações do caso */}
           <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
             <h3 className="mb-4 text-lg font-bold text-foreground">Informações do caso</h3>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Título *</Label>
-                <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} placeholder="Nome do estudo de caso" />
+                <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <Label>Especialidade</Label>
-                <Select value={editing.specialtyId} onChange={(e) => setEditing({ ...editing, specialtyId: e.target.value })}>
-                  <option value="">Sem especialidade</option>
-                  {specialties.map((s) => (<option key={s.id} value={s.id}>{s.name}</option>))}
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Nível de dificuldade</Label>
-                <Select value={editing.difficulty} onChange={(e) => setEditing({ ...editing, difficulty: e.target.value })}>
-                  <option value="BASICO">Básico</option>
-                  <option value="INTERMEDIARIO">Intermediário</option>
-                  <option value="AVANCADO">Avançado</option>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })}>
-                  <option value="DRAFT">Rascunho</option>
-                  <option value="PUBLISHED">Publicado</option>
-                  <option value="ARCHIVED">Arquivado</option>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Autor</Label>
-                <Input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} placeholder="Nome do autor" />
-              </div>
-              <div className="space-y-2">
-                <Label>Instituição</Label>
-                <Input value={editing.institution} onChange={(e) => setEditing({ ...editing, institution: e.target.value })} placeholder="Universidade ou clínica" />
+                <Label>URL do vídeo</Label>
+                <Input
+                  value={editing.videoUrl}
+                  onChange={(e) => {
+                    const newUrl = e.target.value;
+                    setEditing((prev) => {
+                      if (!prev) return prev;
+                      const wasImported = importedVideoUrl.current && prev.videoUrl === importedVideoUrl.current;
+                      return {
+                        ...prev,
+                        videoUrl: newUrl,
+                        thumbnailUrl: wasImported && newUrl !== importedVideoUrl.current ? "" : prev.thumbnailUrl,
+                      };
+                    });
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
               </div>
             </div>
           </div>
 
-          {/* Block 2: Vídeos do caso */}
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface p-5 sm:p-6">
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
             <h3 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
-              <VideoIcon className="h-5 w-5 text-primary-600" />
-              Vídeos do caso
+              <Camera className="h-5 w-5 text-primary-600" />
+              Gravar aula
             </h3>
             <p className="mb-3 text-sm text-muted-foreground">
-              Importe do YouTube ou selecione seus vídeos existentes.
+              Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
             </p>
-            <YouTubeImport onInfo={importYouTubeVideo} />
-            {(() => {
-              const linkedVideos = myVideos.filter((v) => editing.videoIds.includes(v.id));
-              if (linkedVideos.length === 0 && editing.videoIds.length === 0) {
-                return <p className="mt-3 text-sm text-muted-foreground">Nenhum vídeo vinculado. Importe do YouTube acima.</p>;
-              }
-              if (linkedVideos.length === 0 && editing.videoIds.length > 0) {
-                return <p className="mt-3 text-sm text-muted-foreground">Vídeos vinculados não encontrados nos seus uploads.</p>;
-              }
-              return (
-                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {linkedVideos.map((v) => (
-                    <div key={v.id} className="flex flex-col overflow-hidden">
-                      <div className="overflow-hidden rounded-2xl border-2 border-primary-700 shadow-md ring-2 ring-primary-200">
-                        <div className="relative w-full max-h-48 overflow-hidden bg-muted">
-                          {v.thumbnailUrl ? (
-                            <img src={resolveImageUrl(v.thumbnailUrl)} alt={v.title} className="h-full w-full object-cover" style={{ maxHeight: '12rem' }} />
-                          ) : (
-                            <div className="flex h-full w-full items-center bg-gradient-to-br from-primary-700 to-teal-600">
-                              <VideoIcon className="h-10 w-10 text-white/60" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 flex items-center justify-center bg-primary-700/30">
-                            <span className="rounded-full bg-primary-700 px-3 py-1 text-xs font-bold text-white shadow-lg">SELECIONADO</span>
-                          </div>
-                        </div>
-                        <div className="p-3">
-                          <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
-                          <p className="truncate text-xs text-muted-foreground">{v.specialty?.name ?? "Sem especialidade"}</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeVideo(v.id)}
-                        className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Remover
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
+            <VideoRecorder
+              onRecorded={(url, recTitle) => setEditing((prev) => prev ? { ...prev, title: recTitle || prev.title, videoUrl: url } : prev)}
+              onRemoved={() => setEditing((prev) => prev ? { ...prev, videoUrl: "" } : prev)}
+            />
+            {editing.videoUrl && (
+              <div className="mt-3 rounded-xl border border-border overflow-hidden">
+                <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Importar do YouTube</h3>
+            <YouTubeImport onInfo={applyYouTube} />
+            {editing.videoUrl && editing.videoUrl.includes("youtube.com/embed") && (
+              <div className="mt-3 rounded-xl border border-border overflow-hidden">
+                <iframe
+                  src={editing.videoUrl}
+                  className="w-full aspect-video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Pré-visualização do vídeo"
+                />
+              </div>
+            )}
           </div>
 
           {/* Block 3: Áudios */}
@@ -501,78 +449,60 @@ export function MyCases() {
             <div className="space-y-4">
               <div className="rounded-xl border border-border bg-muted/50 p-4">
                 <AudioRecorder
-                  value={editing.audioUrl}
-                  onChange={(audioUrl) => setEditing({ ...editing, audioUrl, ...(audioUrl ? {} : { audioTitle: "", audioTagIds: [] }) })}
+                  value=""
+                  onChange={(audioUrl) => {
+                    if (audioUrl) {
+                      setEditing((prev) => {
+                        if (!prev) return prev;
+                        return {
+                          ...prev,
+                          audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "", createdAt: new Date().toISOString() }],
+                        };
+                      });
+                    }
+                  }}
                   label="Adicionar novo áudio (gravar ou importar)"
                 />
               </div>
 
-              {editing.audioUrl && (
+              {editing.audios.length > 0 && (
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-border p-4 space-y-3">
-                    <AudioPlayer src={resolveImageUrl(editing.audioUrl) || ""} />
-                    <div className="flex items-end gap-2">
-                      <div className="flex-1 space-y-1">
-                        <Label>Título do áudio</Label>
-                        <Input
-                          value={editing.audioTitle}
-                          onChange={(e) => setEditing({ ...editing, audioTitle: e.target.value })}
-                          placeholder="Ex.: Explicação do caso clínico"
-                        />
+                  {editing.audios.map((audio, index) => (
+                    <div key={audio.id} className="rounded-xl border border-border p-4 space-y-3">
+                      <AudioPlayer src={resolveImageUrl(audio.url) || ""} />
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1 space-y-1">
+                          <Label>Título do áudio</Label>
+                          <Input
+                            value={audio.title}
+                            onChange={handleAudioTitleChange(index)}
+                            placeholder="Ex.: Explicação do caso"
+                          />
+                          {audio.createdAt && (
+                            <p className="text-xs text-muted-foreground">
+                              Criado em {new Date(audio.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditing((prev) => {
+                              if (!prev) return prev;
+                              return { ...prev, audios: prev.audios.filter((_, i) => i !== index) };
+                            })
+                          }
+                          className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
+                          title="Remover áudio"
+                          aria-label="Remover áudio"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setEditing({ ...editing, audioUrl: "", audioTitle: "", audioTagIds: [] })}
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
-                        title="Remover áudio"
-                        aria-label="Remover áudio"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
-                  </div>
-
-                  {/* Tags do áudio */}
-                  <div className="rounded-xl border border-border p-4 space-y-3">
-                    <div className="space-y-2">
-                      <Label>Tags do áudio</Label>
-                      <p className="text-xs text-muted-foreground">Tags específicas para o áudio.</p>
-                      <div className="flex flex-wrap gap-2">
-                        {tags.map((tag) => {
-                          const selected = editing.audioTagIds.includes(tag.id);
-                          return (
-                            <span key={tag.id} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${selected ? "bg-primary-700 text-white" : "bg-muted text-muted-foreground"}`}>
-                              <button type="button" onClick={() => toggleAudioTag(tag.id)} className={selected ? "text-white" : "text-muted-foreground hover:text-foreground"}>
-                                #{tag.name}
-                              </button>
-                            </span>
-                          );
-                        })}
-                      </div>
-                      <TagCreator onCreate={createAudioTag} />
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Block 4: Descrição, Diagnóstico, Observações */}
-          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
-            <h3 className="mb-4 text-lg font-bold text-foreground">Descrição e observações</h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Descrição</Label>
-                <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} placeholder="Descreva o caso clínico..." />
-              </div>
-              <div className="space-y-2">
-                <Label>Diagnóstico / Evolução</Label>
-                <Textarea value={editing.diagnosis} onChange={(e) => setEditing({ ...editing, diagnosis: e.target.value })} rows={3} placeholder="Diagnóstico e evolução do paciente..." />
-              </div>
-              <div className="space-y-2">
-                <Label>Observações pessoais</Label>
-                <Textarea value={editing.observations} onChange={(e) => setEditing({ ...editing, observations: e.target.value })} rows={3} placeholder="Anotações privadas sobre este caso..." />
-              </div>
             </div>
           </div>
 
@@ -689,7 +619,70 @@ export function MyCases() {
             </div>
           )}
 
-          {/* Block 7: Acesso, origem e tags */}
+          {/* Block 7: Detalhes */}
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h3 className="mb-4 text-lg font-bold text-foreground">Detalhes</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Thumbnail URL</Label>
+                <Input
+                  value={editing.thumbnailUrl}
+                  onChange={(e) => setEditing({ ...editing, thumbnailUrl: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Especialidade</Label>
+                <Select value={editing.specialtyId} onChange={(e) => setEditing({ ...editing, specialtyId: e.target.value })}>
+                  <option value="">Sem especialidade</option>
+                  {specialties.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Nível de dificuldade</Label>
+                <Select value={editing.difficulty} onChange={(e) => setEditing({ ...editing, difficulty: e.target.value })}>
+                  <option value="BASICO">Básico</option>
+                  <option value="INTERMEDIARIO">Intermediário</option>
+                  <option value="AVANCADO">Avançado</option>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })}>
+                  <option value="DRAFT">Rascunho</option>
+                  <option value="PUBLISHED">Publicado</option>
+                  <option value="ARCHIVED">Arquivado</option>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Autor</Label>
+                <Input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Instituição</Label>
+                <Input value={editing.institution} onChange={(e) => setEditing({ ...editing, institution: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <Label>Descrição</Label>
+              <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} />
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <Label>Diagnóstico / Evolução</Label>
+              <Textarea value={editing.diagnosis} onChange={(e) => setEditing({ ...editing, diagnosis: e.target.value })} rows={3} placeholder="Diagnóstico e evolução do paciente..." />
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <Label>Observações pessoais</Label>
+              <Textarea value={editing.observations} onChange={(e) => setEditing({ ...editing, observations: e.target.value })} rows={3} placeholder="Anotações privadas sobre este conteúdo..." />
+            </div>
+          </div>
+
+          {/* Block 8: Acesso, origem e tags */}
           <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
             <h3 className="mb-4 text-lg font-bold text-foreground">Acesso e tags</h3>
 
