@@ -262,7 +262,7 @@ export function MySchedule() {
 
       {showForm && editing && (
         <div className="fixed inset-0 z-[100] bg-surface" onClick={(e) => e.stopPropagation()}>
-          <div className="mx-auto max-w-md px-6 py-6 space-y-4 pb-32">
+          <div className="mx-auto max-w-md px-6 py-6 space-y-4 pb-48">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-foreground">
                 {editing.id ? "Editar disciplina" : "Nova disciplina"}
