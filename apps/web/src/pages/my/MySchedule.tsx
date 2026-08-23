@@ -6,10 +6,15 @@ import { Label } from "../../components/ui/label";
 
 interface Discipline {
   id: string;
+  turma: string;
+  professor: string;
   name: string;
   period: number;
   day: string;
-  time: string;
+  period1Start: string;
+  period1End: string;
+  period2Start: string;
+  period2End: string;
   color: string;
 }
 
@@ -66,7 +71,19 @@ export function MySchedule() {
   }
 
   function openNew(period: number) {
-    setEditing({ id: "", name: "", period, day: "Segunda", time: "", color: "" });
+    setEditing({
+      id: "",
+      turma: "",
+      professor: "",
+      name: "",
+      period,
+      day: "Segunda",
+      period1Start: "",
+      period1End: "",
+      period2Start: "",
+      period2End: "",
+      color: "",
+    });
     setShowForm(true);
   }
 
@@ -104,6 +121,13 @@ export function MySchedule() {
     openNew(next);
   }
 
+  function formatPeriod(p1s: string, p1e: string, p2s: string, p2e: string) {
+    const parts: string[] = [];
+    if (p1s && p1e) parts.push(`${p1s}–${p1e}`);
+    if (p2s && p2e) parts.push(`${p2s}–${p2e}`);
+    return parts.join(" / ") || "—";
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -112,7 +136,7 @@ export function MySchedule() {
             <BookOpen className="h-5 w-5 text-primary" /> Grade de Disciplinas
           </h2>
           <p className="text-sm text-muted-foreground">
-            Organize suas disciplinas por período, dia e horário.
+            Organize suas disciplinas por período, professor e horário.
           </p>
         </div>
         <Button size="sm" onClick={addPeriod}>
@@ -151,63 +175,66 @@ export function MySchedule() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-t border-border bg-muted/30">
-                      {DAYS.map((day) => (
-                        <th key={day} className="px-3 py-2 text-center text-xs font-medium text-muted-foreground uppercase">
-                          {day}
-                        </th>
-                      ))}
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Turma</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Professor</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Disciplina</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Horário</th>
+                      <th className="px-3 py-2 w-16"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-t border-border">
-                      {DAYS.map((day) => {
-                        const dayItems = periodItems.filter((i) => i.day === day);
-                        return (
-                          <td key={day} className="border-r border-border last:border-r-0 p-2 align-top min-w-[120px]">
-                            <div className="space-y-1.5">
-                              {dayItems.map((d) => (
-                                <div
-                                  key={d.id}
-                                  className={`rounded-lg border p-2 ${d.color} group relative`}
-                                >
-                                  <p className="font-medium text-xs leading-tight">{d.name}</p>
-                                  {d.time && (
-                                    <p className="mt-0.5 flex items-center gap-1 text-[10px] opacity-75">
-                                      <Clock className="h-2.5 w-2.5" /> {d.time}
-                                    </p>
-                                  )}
-                                  <div className="absolute right-1 top-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                      type="button"
-                                      onClick={() => openEdit(d)}
-                                      className="rounded bg-white/80 p-0.5 hover:bg-white"
-                                    >
-                                      <Pencil className="h-2.5 w-2.5" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => deleteDiscipline(d.id)}
-                                      className="rounded bg-white/80 p-0.5 hover:bg-red-100"
-                                    >
-                                      <Trash2 className="h-2.5 w-2.5 text-red-600" />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
+                    {DAYS.map((day) => {
+                      const dayItems = periodItems.filter((i) => i.day === day);
+                      if (dayItems.length === 0) return null;
+                      return dayItems.map((d, idx) => (
+                        <tr key={d.id} className={`border-t border-border ${idx === 0 && d.day !== periodItems[0]?.day ? "border-t-2 border-t-muted" : ""}`}>
+                          <td className="px-3 py-2.5 font-medium text-foreground">{d.turma || "—"}</td>
+                          <td className="px-3 py-2.5 text-foreground">{d.professor || "—"}</td>
+                          <td className="px-3 py-2.5">
+                            <span className={`inline-block rounded-md border px-2 py-0.5 text-xs font-medium ${d.color}`}>
+                              {d.name}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-muted-foreground">{d.day}</td>
+                          <td className="px-3 py-2.5">
+                            <span className="flex items-center gap-1 text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatPeriod(d.period1Start, d.period1End, d.period2Start, d.period2End)}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <div className="flex gap-1">
                               <button
                                 type="button"
-                                onClick={() => openNew(period)}
-                                className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border p-1.5 text-xs text-muted-foreground hover:bg-muted/50 transition-colors"
+                                onClick={() => openEdit(d)}
+                                className="rounded p-1 hover:bg-muted"
                               >
-                                <Plus className="h-3 w-3" />
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteDiscipline(d.id)}
+                                className="rounded p-1 hover:bg-red-100"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-red-600" />
                               </button>
                             </div>
                           </td>
-                        );
-                      })}
-                    </tr>
+                        </tr>
+                      ));
+                    })}
                   </tbody>
                 </table>
+                <div className="border-t border-border px-4 py-2">
+                  <button
+                    type="button"
+                    onClick={() => openNew(period)}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Plus className="h-3 w-3" /> Adicionar disciplina
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -216,7 +243,7 @@ export function MySchedule() {
 
       {showForm && editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-lg">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-lg max-h-[90vh] overflow-y-auto">
             <h3 className="mb-4 text-lg font-bold text-foreground">
               {editing.id ? "Editar disciplina" : "Nova disciplina"}
             </h3>
@@ -228,6 +255,22 @@ export function MySchedule() {
                   min={1}
                   value={editing.period}
                   onChange={(e) => setEditing({ ...editing, period: Number(e.target.value) || 1 })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Nº Turma</Label>
+                <Input
+                  value={editing.turma}
+                  onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
+                  placeholder="Ex.: 001"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Nome do professor</Label>
+                <Input
+                  value={editing.professor}
+                  onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
+                  placeholder="Ex.: Dr. João Silva"
                 />
               </div>
               <div className="space-y-1">
@@ -251,13 +294,49 @@ export function MySchedule() {
                   ))}
                 </select>
               </div>
-              <div className="space-y-1">
-                <Label>Horário</Label>
-                <Input
-                  value={editing.time}
-                  onChange={(e) => setEditing({ ...editing, time: e.target.value })}
-                  placeholder="Ex.: 08:00 - 10:00"
-                />
+
+              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">1º Período</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Início</Label>
+                    <Input
+                      type="time"
+                      value={editing.period1Start}
+                      onChange={(e) => setEditing({ ...editing, period1Start: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Fim</Label>
+                    <Input
+                      type="time"
+                      value={editing.period1End}
+                      onChange={(e) => setEditing({ ...editing, period1End: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">2º Período</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Início</Label>
+                    <Input
+                      type="time"
+                      value={editing.period2Start}
+                      onChange={(e) => setEditing({ ...editing, period2Start: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Fim</Label>
+                    <Input
+                      type="time"
+                      value={editing.period2End}
+                      onChange={(e) => setEditing({ ...editing, period2End: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
