@@ -261,8 +261,8 @@ export function MySchedule() {
       })}
 
       {showForm && editing && (
-        <div className="fixed inset-0 z-[100] bg-surface" onClick={(e) => e.stopPropagation()}>
-          <div className="mx-auto max-w-md px-6 py-6 space-y-4 pb-48">
+        <div className="mx-auto max-w-3xl px-4 py-6">
+          <div className="rounded-2xl border border-border bg-surface shadow-card p-6 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-foreground">
                 {editing.id ? "Editar disciplina" : "Nova disciplina"}
@@ -271,134 +271,137 @@ export function MySchedule() {
                 ✕
               </button>
             </div>
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label>Período</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={editing.period}
-                  onChange={(e) => setEditing({ ...editing, period: Number(e.target.value) || 1 })}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Dia da semana</Label>
-                <select
-                  value={editing.day}
-                  onChange={(e) => setEditing({ ...editing, day: e.target.value })}
-                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-                >
-                  {DAYS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label>Nº Turma</Label>
-                <Input
-                  value={editing.turma}
-                  onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
-                  placeholder="Ex.: 001"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Bloco</Label>
-                <Input
-                  value={editing.bloco}
-                  onChange={(e) => setEditing({ ...editing, bloco: e.target.value })}
-                  placeholder="Ex.: A"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Sala</Label>
-                <Input
-                  value={editing.sala}
-                  onChange={(e) => setEditing({ ...editing, sala: e.target.value })}
-                  placeholder="Ex.: 101"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Curso</Label>
-                <Input
-                  value={editing.curso}
-                  onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
-                  placeholder="Ex.: Odontologia"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Turno</Label>
-                <select
-                  value={editing.turno}
-                  onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
-                  className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
-                >
-                  <option value="Integral">Integral</option>
-                  <option value="Noturno">Noturno</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label>Nome do professor</Label>
-                <Input
-                  value={editing.professor}
-                  onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
-                  placeholder="Ex.: Dr. João Silva"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Nome da disciplina</Label>
-                <Input
-                  value={editing.name}
-                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                  placeholder="Ex.: Anatomia"
-                  autoFocus
-                />
-              </div>
-
-              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">1º Período</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Início</Label>
-                    <Input
-                      type="time"
-                      value={editing.period1Start}
-                      onChange={(e) => setEditing({ ...editing, period1Start: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Fim</Label>
-                    <Input
-                      type="time"
-                      value={editing.period1End}
-                      onChange={(e) => setEditing({ ...editing, period1End: e.target.value })}
-                    />
-                  </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label>Período</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={editing.period}
+                    onChange={(e) => setEditing({ ...editing, period: Number(e.target.value) || 1 })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Dia da semana</Label>
+                  <select
+                    value={editing.day}
+                    onChange={(e) => setEditing({ ...editing, day: e.target.value })}
+                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                  >
+                    {DAYS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label>Nº Turma</Label>
+                  <Input
+                    value={editing.turma}
+                    onChange={(e) => setEditing({ ...editing, turma: e.target.value })}
+                    placeholder="Ex.: 001"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Bloco</Label>
+                  <Input
+                    value={editing.bloco}
+                    onChange={(e) => setEditing({ ...editing, bloco: e.target.value })}
+                    placeholder="Ex.: A"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Sala</Label>
+                  <Input
+                    value={editing.sala}
+                    onChange={(e) => setEditing({ ...editing, sala: e.target.value })}
+                    placeholder="Ex.: 101"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Curso</Label>
+                  <Input
+                    value={editing.curso}
+                    onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
+                    placeholder="Ex.: Odontologia"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Turno</Label>
+                  <select
+                    value={editing.turno}
+                    onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
+                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                  >
+                    <option value="Integral">Integral</option>
+                    <option value="Noturno">Noturno</option>
+                  </select>
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Nome do professor</Label>
+                  <Input
+                    value={editing.professor}
+                    onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
+                    placeholder="Ex.: Dr. João Silva"
+                  />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Nome da disciplina</Label>
+                  <Input
+                    value={editing.name}
+                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                    placeholder="Ex.: Anatomia"
+                    autoFocus
+                  />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">2º Período</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Início</Label>
-                    <Input
-                      type="time"
-                      value={editing.period2Start}
-                      onChange={(e) => setEditing({ ...editing, period2Start: e.target.value })}
-                    />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground">1º Período</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Início</Label>
+                      <Input
+                        type="time"
+                        value={editing.period1Start}
+                        onChange={(e) => setEditing({ ...editing, period1Start: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Fim</Label>
+                      <Input
+                        type="time"
+                        value={editing.period1End}
+                        onChange={(e) => setEditing({ ...editing, period1End: e.target.value })}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Fim</Label>
-                    <Input
-                      type="time"
-                      value={editing.period2End}
-                      onChange={(e) => setEditing({ ...editing, period2End: e.target.value })}
-                    />
+                </div>
+                <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground">2º Período</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Início</Label>
+                      <Input
+                        type="time"
+                        value={editing.period2Start}
+                        onChange={(e) => setEditing({ ...editing, period2Start: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Fim</Label>
+                      <Input
+                        type="time"
+                        value={editing.period2End}
+                        onChange={(e) => setEditing({ ...editing, period2End: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-2 pb-20">
+            <div className="flex justify-end gap-2 pt-4">
               <Button variant="ghost" size="sm" onClick={closeForm}>Cancelar</Button>
               <Button size="sm" onClick={saveDiscipline} disabled={!editing.name.trim()}>Salvar</Button>
             </div>
