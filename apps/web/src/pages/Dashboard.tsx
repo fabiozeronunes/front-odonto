@@ -100,7 +100,7 @@ export function Dashboard() {
               <BookOpen className="h-4 w-4" /> Meus estudos
             </Button>
           </Link>
-          <Link to="/meus-conteudos?tab=grade">
+          <Link to="/meus-estudos">
             <Button variant="outline">
               <Table className="h-4 w-4" /> Grade disciplinas
             </Button>
