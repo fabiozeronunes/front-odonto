@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Pencil, Plus, Trash2, X, AlertTriangle, Music, Camera } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
-import type { CaseStudy, Paginated, Specialty, Tag as TagType, Video } from "../../types";
+import type { CaseStudy, Paginated, Specialty, Tag as TagType } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -445,44 +445,12 @@ export function MyCases() {
               Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
             </p>
             <VideoRecorder
-              onRecorded={async (url, recTitle, yt) => {
-                if (yt) {
-                  try {
-                    const res = await api<{ data: Video }>("/api/videos", {
-                      method: "POST",
-                      body: JSON.stringify({
-                        title: recTitle,
-                        videoUrl: yt.embedUrl,
-                        thumbnailUrl: yt.thumbnailUrl,
-                        difficulty: "INTERMEDIARY",
-                        isFree: true,
-                        source: "STUDENT",
-                        status: "DRAFT",
-                      }),
-                    });
-                    setEditing((prev) => prev ? {
-                      ...prev,
-                      title: recTitle || prev.title,
-                      videoUrl: yt.embedUrl,
-                      thumbnailUrl: yt.thumbnailUrl,
-                      videoIds: [...prev.videoIds, res.data.id],
-                    } : prev);
-                  } catch {
-                    setEditing((prev) => prev ? { ...prev, title: recTitle || prev.title, videoUrl: yt.embedUrl, thumbnailUrl: yt.thumbnailUrl } : prev);
-                  }
-                } else {
-                  setEditing((prev) => prev ? { ...prev, title: recTitle || prev.title, videoUrl: url } : prev);
-                }
-              }}
+              onRecorded={(url, recTitle) => setEditing((prev) => prev ? { ...prev, title: recTitle || prev.title, videoUrl: url } : prev)}
               onRemoved={() => setEditing((prev) => prev ? { ...prev, videoUrl: "" } : prev)}
             />
             {editing.videoUrl && (
               <div className="mt-3 rounded-xl border border-border overflow-hidden">
-                {editing.videoUrl.includes("youtube.com/embed") ? (
-                  <iframe src={editing.videoUrl} className="w-full aspect-video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Prévia do vídeo" />
-                ) : (
-                  <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
-                )}
+                <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
               </div>
             )}
           </div>
