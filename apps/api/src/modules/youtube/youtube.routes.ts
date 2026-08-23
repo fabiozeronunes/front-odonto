@@ -22,6 +22,7 @@ youtubeRouter.get("/callback", ctrl.callback);
 
 youtubeRouter.use(authenticate);
 
+youtubeRouter.get("/token", ctrl.token);
 youtubeRouter.get(
   "/info",
   validate(z.object({ url: z.string().url("URL inválida") }), "query"),

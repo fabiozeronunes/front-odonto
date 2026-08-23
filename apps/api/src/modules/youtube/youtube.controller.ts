@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/errors.js";
 import { env } from "../../config/env.js";
-import { downloadVideo, getInfo, ytDlpAvailable, uploadToYouTube, getYouTubeAuthUrl, exchangeYouTubeCode } from "./youtube.service.js";
+import { downloadVideo, getInfo, ytDlpAvailable, uploadToYouTube, getYouTubeAuthUrl, exchangeYouTubeCode, getYouTubeAccessToken } from "./youtube.service.js";
 
 export const info = asyncHandler(async (req: Request, res: Response) => {
   const url = String(req.query.url ?? "");
@@ -84,4 +84,9 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
   <p style="color:#666">Nome da variável: <strong>YOUTUBE_REFRESH_TOKEN</strong></p>
   <p style="color:#666">Depois feche esta aba.</p>
 </body></html>`);
+});
+
+export const token = asyncHandler(async (req: Request, res: Response) => {
+  const accessToken = await getYouTubeAccessToken();
+  res.json({ data: { accessToken } });
 });

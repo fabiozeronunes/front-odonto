@@ -172,6 +172,20 @@ export async function exchangeYouTubeCode(code: string, redirectUri: string) {
   };
 }
 
+export async function getYouTubeAccessToken(): Promise<string> {
+  if (!env.youtubeClientId || !env.youtubeClientSecret || !env.youtubeRefreshToken) {
+    throw new ApiError(501, "Upload para YouTube não configurado");
+  }
+  const oauth2Client = new google.auth.OAuth2(
+    env.youtubeClientId,
+    env.youtubeClientSecret
+  );
+  oauth2Client.setCredentials({ refresh_token: env.youtubeRefreshToken });
+  const { token } = await oauth2Client.getAccessToken();
+  if (!token) throw new ApiError(502, "Falha ao obter access token do YouTube");
+  return token;
+}
+
 export interface YouTubeUploadResult {
   videoId: string;
   embedUrl: string;
