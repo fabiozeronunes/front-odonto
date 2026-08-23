@@ -197,39 +197,39 @@ export function MySchedule() {
                         {dayItems.map((d) => (
                           <Card key={d.id} className="border border-border bg-white hover:border-primary/30 transition-colors">
                             <CardContent className="p-3 space-y-2">
-                              <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-start gap-3">
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <Badge className={`${d.color} text-xs font-medium`}>{d.name}</Badge>
                                     {d.turma && (
                                       <Badge variant="outline" className="text-xs">Turma {d.turma}</Badge>
                                     )}
                                   </div>
-                                  {d.bloco && (
-                                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                                      <span className="font-medium">{d.bloco}</span>
-                                      <span>Bloco</span>
-                                    </div>
-                                  )}
-                                  {d.sala && (
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                      <span className="font-medium">{d.sala}</span>
-                                      <span>Sala</span>
-                                    </div>
-                                  )}
-                                  {d.curso && (
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                      <span className="font-medium">{d.curso}</span>
-                                      <span>Curso</span>
-                                    </div>
-                                  )}
-                                  {d.turno && (
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                    {d.bloco && (
+                                      <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
+                                        <span className="font-medium">{d.bloco}</span>
+                                        <span>Bloco</span>
+                                      </span>
+                                    )}
+                                    {d.sala && (
+                                      <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
+                                        <span className="font-medium">{d.sala}</span>
+                                        <span>Sala</span>
+                                      </span>
+                                    )}
+                                    {d.curso && (
+                                      <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-border">
+                                        <span className="font-medium">{d.curso}</span>
+                                        <span>Curso</span>
+                                      </span>
+                                    )}
+                                    {d.turno && (
                                       <Badge variant="outline" className="text-[9px]">{d.turno}</Badge>
-                                    </div>
-                                  )}
+                                    )}
+                                  </div>
                                   {d.professor && (
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                                       <span className="font-medium">{d.professor}</span>
                                       <span>Professor</span>
                                     </div>
