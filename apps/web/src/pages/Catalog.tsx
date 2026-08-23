@@ -508,16 +508,6 @@ export function Catalog() {
                               <BookOpen className="h-12 w-12 text-white/60" />
                             </div>
                           )}
-                          <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
-                            <Badge variant={cs.isFree ? "free" : "premium"} className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
-                              {cs.isFree ? "Gratuito" : "Pago"}
-                            </Badge>
-                            {cs.difficulty && (
-                              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1">
-                                {cs.difficulty === "BASICO" ? "Básico" : cs.difficulty === "INTERMEDIARIO" ? "Intermediário" : "Avançado"}
-                              </Badge>
-                            )}
-                          </div>
                         </div>
                         <CardContent className="p-4">
                           <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
@@ -526,6 +516,16 @@ export function Catalog() {
                           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                             <span>{cs.specialty?.name ?? "Geral"}</span>
                             <span>{cs.author ?? ""}</span>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            <Badge variant={cs.isFree ? "free" : "premium"} className="rounded-md px-1.5 py-0.5 text-[9px] uppercase leading-none sm:px-2 sm:py-1 sm:text-[11px]">
+                              {cs.isFree ? "Gratuito" : "Pago"}
+                            </Badge>
+                            {cs.difficulty && (
+                              <Badge variant="info" className="rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1">
+                                {cs.difficulty === "BASICO" ? "Básico" : cs.difficulty === "INTERMEDIARIO" ? "Intermediário" : "Avançado"}
+                              </Badge>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

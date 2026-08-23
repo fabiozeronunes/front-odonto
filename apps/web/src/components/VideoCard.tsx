@@ -23,7 +23,22 @@ export function VideoCard({ video, typeIcon }: { video: Video; typeIcon?: ReactN
               <PlayCircle className="h-12 w-12 text-white/80" />
             </div>
           )}
-          <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+          {video.durationSeconds ? (
+            <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">
+              <Clock className="mr-1 inline h-3 w-3" />
+              {formatDuration(video.durationSeconds)}
+            </div>
+          ) : null}
+        </div>
+        <CardContent className="p-4">
+          <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
+            {video.title}
+          </h3>
+          <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+            <span>{video.specialty?.name ?? "Geral"}</span>
+            <span className="capitalize">{video.difficulty.toLowerCase()}</span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1">
             {video.isFree ? (
               <Badge variant="free" className="rounded-md bg-gradient-to-r from-teal-500 to-amber-500 px-1.5 py-0.5 text-[9px] uppercase leading-none text-white sm:px-2 sm:py-1 sm:text-[11px]">
                 GRATUITO
@@ -47,21 +62,6 @@ export function VideoCard({ video, typeIcon }: { video: Video; typeIcon?: ReactN
                 {typeIcon}
               </Badge>
             ) : null}
-          </div>
-          {video.durationSeconds ? (
-            <div className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white">
-              <Clock className="mr-1 inline h-3 w-3" />
-              {formatDuration(video.durationSeconds)}
-            </div>
-          ) : null}
-        </div>
-        <CardContent className="p-4">
-          <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
-            {video.title}
-          </h3>
-          <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{video.specialty?.name ?? "Geral"}</span>
-            <span className="capitalize">{video.difficulty.toLowerCase()}</span>
           </div>
         </CardContent>
       </Card>

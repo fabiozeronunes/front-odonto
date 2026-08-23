@@ -1,40 +1,36 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingBag, Package, Percent, Check, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, Package, Percent, Loader2, X, SlidersHorizontal } from "lucide-react";
 import { api } from "../lib/api";
-import { useCart } from "../lib/cart";
 import type { Paginated, Product, ProductCategory } from "../types";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { Select } from "../components/ui/select";
+import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { cn, formatPrice, resolveImageUrl } from "../lib/utils";
-import { useMediaQuery } from "../lib/useMediaQuery";
 
-const PER_PAGE = 9;
+const PER_PAGE = 12;
 
 export function Shop() {
-  const navigate = useNavigate();
-  const { addItem } = useCart();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [onSale, setOnSale] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [added, setAdded] = useState<Record<string, boolean>>({});
-  const isTablet = useMediaQuery("(min-width: 768px)");
-  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PER_PAGE);
+  const isLoadMoreRef = useRef(false);
+  const [rows, setRows] = useState<"1" | "2">(() => {
     try {
-      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "3";
+      return localStorage.getItem("odonto_shop_rows") === "1" ? "1" : "2";
     } catch {
-      return "3";
+      return "2";
     }
   });
 
-  function changeRows(value: "1" | "2" | "3") {
+  function changeRows(value: "1" | "2") {
     setRows(value);
     try {
       localStorage.setItem("odonto_shop_rows", value);
@@ -43,7 +39,12 @@ export function Shop() {
     }
   }
 
-  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
+  const search = searchParams.get("search") ?? "";
+  const category = searchParams.get("category") ?? "";
+  const onSale = searchParams.get("onSale") === "true";
+  const sort = searchParams.get("sort") ?? "recent";
+
+  const filterKey = [search, category, onSale, sort].join("|");
 
   useEffect(() => {
     api<{ data: ProductCategory[] }>("/api/products/categories")
@@ -52,238 +53,279 @@ export function Shop() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    const params = new URLSearchParams({ perPage: String(PER_PAGE), page: "1" });
+    const isLoadMore = isLoadMoreRef.current;
+    isLoadMoreRef.current = false;
+    if (!isLoadMore) setLoading(true);
+
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    params.set("perPage", String(visibleCount));
     if (search) params.set("search", search);
     if (category) params.set("category", category);
     if (onSale) params.set("onSale", "true");
+    params.set("sort", sort);
+
     api<Paginated<Product>>(`/api/products?${params.toString()}`)
-      .then((d) => {
-        setProducts(d.data);
-        setTotalPages(d.pagination.totalPages);
+      .then((data) => {
+        setProducts(data.data);
       })
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-  }, [search, category, onSale]);
+      .finally(() => {
+        setLoading(false);
+        setLoadingMore(false);
+      });
+  }, [filterKey, visibleCount]);
 
-  async function loadMore() {
-    const next = page + 1;
+  function updateParam(key: string, value: string) {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    next.delete("page");
+    setSearchParams(next);
+  }
+
+  function loadMore() {
+    if (loadingMore) return;
+    isLoadMoreRef.current = true;
     setLoadingMore(true);
-    const params = new URLSearchParams({ perPage: String(PER_PAGE), page: String(next) });
-    if (search) params.set("search", search);
-    if (category) params.set("category", category);
-    if (onSale) params.set("onSale", "true");
-    try {
-      const d = await api<Paginated<Product>>(`/api/products?${params.toString()}`);
-      setProducts((prev) => [...prev, ...d.data]);
-      setPage(next);
-      setTotalPages(d.pagination.totalPages);
-    } catch {
-      /* ignore */
-    } finally {
-      setLoadingMore(false);
-    }
+    setVisibleCount((c) => c + PER_PAGE);
   }
 
-  function applyFilter(key: "category" | "onSale" | "search", value: string | boolean) {
-    setPage(1);
-    if (key === "category") setCategory(value as string);
-    if (key === "onSale") setOnSale(value as boolean);
-    if (key === "search") setSearch(value as string);
-  }
+  const activeFilterCount = [category, onSale].filter(Boolean).length;
 
-  function handleAdd(p: Product) {
-    addItem(p, 1);
-    setAdded((prev) => ({ ...prev, [p.id]: true }));
-    setTimeout(() => setAdded((prev) => ({ ...prev, [p.id]: false })), 1500);
-  }
-
-  function handleBuy(p: Product) {
-    addItem(p, 1);
-    navigate("/checkout-loja");
-  }
+  const gridClass =
+    rows === "2"
+      ? "grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4"
+      : "mx-auto max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <h1 className="flex items-center gap-2 font-display text-3xl font-bold text-foreground">
-            <ShoppingBag className="h-7 w-7 text-primary-700 dark:text-primary-400" /> Shop Odontus
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Kits, uniformes, instrumentais e materiais odontológicos com desconto para assinantes.
-          </p>
-        </div>
-        <div className="w-full sm:w-64">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => applyFilter("search", e.target.value)}
-              placeholder="Buscar produto..."
-              className="pl-9"
-            />
-          </div>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Shop Odontus</h1>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => applyFilter("category", "")}
-          className={cn(
-            "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-            category === "" ? "bg-primary-700 text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
-          )}
-        >
-          Todos
-        </button>
-        {categories.map((c) => (
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-4 shadow-card">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Ordenar:
+          </span>
           <button
-            key={c.id}
             type="button"
-            onClick={() => applyFilter("category", c.id)}
+            onClick={() => updateParam("sort", "recent")}
             className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-              category === c.id ? "bg-primary-700 text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
+              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              sort === "recent"
+                ? "bg-primary-700 text-primary-foreground shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
             )}
           >
-            {c.name}
+            <Package className="h-4 w-4" /> Mais recentes
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => applyFilter("onSale", !onSale)}
-          className={cn(
-            "ml-auto inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
-            onSale ? "bg-red-600 text-white" : "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900"
-          )}
-        >
-          <Percent className="h-4 w-4" /> Somente ofertas
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => updateParam("sort", "popular")}
+            className={cn(
+              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              sort === "popular"
+                ? "bg-accent-600 text-white shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
+            )}
+          >
+            <Percent className="h-4 w-4" /> Mais vendidos
+          </button>
+          <button
+            type="button"
+            onClick={() => updateParam("sort", "price_asc")}
+            className={cn(
+              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              sort === "price_asc"
+                ? "bg-green-700 text-white shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
+            )}
+          >
+            <Percent className="h-4 w-4" /> Menor preço
+          </button>
+          <button
+            type="button"
+            onClick={() => updateParam("sort", "price_desc")}
+            className={cn(
+              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              sort === "price_desc"
+                ? "bg-green-700 text-white shadow-sm"
+                : "border border-border bg-surface text-foreground hover:bg-muted"
+            )}
+          >
+            <Percent className="h-4 w-4" /> Maior preço
+          </button>
+        </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-muted-foreground">Produtos por linha:</span>
-        <div className="inline-flex overflow-hidden rounded-lg border border-border">
-          {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => changeRows(value)}
-              className={cn(
-                "px-4 py-1.5 font-semibold transition-colors",
-                activeRows === value ? "bg-primary-700 text-primary-foreground" : "bg-surface text-muted-foreground hover:bg-muted"
-              )}
-            >
-              {value} produto{value === "2" ? "s" : value === "3" ? "s" : ""}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-muted" />
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border bg-surface p-16 text-center">
-          <Package className="mx-auto h-10 w-10 text-muted-foreground" />
-          <p className="mt-3 text-muted-foreground">Nenhum produto encontrado.</p>
-        </div>
-      ) : (
-        <div
-          className={cn(
-            "mt-8 grid gap-4 sm:gap-6",
-            activeRows === "2"
-              ? "grid-cols-2"
-              : activeRows === "3"
-              ? "grid-cols-2 md:grid-cols-3"
-              : "mx-auto max-w-2xl grid-cols-1"
-          )}
-        >
-          {products.map((p) => {
-            const price = Number(p.price);
-            const promo = Number(p.promoPrice);
-            const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
-            const img = p.images?.[0]?.url;
-            return (
-              <div
-                key={p.id}
-                className="group flex flex-col rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
+        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <span className="mr-1 rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Produtos por linha:
+          </span>
+          <div className="inline-flex overflow-hidden rounded-lg border border-border">
+            {(["1", "2"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => changeRows(value)}
+                className={cn(
+                  "px-4 py-1.5 text-[9px] font-medium uppercase tracking-wide transition-colors",
+                  rows === value
+                    ? "bg-primary-700 text-primary-foreground"
+                    : "bg-surface text-muted-foreground hover:bg-muted"
+                )}
               >
-                <Link to={`/loja/${p.slug}`} className="block">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-white">
-                    {img ? (
-                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
-                    ) : (
-                      <span className="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <Package className="h-10 w-10" />
-                      </span>
-                    )}
-                    {discount > 0 && (
-                      <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                        -{discount}%
-                      </span>
-                    )}
-                    {p.stock <= 0 && (
-                      <span className="absolute right-2 top-2 rounded-full bg-slate-800/80 px-2 py-0.5 text-xs font-semibold text-white">
-                        Esgotado
-                      </span>
-                    )}
-                  </div>
-                </Link>
-                <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
-                  <Link to={`/loja/${p.slug}`} className="block">
-                    <p className="truncate text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
-                      {p.name}
-                    </p>
-                  </Link>
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {p.brand ?? "Odontus"}
-                    {p.category ? ` • ${p.category.name}` : ""}
-                  </p>
-                  <div className="mt-2 flex items-baseline gap-2">
-                    {discount > 0 && (
-                      <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
-                    )}
-                    <span className="font-display text-base font-bold text-foreground sm:text-lg">
-                      {formatPrice(p.promoPrice)}
-                    </span>
-                  </div>
-                  {p.saleEndsAt && (
-                    <CountdownTimer startsAt={p.saleStartsAt} endsAt={p.saleEndsAt} className="mt-3" />
-                  )}
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:pt-1">
-                    <Button
-                      variant="outline"
-                      className="w-full sm:flex-1"
-                      disabled={p.stock <= 0}
-                      onClick={() => handleAdd(p)}
-                    >
-                      {added[p.id] ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                      {added[p.id] ? "Adicionado" : "Carrinho"}
-                    </Button>
-                    <Button className="w-full sm:flex-1" disabled={p.stock <= 0} onClick={() => handleBuy(p)}>
-                      Comprar
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                {value}
+              </button>
+            ))}
+          </div>
+          <span className="ml-1 text-xs text-muted-foreground">
+            {rows === "1" ? "1 por linha no celular · 2 no tablet" : "2 por linha no celular · 3 no tablet"}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 mt-4">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              defaultValue={search}
+              placeholder="Buscar produto..."
+              className="pl-9"
+              onChange={(e) => updateParam("search", e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters((s) => !s)}
+              aria-expanded={showFilters}
+            >
+              <SlidersHorizontal className="h-4 w-4" /> Filtros
+              {activeFilterCount > 0 && (
+                <Badge variant="default" className="ml-1">{activeFilterCount}</Badge>
+              )}
+            </Button>
+            {(search || activeFilterCount > 0) && (
+              <Button variant="ghost" onClick={() => {
+                const next = new URLSearchParams();
+                setSearchParams(next);
+              }}>
+                <X className="h-4 w-4" /> Limpar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {showFilters && (
+          <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Select value={category} onChange={(e) => updateParam("category", e.target.value)}>
+              <option value="">Todas categorias</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </Select>
+            <Select value={onSale ? "true" : ""} onChange={(e) => updateParam("onSale", e.target.value)}>
+              <option value="">Todos</option>
+              <option value="true">Apenas ofertas</option>
+            </Select>
+          </div>
+        )}
+      </div>
+
+      {activeFilterCount > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
+            Filtros ativos:
+          </span>
+          <Button variant="ghost" size="sm" onClick={() => {
+            const next = new URLSearchParams();
+            setSearchParams(next);
+          }}>
+            Limpar filtros
+          </Button>
         </div>
       )}
 
-      {page < totalPages && (
-        <div className="mt-8 flex justify-center">
-          <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
-            {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : <Package className="h-4 w-4" />}
-            {loadingMore ? "Carregando..." : "Carregar mais produtos"}
-          </Button>
+      {loading ? (
+        <div className={gridClass}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-muted" />
+          ))}
         </div>
+      ) : products.length === 0 ? (
+        <div className="flex flex-col items-center py-20 text-center">
+          <Package className="h-10 w-10 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhum produto encontrado</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Tente ajustar os filtros ou buscar por outro termo.</p>
+        </div>
+      ) : (
+        <>
+          <div className={gridClass}>
+            {products.map((p) => {
+              const price = Number(p.price);
+              const promo = Number(p.promoPrice);
+              const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
+              const img = p.images?.[0]?.url;
+              return (
+                <Link
+                  key={p.id}
+                  to={`/loja/${p.slug}`}
+                  className="group block"
+                >
+                  <Card className="overflow-hidden transition-all group-hover:-translate-y-0.5 group-hover:shadow-lift">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-white">
+                      {img ? (
+                        <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-muted-foreground">
+                          <Package className="h-10 w-10" />
+                        </span>
+                      )}
+                      {discount > 0 && (
+                        <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                          -{discount}%
+                        </span>
+                      )}
+                      {p.stock <= 0 && (
+                        <span className="absolute right-2 top-2 rounded-full bg-slate-800/80 px-2 py-0.5 text-xs font-semibold text-white">
+                          Esgotado
+                        </span>
+                      )}
+                    </div>
+                    <CardContent className="p-4">
+                      <p className="truncate text-sm font-semibold text-foreground group-hover:text-primary-800 dark:group-hover:text-primary-300">
+                        {p.name}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        {p.brand ?? "Odontus"}
+                        {p.category ? ` • ${p.category.name}` : ""}
+                      </p>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        {discount > 0 && (
+                          <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
+                        )}
+                        <span className="font-display text-base font-bold text-foreground sm:text-lg">
+                          {formatPrice(p.promoPrice)}
+                        </span>
+                      </div>
+                      {p.saleEndsAt && (
+                        <CountdownTimer startsAt={p.saleStartsAt} endsAt={p.saleEndsAt} className="mt-3" />
+                      )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+          {visibleCount < products.length && (
+            <div className="mt-10 flex justify-center">
+              <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : <Package className="h-4 w-4" />}
+                {loadingMore ? "Carregando..." : "Carregar mais produtos"}
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
