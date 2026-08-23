@@ -3,6 +3,8 @@ import { Plus, Trash2, Pencil, Clock, BookOpen, ChevronDown, ChevronUp } from "l
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { Card, CardContent } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
 
 interface Discipline {
   id: string;
@@ -134,6 +136,10 @@ export function MySchedule() {
     return "—";
   }
 
+  function getDisciplinesForDay(periodItems: Discipline[], day: string) {
+    return periodItems.filter((i) => i.day === day);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -142,7 +148,7 @@ export function MySchedule() {
             <BookOpen className="h-5 w-5 text-primary" /> Grade de Disciplinas
           </h2>
           <p className="text-sm text-muted-foreground">
-            Organize suas disciplinas por período, professor e horário.
+            Organize suas disciplinas por período, dia e horário.
           </p>
         </div>
         <Button size="sm" onClick={addPeriod}>
@@ -177,83 +183,94 @@ export function MySchedule() {
             </button>
 
             {expanded && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-t border-border bg-muted/30">
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Turma</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Bloco</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Sala</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Curso</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Professor</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Disciplina</th>
-                      <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground uppercase">1º Período</th>
-                      <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground uppercase">2º Período</th>
-                      <th className="px-3 py-2 w-16"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {DAYS.map((day) => {
-                      const dayItems = periodItems.filter((i) => i.day === day);
-                      if (dayItems.length === 0) return null;
-                      return dayItems.map((d, idx) => (
-                        <tr key={d.id} className={`border-t border-border ${idx === 0 && d.day !== periodItems[0]?.day ? "border-t-2 border-t-muted" : ""}`}>
-                          <td className="px-3 py-2.5 text-muted-foreground">{d.day}</td>
-                          <td className="px-3 py-2.5 font-medium text-foreground">{d.turma || "—"}</td>
-                          <td className="px-3 py-2.5 text-muted-foreground">{d.bloco || "—"}</td>
-                          <td className="px-3 py-2.5 text-muted-foreground">{d.sala || "—"}</td>
-                          <td className="px-3 py-2.5 text-muted-foreground">{d.curso || "—"}</td>
-                          <td className="px-3 py-2.5 text-foreground">{d.professor || "—"}</td>
-                          <td className="px-3 py-2.5">
-                            <span className={`inline-block rounded-md border px-2 py-0.5 text-xs font-medium ${d.color}`}>
-                              {d.name}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2.5 text-center">
-                            <span className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {formatPeriod(d.period1Start, d.period1End)}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2.5 text-center">
-                            <span className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {formatPeriod(d.period2Start, d.period2End)}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2.5">
-                            <div className="flex gap-1">
-                              <button
-                                type="button"
-                                onClick={() => openEdit(d)}
-                                className="rounded p-1 hover:bg-muted"
-                              >
-                                <Pencil className="h-3.5 w-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deleteDiscipline(d.id)}
-                                className="rounded p-1 hover:bg-red-100"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ));
-                    })}
-                  </tbody>
-                </table>
-                <div className="border-t border-border px-4 py-2">
-                  <button
-                    type="button"
-                    onClick={() => openNew(period)}
-                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Plus className="h-3 w-3" /> Adicionar disciplina
-                  </button>
-                </div>
+              <div className="p-4 space-y-4">
+                {DAYS.map((day) => {
+                  const dayItems = getDisciplinesForDay(periodItems, day);
+                  if (dayItems.length === 0) return null;
+                  return (
+                    <div key={day} className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-foreground">{day}</h4>
+                        <Badge variant="outline" className="text-xs">{dayItems.length} disciplina(s)</Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {dayItems.map((d) => (
+                          <Card key={d.id} className="border border-border bg-white hover:border-primary/30 transition-colors">
+                            <CardContent className="p-3 space-y-2">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <Badge className={`${d.color} text-xs font-medium`}>{d.name}</Badge>
+                                    {d.turma && (
+                                      <Badge variant="outline" className="text-xs">Turma {d.turma}</Badge>
+                                    )}
+                                  </div>
+                                  {d.bloco && (
+                                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span className="font-medium">{d.bloco}</span>
+                                      <span>Bloco</span>
+                                    </div>
+                                  )}
+                                  {d.sala && (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span className="font-medium">{d.sala}</span>
+                                      <span>Sala</span>
+                                    </div>
+                                  )}
+                                  {d.curso && (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span className="font-medium">{d.curso}</span>
+                                      <span>Curso</span>
+                                    </div>
+                                  )}
+                                  {d.turno && (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Badge variant="outline" className="text-[9px]">{d.turno}</Badge>
+                                    </div>
+                                  )}
+                                  {d.professor && (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span className="font-medium">{d.professor}</span>
+                                      <span>Professor</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    <span className="font-mono text-sm">{formatPeriod(d.period1Start, d.period1End)}</span>
+                                    <span className="text-muted-foreground">1º</span>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    <span className="font-mono text-sm">{formatPeriod(d.period2Start, d.period2End)}</span>
+                                    <span className="text-muted-foreground">2º</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex justify-end gap-1 pt-1 border-t border-border">
+                                <button
+                                  type="button"
+                                  onClick={() => openEdit(d)}
+                                  className="rounded p-1 hover:bg-muted text-xs text-muted-foreground hover:text-foreground"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteDiscipline(d.id)}
+                                  className="rounded p-1 hover:bg-red-100 text-red-600"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
