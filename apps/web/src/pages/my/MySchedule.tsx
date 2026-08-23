@@ -183,6 +183,8 @@ export function MySchedule() {
                     <tr className="border-t border-border bg-muted/30">
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Turma</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Bloco</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Sala</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Curso</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Professor</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Disciplina</th>
@@ -199,6 +201,8 @@ export function MySchedule() {
                         <tr key={d.id} className={`border-t border-border ${idx === 0 && d.day !== periodItems[0]?.day ? "border-t-2 border-t-muted" : ""}`}>
                           <td className="px-3 py-2.5 text-muted-foreground">{d.day}</td>
                           <td className="px-3 py-2.5 font-medium text-foreground">{d.turma || "—"}</td>
+                          <td className="px-3 py-2.5 text-muted-foreground">{d.bloco || "—"}</td>
+                          <td className="px-3 py-2.5 text-muted-foreground">{d.sala || "—"}</td>
                           <td className="px-3 py-2.5 text-muted-foreground">{d.curso || "—"}</td>
                           <td className="px-3 py-2.5 text-foreground">{d.professor || "—"}</td>
                           <td className="px-3 py-2.5">
@@ -258,7 +262,7 @@ export function MySchedule() {
 
       {showForm && editing && (
         <div className="fixed inset-0 z-[100] bg-surface" onClick={(e) => e.stopPropagation()}>
-          <div className="mx-auto max-w-md px-6 py-6 space-y-4">
+          <div className="mx-auto max-w-md px-6 py-6 space-y-4 pb-32">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-foreground">
                 {editing.id ? "Editar disciplina" : "Nova disciplina"}
