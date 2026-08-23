@@ -334,6 +334,7 @@ export function MySchedule() {
                     className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                   >
                     <option value="Integral">Integral</option>
+                    <option value="Manhã">Manhã</option>
                     <option value="Noturno">Noturno</option>
                   </select>
                 </div>
