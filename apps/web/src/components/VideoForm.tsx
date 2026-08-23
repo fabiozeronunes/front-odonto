@@ -383,22 +383,12 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
         </p>
         <VideoRecorder
-          onRecorded={async (url, recTitle, yt) => {
-            if (yt) {
-              setEditing({ ...editing, title: recTitle || editing.title, videoUrl: yt.embedUrl, thumbnailUrl: yt.thumbnailUrl });
-            } else {
-              setEditing({ ...editing, title: recTitle || editing.title, videoUrl: url });
-            }
-          }}
+          onRecorded={(url, recTitle) => setEditing({ ...editing, title: recTitle || editing.title, videoUrl: url })}
           onRemoved={() => setEditing({ ...editing, videoUrl: "" })}
         />
         {editing.videoUrl && (
           <div className="mt-3 rounded-xl border border-border overflow-hidden">
-            {editing.videoUrl.includes("youtube.com/embed") ? (
-              <iframe src={editing.videoUrl} className="w-full aspect-video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Prévia" />
-            ) : (
-              <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
-            )}
+            <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
           </div>
         )}
       </div>

@@ -8,3 +8,4 @@ export const uploadsRouter = Router();
 uploadsRouter.use(authenticate);
 uploadsRouter.get("/mine", ctrl.myUploads);
 uploadsRouter.post("/", upload.single("image"), ctrl.uploadImage);
+uploadsRouter.post("/signed-url", ctrl.getSignedUrl);

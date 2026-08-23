@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: odonto-api
+    runtime: docker
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: apps/api
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: WEB_URL
+        value: https://front-odonto-web.vercel.app
+      - key: API_URL
+        value: https://odonto-api.onrender.com
+      - key: CORS_ORIGINS
+        value: https://front-odonto-web.vercel.app
+      - key: YOUTUBE_CLIENT_ID
+        sync: false
+      - key: YOUTUBE_CLIENT_SECRET
+        sync: false
+      - key: YOUTUBE_REFRESH_TOKEN
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true
