@@ -242,8 +242,8 @@ export function MySchedule() {
       })}
 
       {showForm && editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-4">
+          <div className="w-full max-w-md rounded-t-2xl border border-border bg-surface p-6 shadow-lg max-h-[85vh] overflow-y-auto sm:rounded-2xl">
             <h3 className="mb-4 text-lg font-bold text-foreground">
               {editing.id ? "Editar disciplina" : "Nova disciplina"}
             </h3>
