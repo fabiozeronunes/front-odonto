@@ -7,6 +7,7 @@ import { Label } from "../../components/ui/label";
 interface Discipline {
   id: string;
   turma: string;
+  curso: string;
   professor: string;
   name: string;
   period: number;
@@ -74,6 +75,7 @@ export function MySchedule() {
     setEditing({
       id: "",
       turma: "",
+      curso: "",
       professor: "",
       name: "",
       period,
@@ -176,6 +178,7 @@ export function MySchedule() {
                   <thead>
                     <tr className="border-t border-border bg-muted/30">
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Turma</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Curso</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Professor</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Disciplina</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Dia</th>
@@ -190,6 +193,7 @@ export function MySchedule() {
                       return dayItems.map((d, idx) => (
                         <tr key={d.id} className={`border-t border-border ${idx === 0 && d.day !== periodItems[0]?.day ? "border-t-2 border-t-muted" : ""}`}>
                           <td className="px-3 py-2.5 font-medium text-foreground">{d.turma || "—"}</td>
+                          <td className="px-3 py-2.5 text-muted-foreground">{d.curso || "—"}</td>
                           <td className="px-3 py-2.5 text-foreground">{d.professor || "—"}</td>
                           <td className="px-3 py-2.5">
                             <span className={`inline-block rounded-md border px-2 py-0.5 text-xs font-medium ${d.color}`}>
@@ -271,6 +275,14 @@ export function MySchedule() {
                   value={editing.professor}
                   onChange={(e) => setEditing({ ...editing, professor: e.target.value })}
                   placeholder="Ex.: Dr. João Silva"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Curso</Label>
+                <Input
+                  value={editing.curso}
+                  onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
+                  placeholder="Ex.: Odontologia"
                 />
               </div>
               <div className="space-y-1">
