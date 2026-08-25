@@ -168,7 +168,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("status", status === "PUBLISHED" ? "" : "PUBLISHED")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               status === "PUBLISHED"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -180,7 +180,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("status", status === "DRAFT" ? "" : "DRAFT")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               status === "DRAFT"
                 ? "bg-amber-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -198,7 +198,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("access", access === "gratuito" ? "" : "gratuito")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               access === "gratuito"
                 ? "bg-emerald-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -210,7 +210,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("access", access === "pago" ? "" : "pago")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               access === "pago"
                 ? "bg-violet-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -228,7 +228,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("sort", "recent")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "recent"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -240,7 +240,7 @@ export function MyVideos() {
           <button
             type="button"
             onClick={() => updateParam("sort", "oldest")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "oldest"
                 ? "bg-accent-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
