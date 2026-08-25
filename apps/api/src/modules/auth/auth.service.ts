@@ -66,13 +66,9 @@ async function createRefreshToken(userId: string, ip?: string): Promise<string> 
   const token = crypto.randomBytes(40).toString("hex");
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  try {
-    await prisma.refreshToken.create({
-      data: { token, userId, expiresAt },
-    });
-  } catch (err) {
-    console.warn("[REFRESH] Could not persist refresh token:", err);
-  }
+  await prisma.refreshToken.create({
+    data: { token, userId, expiresAt, ipAddress: ip ?? null },
+  });
 
   return token;
 }
@@ -217,7 +213,7 @@ export async function loginUser(input: LoginInput, ip?: string) {
   cleanupOldAttempts().catch(() => {});
 
   const { passwordHash: _ph, ...safeUser } = user;
-  const refreshToken = await createRefreshToken(user.id);
+  const refreshToken = await createRefreshToken(user.id, clientIp);
 
   return {
     user: publicUser(safeUser),

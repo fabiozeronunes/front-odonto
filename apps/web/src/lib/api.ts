@@ -99,14 +99,15 @@ async function doRefresh(): Promise<boolean> {
       body: JSON.stringify({ refreshToken }),
     });
     if (!res.ok) {
-      clearTokens();
+      if (res.status === 401) {
+        clearTokens();
+      }
       return false;
     }
     const data = (await res.json()) as { accessToken: string; refreshToken: string };
     setTokens(data.accessToken, data.refreshToken);
     return true;
   } catch {
-    clearTokens();
     return false;
   }
 }
