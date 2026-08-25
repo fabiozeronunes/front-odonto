@@ -147,6 +147,10 @@ model Video {
   source          VideoSource      @default(FRONTODONTUS)
   audioTitle      String?
   audioUrl        String?
+  recordedUrl     String?
+  recordedTitle   String?
+  recordedDate    String?
+  recordedTime    String?
   favorites       Favorite[]
   images          Media[]
   studyResources  StudyResource[]

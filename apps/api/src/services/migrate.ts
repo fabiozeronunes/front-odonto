@@ -120,6 +120,25 @@ export async function applyMigrations() {
       }
     }
 
+    // 10. Video recorded* columns (aula gravada separada do embed YouTube)
+    if (await tableExists("Video")) {
+      const videoCols = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'Video' AND column_name IN ('recordedUrl','recordedTitle','recordedDate','recordedTime')` as any[];
+      const existing = new Set(videoCols.map((c: any) => c.column_name));
+      if (!existing.has("recordedUrl")) {
+        console.log("[MIGRATION] Adding recorded* columns to Video...");
+        await prisma.$executeRaw`ALTER TABLE "Video" ADD COLUMN "recordedUrl" TEXT`;
+      }
+      if (!existing.has("recordedTitle")) {
+        await prisma.$executeRaw`ALTER TABLE "Video" ADD COLUMN "recordedTitle" TEXT`;
+      }
+      if (!existing.has("recordedDate")) {
+        await prisma.$executeRaw`ALTER TABLE "Video" ADD COLUMN "recordedDate" TEXT`;
+      }
+      if (!existing.has("recordedTime")) {
+        await prisma.$executeRaw`ALTER TABLE "Video" ADD COLUMN "recordedTime" TEXT`;
+      }
+    }
+
     console.log("[MIGRATION] All migrations applied successfully.");
   } catch (err) {
     console.error("[MIGRATION] Error applying migrations:", err);

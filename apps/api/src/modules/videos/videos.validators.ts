@@ -39,6 +39,10 @@ export const createVideoSchema = z.object({
   audioTitle: z.string().max(200).optional().nullable(),
   audioTagIds: z.array(z.string()).max(20).default([]),
   audios: z.array(audioItem).max(10).default([]),
+  recordedUrl: z.string().max(1000).optional().nullable(),
+  recordedTitle: z.string().max(200).optional().nullable(),
+  recordedDate: z.string().max(20).optional().nullable(),
+  recordedTime: z.string().max(20).optional().nullable(),
 });
 
 export const updateVideoSchema = createVideoSchema.partial();

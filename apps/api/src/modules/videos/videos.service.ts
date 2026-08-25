@@ -109,6 +109,10 @@ const videoSelect = {
   viewCount: true,
   audioUrl: true,
   audioTitle: true,
+  recordedUrl: true,
+  recordedTitle: true,
+  recordedDate: true,
+  recordedTime: true,
   audios: {
     select: {
       id: true,
@@ -388,6 +392,11 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
     createdBy: { connect: { id: createdById } },
   };
 
+  data.recordedUrl = input.recordedUrl ?? null;
+  data.recordedTitle = input.recordedTitle ?? null;
+  data.recordedDate = input.recordedDate ?? null;
+  data.recordedTime = input.recordedTime ?? null;
+
   if (data.status === ContentStatus.PUBLISHED) {
     data.publishedAt = new Date();
   }
@@ -446,6 +455,10 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "institution",
     "observations",
     "status",
+    "recordedUrl",
+    "recordedTitle",
+    "recordedDate",
+    "recordedTime",
   ] as const;
 
   for (const field of simpleFields) {

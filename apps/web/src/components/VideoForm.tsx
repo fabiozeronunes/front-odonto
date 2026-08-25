@@ -34,6 +34,10 @@ export interface VideoFormState {
   title: string;
   description: string;
   videoUrl: string;
+  recordedUrl: string;
+  recordedTitle: string;
+  recordedDate: string;
+  recordedTime: string;
   thumbnailUrl: string;
   specialtyId: string;
   difficulty: string;
@@ -52,6 +56,10 @@ export const emptyVideoForm: VideoFormState = {
   title: "",
   description: "",
   videoUrl: "",
+  recordedUrl: "",
+  recordedTitle: "",
+  recordedDate: "",
+  recordedTime: "",
   thumbnailUrl: "",
   specialtyId: "",
   difficulty: "BASICO",
@@ -103,6 +111,10 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           title: editing.title,
           description: editing.description || undefined,
           videoUrl: editing.videoUrl,
+          recordedUrl: editing.recordedUrl || null,
+          recordedTitle: editing.recordedTitle || null,
+          recordedDate: editing.recordedDate || null,
+          recordedTime: editing.recordedTime || null,
           thumbnailUrl: editing.thumbnailUrl || undefined,
           specialtyId: editing.specialtyId || null,
           difficulty: editing.difficulty,
@@ -179,6 +191,10 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       title: editing.title,
       description: editing.description || undefined,
       videoUrl: editing.videoUrl,
+      recordedUrl: editing.recordedUrl || null,
+      recordedTitle: editing.recordedTitle || null,
+      recordedDate: editing.recordedDate || null,
+      recordedTime: editing.recordedTime || null,
       thumbnailUrl: editing.thumbnailUrl || undefined,
       specialtyId: editing.specialtyId || null,
       difficulty: editing.difficulty,
@@ -380,15 +396,60 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           Gravar aula
         </h3>
         <p className="mb-3 text-sm text-muted-foreground">
-          Grave diretamente pela câmera do seu dispositivo (mobile ou tablet).
+          Grave diretamente pela câmera do seu dispositivo (mobile ou tablet). A aula gravada fica
+          salva aqui, sem substituir o vídeo importado do YouTube.
         </p>
         <VideoRecorder
-          onRecorded={(url, recTitle) => setEditing({ ...editing, title: recTitle || editing.title, videoUrl: url })}
-          onRemoved={() => setEditing({ ...editing, videoUrl: "" })}
+          onRecorded={(url, recTitle) =>
+            setEditing((prev) => ({
+              ...prev,
+              recordedUrl: url,
+              recordedTitle: prev.recordedTitle || recTitle || "",
+              recordedDate: prev.recordedDate || new Date().toISOString().slice(0, 10),
+              recordedTime: prev.recordedTime || new Date().toTimeString().slice(0, 5),
+            }))
+          }
+          onRemoved={() =>
+            setEditing((prev) => ({
+              ...prev,
+              recordedUrl: "",
+              recordedTitle: "",
+              recordedDate: "",
+              recordedTime: "",
+            }))
+          }
         />
-        {editing.videoUrl && (
-          <div className="mt-3 rounded-xl border border-border overflow-hidden">
-            <video controls src={editing.videoUrl} className="w-full" preload="metadata" />
+        {editing.recordedUrl && (
+          <div className="mt-4 space-y-3">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2 md:col-span-3">
+                <Label>Nome do vídeo gravado</Label>
+                <Input
+                  value={editing.recordedTitle}
+                  onChange={(e) => setEditing({ ...editing, recordedTitle: e.target.value })}
+                  placeholder="Ex.: Aula de Anatomia - 1º período"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Data da gravação</Label>
+                <Input
+                  type="date"
+                  value={editing.recordedDate}
+                  onChange={(e) => setEditing({ ...editing, recordedDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Hora da gravação</Label>
+                <Input
+                  type="time"
+                  value={editing.recordedTime}
+                  onChange={(e) => setEditing({ ...editing, recordedTime: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="rounded-xl border border-border overflow-hidden">
+              <video controls src={editing.recordedUrl} className="w-full" preload="metadata" />
+            </div>
           </div>
         )}
       </div>

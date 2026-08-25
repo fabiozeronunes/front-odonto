@@ -95,6 +95,10 @@ export interface Video {
   observations?: string | null;
   audioUrl?: string | null;
   audioTitle?: string | null;
+  recordedUrl?: string | null;
+  recordedTitle?: string | null;
+  recordedDate?: string | null;
+  recordedTime?: string | null;
   audioTags?: VideoTag[];
   audios?: { id: string; url: string; title?: string | null; createdAt?: string }[];
   status: ContentStatus;
