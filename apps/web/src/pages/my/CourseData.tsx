@@ -8,10 +8,20 @@ import { Label } from "../../components/ui/label";
 const DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const TURNOS = ["Manhã", "Integral", "Noite"];
 
+function sortByDay<T extends { diaSemana?: string | null; name: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const ia = DAYS.indexOf(a.diaSemana ?? "");
+    const ib = DAYS.indexOf(b.diaSemana ?? "");
+    if (ia !== ib) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    return a.name.localeCompare(b.name);
+  });
+}
+
 interface CourseEntry {
   id: string;
   name: string;
   curso: string | null;
+  codigo: string | null;
   diaSemana: string | null;
   periodo: string | null;
   turno: string | null;
@@ -24,6 +34,7 @@ interface CourseEntry {
 const EMPTY = {
   name: "",
   curso: "",
+  codigo: "",
   diaSemana: "",
   periodo: "",
   turno: "",
@@ -48,7 +59,7 @@ export function CourseData() {
   function load() {
     setLoading(true);
     api<{ data: { disciplinas: CourseEntry[] } }>("/api/my-disciplines")
-      .then((d) => setEntries(d.data.disciplinas))
+      .then((d) => setEntries(sortByDay(d.data.disciplinas)))
       .catch((e) => setError(e instanceof ApiRequestError ? e.message : "Erro ao carregar"))
       .finally(() => setLoading(false));
   }
@@ -63,16 +74,14 @@ export function CourseData() {
           method: "PUT",
           body: JSON.stringify(form),
         });
-        setEntries((prev) =>
-          prev.map((e) => (e.id === editingId ? res.data : e)).sort((a, b) => a.name.localeCompare(b.name))
-        );
+        setEntries((prev) => sortByDay(prev.map((e) => (e.id === editingId ? res.data : e))));
       } else {
         const res = await api<{ data: CourseEntry }>("/api/my-disciplines", {
           method: "POST",
           body: JSON.stringify(form),
         });
         if (!entries.some((e) => e.id === res.data.id)) {
-          setEntries((prev) => [...prev, res.data].sort((a, b) => a.name.localeCompare(b.name)));
+          setEntries((prev) => sortByDay([...prev, res.data]));
         }
       }
       setForm({ ...EMPTY });
@@ -89,6 +98,7 @@ export function CourseData() {
     setForm({
       name: entry.name,
       curso: entry.curso ?? "",
+      codigo: entry.codigo ?? "",
       diaSemana: entry.diaSemana ?? "",
       periodo: entry.periodo ?? "",
       turno: entry.turno ?? "",
@@ -202,6 +212,7 @@ export function CourseData() {
             "Escolher..."
           )}
           {field("Disciplina *", "name", "Ex.: Anatomia Dental", true)}
+          {field("Cod Disciplina", "codigo", "Ex.: ARA4185")}
           {field("Professor", "professor", "Ex.: Dr. João Silva")}
           {field("Turma", "turma", "Ex.: 001")}
           {field("Bloco", "bloco", "Ex.: A")}
@@ -237,6 +248,9 @@ export function CourseData() {
             <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
+                {entry.codigo && (
+                  <p className="truncate text-xs font-medium text-muted-foreground">COD: {entry.codigo}</p>
+                )}
                 {(entry.diaSemana || entry.turno) && (
                   <p className="truncate text-xs text-muted-foreground">
                     {[entry.diaSemana && `Dia: ${entry.diaSemana}`, entry.turno && `Turno: ${entry.turno}`]
