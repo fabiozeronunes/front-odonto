@@ -7,6 +7,7 @@ import type { MembershipPlan } from "../types";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { formatPrice, cn } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 const PLAN_ORDER: Record<string, number> = {
   "odontus-premium": 0,
@@ -192,6 +193,7 @@ export function Plans() {
   return (
     <div className="border-y border-teal-200/60 bg-teal-50/80 dark:border-primary-800/40 dark:bg-primary-950/40">
       <div className="mx-auto max-w-[99%] px-4 py-14 sm:px-6">
+      <BackButton to="/" />
       <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
         <Badge className="rounded-full border border-teal-300/60 bg-white px-4 py-1.5 text-teal-700 dark:border-primary-700 dark:bg-primary-900/40 dark:text-teal-300">
           <Sparkles className="h-3 w-3" /> Planos de assinatura

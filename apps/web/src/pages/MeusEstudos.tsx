@@ -8,6 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { StudyResourceRenderer } from "../components/StudyResourceRenderer";
 import { MySchedule } from "./my/MySchedule";
 import { resolveImageUrl } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 const STATUS_LABEL: Record<string, string> = {
   RASCUNHO: "Rascunho",
@@ -62,6 +63,7 @@ export function MeusEstudos() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">

@@ -3,6 +3,7 @@ import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft, Package } from "lucide-re
 import { useCart } from "../lib/cart";
 import { Button } from "../components/ui/button";
 import { formatPrice, resolveImageUrl } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 export function Cart() {
   const { items, subtotal, discount, total, setQuantity, removeItem, clear } = useCart();
@@ -22,6 +23,7 @@ export function Cart() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <BackButton to="/loja" />
       <div className="flex items-center justify-between">
         <h1 className="flex items-center gap-2 font-display text-3xl font-bold text-foreground">
           <ShoppingCart className="h-7 w-7 text-primary-700" /> Carrinho

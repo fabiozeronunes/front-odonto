@@ -6,6 +6,7 @@ import { MyTaxonomy } from "./MyTaxonomy";
 import { useAuth } from "../../lib/auth";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+import { BackButton } from "../../components/BackButton";
 
 type Tab = "videos" | "cases" | "taxonomy";
 
@@ -54,6 +55,7 @@ export function MyContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-foreground">Meu espaço</h1>
         <p className="mt-1 text-muted-foreground">

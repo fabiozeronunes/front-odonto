@@ -13,6 +13,7 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { BackButton } from "../components/BackButton";
 import { Button } from "../components/ui/button";
 import { formatDate, formatPrice } from "../lib/utils";
 
@@ -134,6 +135,7 @@ export function Commissions() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Minhas comissões</h1>

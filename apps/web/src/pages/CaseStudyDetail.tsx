@@ -9,6 +9,7 @@ import { StudySection } from "../components/StudySection";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { resolveImageUrl } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 interface CaseStudyDetail extends CaseStudy {
   videoCases: { video: Video }[];
@@ -83,9 +84,7 @@ export function CaseStudyDetail() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <Link to="/catalogo?type=cases" className="text-sm font-medium text-primary-700 hover:text-primary-800">
-        ← Voltar ao catálogo
-      </Link>
+      <BackButton to="/catalogo?type=cases" label="Voltar ao catálogo" />
 
       <div className="mt-4 rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
         <div className="flex flex-wrap items-center gap-2">

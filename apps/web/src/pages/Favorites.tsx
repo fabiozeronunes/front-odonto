@@ -5,6 +5,7 @@ import type { Paginated, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
+import { BackButton } from "../components/BackButton";
 
 export function Favorites() {
   const [items, setItems] = useState<{ createdAt: string; video: Video }[]>([]);
@@ -19,6 +20,7 @@ export function Favorites() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
         <Heart className="h-7 w-7 fill-red-500 text-red-500" /> Meus favoritos
       </h1>

@@ -23,6 +23,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
+import { BackButton } from "../components/BackButton";
 
 interface ProfileStats {
   videos: number;
@@ -129,6 +130,7 @@ export function Profile() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
         <UserIcon className="h-7 w-7 text-primary-700" /> Meu perfil
       </h1>

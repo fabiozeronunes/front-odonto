@@ -11,6 +11,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { StudySection } from "../components/StudySection";
 import { formatDate, formatDuration, resolveImageUrl, cn } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 function hasPremiumAccess(user: { role?: string; plan?: { slug: string } } | null) {
   return user?.role === "ADMIN" || (!!user?.plan && user.plan.slug !== "gratuito");
@@ -95,9 +96,7 @@ export function VideoDetail() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-4">
-        <Link to="/catalogo" className="text-sm font-medium bg-gradient-to-r from-teal-500 to-amber-500 bg-clip-text text-transparent">
-          ← Voltar ao catálogo
-        </Link>
+        <BackButton to="/catalogo" label="Voltar ao catálogo" />
       </div>
 
       <div className="mb-4 flex items-center gap-2">

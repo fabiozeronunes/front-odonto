@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { api } from "../lib/api";
 import { formatDate, formatPrice } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 import { useCart } from "../lib/cart";
 import { useAuth } from "../lib/auth";
 import { Button } from "../components/ui/button";
@@ -124,6 +125,7 @@ export function Financeiro() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/dashboard" />
       <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
         <Wallet className="h-7 w-7 text-primary-700" /> Dados financeiros
       </h1>

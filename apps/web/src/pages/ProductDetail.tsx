@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { api } from "../lib/api";
 import { useCart } from "../lib/cart";
+import { BackButton } from "../components/BackButton";
 import type { Product } from "../types";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -109,9 +110,7 @@ export function ProductDetail() {
         <span className="truncate text-foreground">{product.name}</span>
       </nav>
 
-      <Link to="/loja" className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-primary-700 hover:text-primary-800 dark:text-primary-400">
-        <ChevronLeft className="h-4 w-4" /> Voltar ao Shop
-      </Link>
+      <BackButton to="/loja" label="Voltar ao Shop" />
 
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Galeria */}

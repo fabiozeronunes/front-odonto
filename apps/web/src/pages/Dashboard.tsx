@@ -11,6 +11,7 @@ import { Button } from "../components/ui/button";
 import { useMediaQuery } from "../lib/useMediaQuery";
 import { Badge } from "../components/ui/badge";
 import { formatPrice, resolveImageUrl, cn } from "../lib/utils";
+import { BackButton } from "../components/BackButton";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -55,6 +56,7 @@ export function Dashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <BackButton to="/" />
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
