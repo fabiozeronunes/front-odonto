@@ -1023,7 +1023,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                 return (
                   <span
                     key={tag.id}
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                       selected
                         ? "bg-primary-700 text-white"
                         : "bg-muted text-muted-foreground"

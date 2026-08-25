@@ -53,7 +53,7 @@ export function AudioBox({
                 <span
                   key={tag.id}
                   className={
-                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors bg-muted text-muted-foreground hover:text-foreground"
+                    "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors bg-muted text-muted-foreground hover:text-foreground"
                   }
                 >
                   #{tag.name}
@@ -75,7 +75,7 @@ export function AudioBox({
                 <span
                   key={id}
                   className={
-                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors bg-accent-50 text-accent-700 dark:bg-accent-900 dark:text-accent-200"
+                    "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors bg-accent-50 text-accent-700 dark:bg-accent-900 dark:text-accent-200"
                   }
                 >
                   #{id}

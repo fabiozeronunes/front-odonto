@@ -193,7 +193,7 @@ export function Catalog() {
               key={id}
               type="button"
               onClick={() => updateParam("type", contentType === id ? "" : id)}
-              className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+              className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
                 contentType === id
                   ? id === "videos"
                     ? "bg-primary-700 text-primary-foreground shadow-sm"
@@ -230,7 +230,7 @@ export function Catalog() {
             onClick={() =>
               updateParam("source", source === "FRONTODONTUS" ? "" : "FRONTODONTUS")
             }
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               source === "FRONTODONTUS"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -244,7 +244,7 @@ export function Catalog() {
           <button
             type="button"
             onClick={() => updateParam("source", source === "STUDENT" ? "" : "STUDENT")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               source === "STUDENT"
                 ? "bg-sky-700 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -264,7 +264,7 @@ export function Catalog() {
           <button
             type="button"
             onClick={() => updateParam("sort", "recent")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "recent"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -276,7 +276,7 @@ export function Catalog() {
           <button
             type="button"
             onClick={() => updateParam("sort", "popular")}
-            className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+            className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
               sort === "popular"
                 ? "bg-accent-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"

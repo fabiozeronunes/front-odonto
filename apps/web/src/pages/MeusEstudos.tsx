@@ -92,7 +92,7 @@ export function MeusEstudos() {
         <button
           type="button"
           onClick={() => setView("estudos")}
-          className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-xs font-medium transition-colors ${
+          className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-xs font-medium transition-colors ${
             view === "estudos"
               ? "bg-primary-700 text-primary-foreground shadow-sm"
               : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -103,7 +103,7 @@ export function MeusEstudos() {
         <button
           type="button"
           onClick={() => setView("dados")}
-          className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-xs font-medium transition-colors ${
+          className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-xs font-medium transition-colors ${
             view === "dados"
               ? "bg-primary-700 text-primary-foreground shadow-sm"
               : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -114,7 +114,7 @@ export function MeusEstudos() {
         <button
           type="button"
           onClick={() => setView("grade")}
-          className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-xs font-medium transition-colors ${
+          className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-xs font-medium transition-colors ${
             view === "grade"
               ? "bg-primary-700 text-primary-foreground shadow-sm"
               : "border border-border bg-surface text-foreground hover:bg-muted"

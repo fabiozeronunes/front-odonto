@@ -95,7 +95,7 @@ export function ImagePicker({ value, onChange, label = "Imagens" }: ImagePickerP
             <button
               type="button"
               onClick={() => remove(u)}
-              className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute right-1 top-1 rounded-md bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
               aria-label="Remover imagem"
             >
               <X className="h-3 w-3" />

@@ -73,7 +73,7 @@ export function MyContent() {
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
+              className={`inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors ${
                 tab === id
                   ? "bg-primary-700 text-primary-foreground shadow-sm"
                   : "border border-border bg-surface text-foreground hover:bg-muted"

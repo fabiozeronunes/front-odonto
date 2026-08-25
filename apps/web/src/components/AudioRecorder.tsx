@@ -202,7 +202,7 @@ export function AudioRecorder({
         />
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold",
             recording ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"
           )}
         >

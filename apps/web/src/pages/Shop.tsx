@@ -112,7 +112,7 @@ export function Shop() {
             type="button"
             onClick={() => updateParam("sort", "recent")}
             className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              "inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
               sort === "recent"
                 ? "bg-primary-700 text-primary-foreground shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -124,7 +124,7 @@ export function Shop() {
             type="button"
             onClick={() => updateParam("sort", "popular")}
             className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              "inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
               sort === "popular"
                 ? "bg-accent-600 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -136,7 +136,7 @@ export function Shop() {
             type="button"
             onClick={() => updateParam("sort", "price_asc")}
             className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              "inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
               sort === "price_asc"
                 ? "bg-green-700 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
@@ -148,7 +148,7 @@ export function Shop() {
             type="button"
             onClick={() => updateParam("sort", "price_desc")}
             className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-full px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
+              "inline-flex h-9 items-center gap-2 rounded-md px-4 text-[9px] font-medium uppercase tracking-wide transition-colors",
               sort === "price_desc"
                 ? "bg-green-700 text-white shadow-sm"
                 : "border border-border bg-surface text-foreground hover:bg-muted"
