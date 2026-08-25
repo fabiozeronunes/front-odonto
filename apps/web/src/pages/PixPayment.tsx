@@ -40,11 +40,20 @@ export function PixPayment() {
     if (!settings?.pixKey) return;
     try {
       await navigator.clipboard.writeText(settings.pixKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* ignore */
+      const el = document.createElement("textarea");
+      el.value = settings.pixKey;
+      document.body.appendChild(el);
+      el.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        window.prompt("Copie manualmente a chave Pix:", settings.pixKey);
+      }
+      document.body.removeChild(el);
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   const displayPlan = planName === "odontus-premium" ? "Premium" : planName === "odontus-vip" ? "VIP" : planName;

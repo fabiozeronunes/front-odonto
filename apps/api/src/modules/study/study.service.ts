@@ -87,6 +87,7 @@ export async function listMyResources(userId: string) {
   return prisma.studyResource.findMany({
     where: { authorId: userId },
     orderBy: { createdAt: "desc" },
+    take: 200,
     select: {
       id: true,
       type: true,
@@ -121,6 +122,7 @@ export async function listVideoResources(userId: string, videoId: string) {
   const resources = await prisma.studyResource.findMany({
     where: { videoId, OR: [{ status: "PUBLICADO" }, { authorId: userId }] },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }],
+    take: 200,
     select: resourceSelect,
   });
 
@@ -139,6 +141,7 @@ export async function listCaseResources(userId: string, caseStudyId: string) {
   const resources = await prisma.studyResource.findMany({
     where: { caseStudyId, OR: [{ status: "PUBLICADO" }, { authorId: userId }] },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }],
+    take: 200,
     select: resourceSelect,
   });
 

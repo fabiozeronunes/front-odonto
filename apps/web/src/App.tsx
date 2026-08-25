@@ -60,7 +60,7 @@ export default function App() {
     <HomeLockProvider>
       <div className="flex min-h-screen flex-col overflow-x-clip">
         <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pb-20 lg:pb-0">
         <div key={location.pathname} className="animate-page-enter">
         <Suspense fallback={<PageFallback />}>
         <Routes>

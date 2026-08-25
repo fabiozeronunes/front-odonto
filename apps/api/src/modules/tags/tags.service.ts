@@ -46,6 +46,7 @@ export async function listMyTags(userId: string) {
   return prisma.tag.findMany({
     where: { createdById: userId },
     orderBy: { name: "asc" },
+    take: 500,
     select: {
       id: true,
       name: true,

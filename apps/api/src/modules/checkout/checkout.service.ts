@@ -186,6 +186,7 @@ export async function getMyFinance(userId: string) {
     prisma.subscription.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
+      take: 200,
       select: {
         id: true,
         status: true,

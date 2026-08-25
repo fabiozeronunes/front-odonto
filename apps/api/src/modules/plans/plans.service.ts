@@ -6,6 +6,7 @@ import type { CreatePlanInput, UpdatePlanInput } from "./plans.validators.js";
 export async function listPlans() {
   return prisma.membershipPlan.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    take: 100,
     include: { _count: { select: { users: true } } },
   });
 }

@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { Select } from "../../components/ui/select";
 import { api } from "../../lib/api";
 import { toast } from "../../components/Toast";
 
@@ -342,15 +343,14 @@ export function MySchedule() {
                 </div>
                 <div className="space-y-1">
                   <Label>Dia da semana</Label>
-                  <select
+                  <Select
                     value={editing.day}
                     onChange={(e) => setEditing({ ...editing, day: e.target.value })}
-                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                   >
                     {DAYS.map((d) => (
                       <option key={d} value={d}>{d}</option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
                 <div className="space-y-1">
                   <Label>Nº Turma</Label>
@@ -386,15 +386,14 @@ export function MySchedule() {
                 </div>
                 <div className="space-y-1">
                   <Label>Turno</Label>
-                  <select
+                  <Select
                     value={editing.turno}
                     onChange={(e) => setEditing({ ...editing, turno: e.target.value })}
-                    className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                   >
                     <option value="Integral">Integral</option>
                     <option value="Manhã">Manhã</option>
                     <option value="Noturno">Noturno</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className="space-y-1 sm:col-span-2">
                   <Label>Nome do professor</Label>

@@ -135,7 +135,8 @@ export function Navbar() {
           <button
             className="rounded-lg p-2 text-muted-foreground hover:bg-muted"
             onClick={() => setOpen(!open)}
-            aria-label="Abrir menu"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
