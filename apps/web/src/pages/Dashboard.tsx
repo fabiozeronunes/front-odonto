@@ -1,57 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, ShoppingBag, Percent, Package, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
+import { Heart, History, Sparkles, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import type { Paginated, Product, Video } from "../types";
+import type { Paginated, Video } from "../types";
 import { VideoCard } from "../components/VideoCard";
 import { AffiliateShareCard } from "../components/AffiliateShareCard";
-import { CountdownTimer } from "../components/CountdownTimer";
 import { Button } from "../components/ui/button";
-import { useMediaQuery } from "../lib/useMediaQuery";
 import { Badge } from "../components/ui/badge";
-import { formatPrice, resolveImageUrl, cn } from "../lib/utils";
 import { BackButton } from "../components/BackButton";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
   const [recent, setRecent] = useState<{ watchedAt: string; video: Video }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saleProducts, setSaleProducts] = useState<Product[]>([]);
-  const [loadingSales, setLoadingSales] = useState(true);
-  const isTablet = useMediaQuery("(min-width: 768px)");
-  const [rows, setRows] = useState<"1" | "2" | "3">(() => {
-    try {
-      return localStorage.getItem("odonto_dashboard_sale_rows") === "1" ? "1" : "3";
-    } catch {
-      return "3";
-    }
-  });
   const isPremium = user?.role === "ADMIN" || (!!user?.plan && user.plan.slug !== "gratuito");
-
-  function changeRows(value: "1" | "2" | "3") {
-    setRows(value);
-    try {
-      localStorage.setItem("odonto_dashboard_sale_rows", value);
-    } catch {
-      /* ignore */
-    }
-  }
-
-  const activeRows: "1" | "2" | "3" = isTablet ? (rows === "1" ? "2" : rows) : rows === "3" ? "2" : rows;
 
   useEffect(() => {
     api<Paginated<{ watchedAt: string; video: Video }>>("/api/videos/me/history?perPage=6")
       .then((data) => setRecent(data.data))
       .catch(() => setRecent([]))
       .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    api<Paginated<Product>>("/api/products?perPage=8&onSale=true")
-      .then((data) => setSaleProducts(data.data))
-      .catch(() => setSaleProducts([]))
-      .finally(() => setLoadingSales(false));
   }, []);
 
   return (
@@ -171,121 +140,6 @@ export function Dashboard() {
         )}
       </section>
 
-      <section className="mt-10">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
-            <ShoppingBag className="h-5 w-5 text-primary-700" /> Shop Odontus
-          </h2>
-          <Link to="/loja">
-            <Button variant="outline" size="sm">
-              <Percent className="h-4 w-4" /> Ver todas as ofertas
-            </Button>
-          </Link>
-        </div>
-        <p className="mb-5 -mt-3 text-sm text-muted-foreground">
-          Descontos exclusivos em kits, uniformes e materiais odontológicos para assinantes.
-        </p>
-
-        <div className="mb-6 rounded-2xl border border-border bg-surface p-4 shadow-card">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[9px] font-medium uppercase text-accent-700 dark:bg-accent-900 dark:text-accent-200">
-              Produtos por linha:
-            </span>
-            <div className="inline-flex overflow-hidden rounded-lg border border-border">
-              {(isTablet ? (["2", "3"] as const) : (["1", "2"] as const)).map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => changeRows(value)}
-                  className={cn(
-                    "px-4 py-1.5 text-[9px] font-medium uppercase tracking-wide transition-colors",
-                    activeRows === value
-                      ? "bg-primary-700 text-primary-foreground"
-                      : "bg-surface text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  {value} produto{value === "2" || value === "3" ? "s" : ""}
-                </button>
-              ))}
-            </div>
-            <span className="ml-1 text-xs text-muted-foreground">
-              {activeRows === "1" ? "1 por linha no celular · 2 no tablet" : activeRows === "2" ? "2 por linha no celular · 2 no tablet" : "2 por linha no celular · 3 no tablet"}
-            </span>
-          </div>
-        </div>
-
-        {loadingSales ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-square animate-pulse rounded-2xl bg-muted" />
-            ))}
-          </div>
-        ) : saleProducts.length === 0 ? (
-          <div className="flex flex-col items-center py-10 text-center">
-            <Package className="h-10 w-10 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold text-foreground">Nenhuma oferta disponível</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Novas ofertas em breve. Fique de olho!
-            </p>
-          </div>
-        ) : (
-          <div
-            className={cn(
-              "grid gap-4 sm:gap-6",
-              activeRows === "2"
-                ? "grid-cols-2"
-                : activeRows === "3"
-                ? "grid-cols-2 md:grid-cols-3"
-                : "mx-auto max-w-2xl grid-cols-1"
-            )}
-          >
-            {saleProducts.map((p) => {
-              const price = Number(p.price);
-              const promo = Number(p.promoPrice);
-              const discount = promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
-              const img = p.images?.[0]?.url;
-              return (
-                <Link
-                  key={p.id}
-                  to={`/loja/${p.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
-                >
-                  <div className="relative aspect-[4/3] bg-white">
-                    {img ? (
-                      <img src={resolveImageUrl(img)} alt={p.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
-                    ) : (
-                      <span className="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <Package className="h-10 w-10" />
-                      </span>
-                    )}
-                    {discount > 0 && (
-                      <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                        -{discount}%
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <p className="truncate text-sm font-semibold text-foreground">{p.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {p.brand ?? "—"}
-                      {p.category ? ` • ${p.category.name}` : ""}
-                    </p>
-                    <div className="mt-2 flex items-baseline gap-2">
-                      {discount > 0 && (
-                        <span className="text-xs text-muted-foreground line-through">{formatPrice(p.price)}</span>
-                      )}
-                      <span className="text-sm font-bold text-emerald-700">{formatPrice(p.promoPrice)}</span>
-                    </div>
-                    {p.saleEndsAt && (
-                      <CountdownTimer startsAt={p.saleStartsAt} endsAt={p.saleEndsAt} className="mt-3" />
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </section>
     </div>
   );
 }
