@@ -4,6 +4,7 @@ import { api, ApiRequestError } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { confirmAction } from "../../components/Confirm";
 
 const DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const TURNOS = ["Manhã", "Integral", "Noite"];
@@ -116,7 +117,7 @@ export function CourseData() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir estes dados do curso?")) return;
+    if (!(await confirmAction("Excluir estes dados do curso?"))) return;
     try {
       await api(`/api/my-disciplines/${id}`, { method: "DELETE" });
       setEntries((prev) => prev.filter((e) => e.id !== id));

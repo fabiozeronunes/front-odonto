@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 export function AdminTags() {
   const [items, setItems] = useState<Tag[]>([]);
@@ -41,7 +42,7 @@ export function AdminTags() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir esta tag?")) return;
+    if (!(await confirmAction("Excluir esta tag?"))) return;
     await api(`/api/tags/${id}`, { method: "DELETE" });
     load();
   }

@@ -11,6 +11,7 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ImagePicker } from "../../components/ImagePicker";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 interface CaseForm {
   id?: string;
@@ -112,7 +113,7 @@ export function AdminCaseStudies() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este estudo de caso?")) return;
+    if (!(await confirmAction("Excluir este estudo de caso?"))) return;
     await api(`/api/case-studies/${id}`, { method: "DELETE" });
     load();
   }

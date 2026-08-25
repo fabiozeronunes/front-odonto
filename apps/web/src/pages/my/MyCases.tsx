@@ -17,6 +17,7 @@ import { AudioPlayer } from "../../components/AudioPlayer";
 import { VideoRecorder } from "../../components/VideoRecorder";
 import { TagCreator } from "../../components/TagCreator";
 import { resolveImageUrl } from "../../lib/utils";
+import { confirmAction } from "../../components/Confirm";
 
 interface ImageDraft {
   id: string;
@@ -258,7 +259,7 @@ export function MyCases() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este estudo de caso?")) return;
+    if (!(await confirmAction("Excluir este estudo de caso?"))) return;
     await api(`/api/case-studies/${id}`, { method: "DELETE" });
     load();
   }

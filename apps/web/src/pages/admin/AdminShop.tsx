@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { ImagePicker } from "../../components/ImagePicker";
 import { cn, formatDate, formatPrice } from "../../lib/utils";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 interface ProductFormState {
   id?: string;
@@ -93,7 +94,7 @@ export function AdminShop() {
   }, [tab]);
 
   async function handleDeleteOrder(orderId: string) {
-    if (!window.confirm("Excluir este pedido? Esta ação não pode ser desfeita.")) return;
+    if (!(await confirmAction("Excluir este pedido? Esta ação não pode ser desfeita."))) return;
     try {
       await api(`/api/products/orders/${orderId}`, { method: "DELETE" });
       setOrders((prev) => prev.filter((o) => o.id !== orderId));
@@ -167,7 +168,7 @@ export function AdminShop() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este produto?")) return;
+    if (!(await confirmAction("Excluir este produto?"))) return;
     await api(`/api/products/${id}`, { method: "DELETE" });
     load();
   }
@@ -195,7 +196,7 @@ export function AdminShop() {
   }
 
   async function removeCategory(id: string) {
-    if (!confirm("Excluir esta categoria?")) return;
+    if (!(await confirmAction("Excluir esta categoria?"))) return;
     try {
       await api(`/api/products/categories/${id}`, { method: "DELETE" });
       load();

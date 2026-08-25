@@ -18,6 +18,8 @@ import { Badge } from "../../components/ui/badge";
 import { Select } from "../../components/ui/select";
 import { InfoPopover } from "../../components/ui/info-popover";
 import { formatDate, formatPrice, cn } from "../../lib/utils";
+import { confirmAction } from "../../components/Confirm";
+import { toast } from "../../components/Toast";
 
 interface Affiliate {
   id: string;
@@ -185,24 +187,30 @@ export function AdminAffiliates() {
   }
 
   async function markPaid(commissionId: string) {
-    if (!confirm("Marcar esta comissão como paga?")) return;
+    if (!(await confirmAction("Marcar esta comissão como paga?"))) return;
     setBusy(commissionId);
     try {
       await api(`/api/affiliates/commissions/${commissionId}/pay`, { method: "POST" });
       if (selected) await loadDetail(selected.id);
       await load();
+      toast.success("Comissão marcada como paga");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao marcar comissão como paga");
     } finally {
       setBusy(null);
     }
   }
 
   async function cancelCommission(commissionId: string) {
-    if (!confirm("Cancelar esta comissão?")) return;
+    if (!(await confirmAction("Cancelar esta comissão?"))) return;
     setBusy(commissionId);
     try {
       await api(`/api/affiliates/commissions/${commissionId}/cancel`, { method: "POST" });
       if (selected) await loadDetail(selected.id);
       await load();
+      toast.success("Comissão cancelada");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao cancelar comissão");
     } finally {
       setBusy(null);
     }

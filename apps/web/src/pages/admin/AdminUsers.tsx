@@ -11,6 +11,8 @@ import { Badge } from "../../components/ui/badge";
 import { PieChart } from "../../components/ui/pie-chart";
 import { formatDate, formatPrice } from "../../lib/utils";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
+import { toast } from "../../components/Toast";
 
 type StatusFilter = "" | "pagos" | "atraso" | "aguardando" | "gratuito";
 
@@ -66,8 +68,13 @@ export function AdminUsers() {
   }, [page, search, status]);
 
   async function toggleActive(id: string, isActive: boolean) {
-    await api(`/api/admin/users/${id}/${isActive ? "deactivate" : "activate"}`, { method: "POST" });
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, isActive: !u.isActive } : u)));
+    try {
+      await api(`/api/admin/users/${id}/${isActive ? "deactivate" : "activate"}`, { method: "POST" });
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, isActive: !u.isActive } : u)));
+      toast.success(isActive ? "Usuário desativado" : "Usuário ativado");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao alterar status do usuário");
+    }
   }
 
   async function changePlan(id: string, planId: string) {
@@ -117,7 +124,7 @@ export function AdminUsers() {
   }
 
   async function notifyWhatsApp(user: User) {
-    if (!confirm(`Enviar aviso de atraso por WhatsApp para ${user.name}?`)) return;
+    if (!(await confirmAction(`Enviar aviso de atraso por WhatsApp para ${user.name}?`))) return;
     setBusy(user.id);
     try {
       const res = await api<{ data: { sent: boolean; fallbackLink?: string | null; message?: string; error?: string } }>(
@@ -139,7 +146,7 @@ export function AdminUsers() {
   }
 
   async function deleteUser(user: User) {
-    if (!confirm(`Excluir definitivamente o usuário ${user.name} (${user.email})? Essa ação não pode ser desfeita.`)) {
+    if (!(await confirmAction(`Excluir definitivamente o usuário ${user.name} (${user.email})? Essa ação não pode ser desfeita.`))) {
       return;
     }
     setBusy(user.id);
@@ -176,7 +183,7 @@ export function AdminUsers() {
   }
 
   async function confirmPayment(user: User) {
-    if (!confirm(`Confirmar o pagamento do usuário ${user.name}? O acesso ao plano será liberado.`)) {
+    if (!(await confirmAction(`Confirmar o pagamento do usuário ${user.name}? O acesso ao plano será liberado.`))) {
       return;
     }
     setBusy(user.id);

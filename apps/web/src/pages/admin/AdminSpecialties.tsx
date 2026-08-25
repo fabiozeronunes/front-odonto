@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 export function AdminSpecialties() {
   const [items, setItems] = useState<Specialty[]>([]);
@@ -45,7 +46,7 @@ export function AdminSpecialties() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir esta especialidade?")) return;
+    if (!(await confirmAction("Excluir esta especialidade?"))) return;
     await api(`/api/specialties/${id}`, { method: "DELETE" });
     load();
   }

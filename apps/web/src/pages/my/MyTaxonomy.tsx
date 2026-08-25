@@ -5,6 +5,7 @@ import type { Specialty, Tag } from "../../types";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { confirmAction } from "../../components/Confirm";
 
 export function MyTaxonomy() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
@@ -79,13 +80,13 @@ export function MyTaxonomy() {
   }
 
   async function removeSpecialty(id: string) {
-    if (!confirm("Excluir esta especialidade?")) return;
+    if (!(await confirmAction("Excluir esta especialidade?"))) return;
     await api(`/api/specialties/${id}`, { method: "DELETE" });
     load();
   }
 
   async function removeTag(id: string) {
-    if (!confirm("Excluir esta tag?")) return;
+    if (!(await confirmAction("Excluir esta tag?"))) return;
     await api(`/api/tags/${id}`, { method: "DELETE" });
     load();
   }

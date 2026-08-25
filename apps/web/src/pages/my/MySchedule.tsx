@@ -6,6 +6,7 @@ import { Label } from "../../components/ui/label";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { api } from "../../lib/api";
+import { toast } from "../../components/Toast";
 
 interface Discipline {
   id: string;
@@ -49,6 +50,7 @@ function nextColor(used: string[]): string {
 export function MySchedule() {
   const [items, setItems] = useState<Discipline[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [editing, setEditing] = useState<Discipline | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [expandedPeriods, setExpandedPeriods] = useState<Record<number, boolean>>({});
@@ -62,8 +64,10 @@ export function MySchedule() {
       setLoading(true);
       const res = await api<{ data: Discipline[] }>("/api/grade");
       setItems(res.data);
+      setLoadError(false);
     } catch {
       setItems([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -126,8 +130,9 @@ export function MySchedule() {
         setItems((prev) => [...prev, res.data]);
       }
       closeForm();
-    } catch {
-      // erro silencioso
+      toast.success(editing.id ? "Disciplina atualizada" : "Disciplina adicionada");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar disciplina");
     }
   }
 
@@ -135,8 +140,9 @@ export function MySchedule() {
     try {
       await api(`/api/grade/${id}`, { method: "DELETE" });
       setItems((prev) => prev.filter((i) => i.id !== id));
-    } catch {
-      // erro silencioso
+      toast.success("Disciplina excluída");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao excluir disciplina");
     }
   }
 
@@ -179,7 +185,18 @@ export function MySchedule() {
         </Button>
       </div>
 
-      {items.length === 0 && !showForm && (
+      {loadError && items.length === 0 && !showForm && (
+        <div className="flex flex-col items-center rounded-2xl border border-red-200 bg-red-50 p-10 text-center dark:border-red-900 dark:bg-red-950/40">
+          <p className="text-sm font-medium text-red-800 dark:text-red-200">
+            Não foi possível carregar sua grade. Verifique sua conexão.
+          </p>
+          <Button size="sm" variant="outline" className="mt-4" onClick={loadItems}>
+            Tentar novamente
+          </Button>
+        </div>
+      )}
+
+      {!loadError && items.length === 0 && !showForm && (
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
           <BookOpen className="mx-auto h-10 w-10 text-muted-foreground/50" />
           <p className="mt-3 text-sm text-muted-foreground">
@@ -272,6 +289,8 @@ export function MySchedule() {
                                 <button
                                   type="button"
                                   onClick={() => openEdit(d)}
+                                  aria-label={`Editar ${d.name}`}
+                                  title={`Editar ${d.name}`}
                                   className="rounded p-1 hover:bg-muted text-xs text-muted-foreground hover:text-foreground"
                                 >
                                   <Pencil className="h-3.5 w-3.5" />
@@ -279,6 +298,8 @@ export function MySchedule() {
                                 <button
                                   type="button"
                                   onClick={() => deleteDiscipline(d.id)}
+                                  aria-label={`Excluir ${d.name}`}
+                                  title={`Excluir ${d.name}`}
                                   className="rounded p-1 hover:bg-red-100 text-red-600"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />

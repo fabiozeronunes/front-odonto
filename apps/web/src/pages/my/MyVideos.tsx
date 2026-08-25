@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
+import { confirmAction } from "../../components/Confirm";
 
 export function MyVideos() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -110,7 +111,7 @@ export function MyVideos() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este vídeo?")) return;
+    if (!(await confirmAction("Excluir este vídeo?"))) return;
     await api(`/api/videos/${id}`, { method: "DELETE" });
     load();
   }

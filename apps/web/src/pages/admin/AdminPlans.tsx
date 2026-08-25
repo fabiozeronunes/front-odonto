@@ -10,6 +10,7 @@ import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { formatPrice } from "../../lib/utils";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 interface PlanForm {
   id?: string;
@@ -71,7 +72,7 @@ export function AdminPlans() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este plano?")) return;
+    if (!(await confirmAction("Excluir este plano?"))) return;
     await api(`/api/plans/${id}`, { method: "DELETE" });
     load();
   }

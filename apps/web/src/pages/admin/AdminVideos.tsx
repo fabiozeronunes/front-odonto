@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { InfoPopover } from "../../components/ui/info-popover";
+import { confirmAction } from "../../components/Confirm";
 
 export function AdminVideos() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -74,7 +75,7 @@ export function AdminVideos() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Excluir este vídeo?")) return;
+    if (!(await confirmAction("Excluir este vídeo?"))) return;
     await api(`/api/videos/${id}`, { method: "DELETE" });
     load();
   }
