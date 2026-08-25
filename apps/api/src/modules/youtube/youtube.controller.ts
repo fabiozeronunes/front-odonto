@@ -64,7 +64,12 @@ export const auth = asyncHandler(async (req: Request, res: Response) => {
 
 export const callback = asyncHandler(async (req: Request, res: Response) => {
   const code = String(req.query.code ?? "");
-  const error = String(req.query.error ?? "");
+  const error = String(req.query.error ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
   if (error) {
     res.status(400).send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Erro</title></head><body style="font-family:sans-serif;text-align:center;padding:60px"><h1 style="color:red">Erro na autorização</h1><p>${error}</p></body></html>`);
     return;

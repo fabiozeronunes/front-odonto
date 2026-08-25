@@ -23,12 +23,17 @@ async function loadBlacklist() {
 }
 
 export async function checkBlacklist(req: Request, _res: Response, next: NextFunction) {
-  await loadBlacklist();
-  const ip = req.ip || req.socket.remoteAddress || "unknown";
-  if (blacklistedIPs.has(ip)) {
-    throw new ForbiddenError("Acesso bloqueado");
+  try {
+    await loadBlacklist();
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    if (blacklistedIPs.has(ip)) {
+      next(new ForbiddenError("Acesso bloqueado"));
+      return;
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 }
 
 export async function blacklistIP(ip: string, reason?: string, expiresAt?: Date) {

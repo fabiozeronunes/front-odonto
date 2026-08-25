@@ -1,6 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
+import rateLimit from "express-rate-limit";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { requirePaidPlan } from "../../middlewares/requirePaidPlan.js";
 import { validate } from "../../middlewares/validate.js";
 import { z } from "zod";
 import * as ctrl from "./youtube.controller.js";
@@ -20,9 +22,18 @@ const upload = multer({
 youtubeRouter.get("/auth", ctrl.auth);
 youtubeRouter.get("/callback", ctrl.callback);
 
-youtubeRouter.use(authenticate);
+const youtubeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { message: "Limite de operações do YouTube excedido. Tente novamente mais tarde." } },
+});
 
-youtubeRouter.get("/token", ctrl.token);
+youtubeRouter.use(authenticate);
+youtubeRouter.use(youtubeLimiter);
+
+youtubeRouter.get("/token", requirePaidPlan, ctrl.token);
 youtubeRouter.get(
   "/info",
   validate(z.object({ url: z.string().url("URL inválida") }), "query"),

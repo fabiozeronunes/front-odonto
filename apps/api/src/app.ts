@@ -8,6 +8,9 @@ import { requestId, requestTimeout } from "./middlewares/request.js";
 import { sanitizeInput } from "./middlewares/sanitize.js";
 import { fingerprintDetector } from "./middlewares/fingerprint.js";
 import { checkBlacklist } from "./services/blacklist.js";
+import { authenticate } from "./middlewares/authenticate.js";
+import { requireRole } from "./middlewares/requireRole.js";
+import { Role } from "@prisma/client";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { specialtiesRouter } from "./modules/specialties/specialties.routes.js";
 import { tagsRouter } from "./modules/tags/tags.routes.js";
@@ -31,7 +34,7 @@ export function createApp() {
   const app = express();
 
   app.disable("x-powered-by");
-  app.set("trust proxy", 1);
+  app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
 
   if (env.nodeEnv === "production") {
     app.use((req, res, next) => {
@@ -106,7 +109,7 @@ export function createApp() {
     }
   });
 
-  app.post("/admin/migrate", async (_req, res) => {
+  app.post("/admin/migrate", authenticate, requireRole(Role.ADMIN), async (_req, res) => {
     const { applyMigrations } = await import("./services/migrate.js");
     await applyMigrations();
     res.json({ status: "ok", message: "Migrations applied" });

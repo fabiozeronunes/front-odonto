@@ -43,8 +43,6 @@ export async function applyMigrations() {
         await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN "emailVerified" BOOLEAN NOT NULL DEFAULT false`;
       }
 
-      // Auto-verify existing users so they aren't locked out
-      await prisma.$executeRaw`UPDATE "User" SET "emailVerified" = true WHERE "emailVerified" = false`;
     }
 
     // 2. EmailVerificationToken

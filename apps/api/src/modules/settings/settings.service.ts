@@ -167,9 +167,27 @@ export async function saveFaq(input: unknown): Promise<Faq> {
   return next;
 }
 
-export async function getPaymentSettings() {
+const PUBLIC_PAYMENT_FIELDS = [
+  "pixKey",
+  "pixKeyType",
+  "bankName",
+  "agency",
+  "account",
+  "beneficiary",
+  "cpfCnpj",
+  "instructions",
+] as const;
+
+export async function getPaymentSettings(): Promise<Record<string, unknown> | null> {
   const row = await prisma.siteSetting.findUnique({ where: { key: "payment" } });
-  return (row?.value as Record<string, unknown> | null) ?? null;
+  const value = row?.value as Record<string, unknown> | null;
+  if (!value) return null;
+  // Expõe publicamente apenas campos de exibição; qualquer outra chave salva pelo admin nunca vaza.
+  const out: Record<string, unknown> = {};
+  for (const k of PUBLIC_PAYMENT_FIELDS) {
+    if (value[k] !== undefined && value[k] !== null && value[k] !== "") out[k] = value[k];
+  }
+  return out;
 }
 
 export async function upsertPaymentSettings(data: Record<string, unknown>) {
