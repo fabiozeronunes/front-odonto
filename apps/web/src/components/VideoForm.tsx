@@ -95,12 +95,24 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   const [editingTagName, setEditingTagName] = useState("");
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
   const [metaEdit, setMetaEdit] = useState(false);
+  const [videoMetaEdit, setVideoMetaEdit] = useState(false);
+  const [audioEditId, setAudioEditId] = useState<string | null>(null);
   const lastSavedRef = useRef<string>("");
 
   function formatRecDate(d?: string | null) {
     if (!d) return "";
     const dt = new Date(`${d}T12:00:00`);
     return isNaN(dt.getTime()) ? d : dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function clearYouTube() {
+    const wasImported = !!importedVideoUrl.current && editing.videoUrl === importedVideoUrl.current;
+    setEditing((prev) => ({
+      ...prev,
+      videoUrl: "",
+      thumbnailUrl: wasImported ? "" : prev.thumbnailUrl,
+    }));
+    setVideoMetaEdit(false);
   }
 
   function clearRecorded() {
@@ -386,34 +398,6 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
       <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
-        <h3 className="mb-4 text-lg font-bold text-foreground">Informações do vídeo</h3>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Título *</Label>
-            <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>URL do vídeo</Label>
-            <Input
-              value={editing.videoUrl}
-              onChange={(e) => {
-                const newUrl = e.target.value;
-                setEditing((prev) => {
-                  const wasImported = importedVideoUrl.current && prev.videoUrl === importedVideoUrl.current;
-                  return {
-                    ...prev,
-                    videoUrl: newUrl,
-                    thumbnailUrl: wasImported && newUrl !== importedVideoUrl.current ? "" : prev.thumbnailUrl,
-                  };
-                });
-              }}
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
         <h3 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
           <Camera className="h-5 w-5 text-primary-600" />
           Gravar aula
@@ -528,15 +512,80 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
         <YouTubeImport
           onInfo={applyYouTube}
         />
-        {editing.videoUrl && editing.videoUrl.includes("youtube.com/embed") && (
-          <div className="mt-3 rounded-xl border border-border overflow-hidden">
-            <iframe
-              src={editing.videoUrl}
-              className="w-full aspect-video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="Pré-visualização do vídeo"
-            />
+        {editing.videoUrl && (
+          <div className="mt-3 space-y-3">
+            {editing.videoUrl.includes("youtube.com/embed") && (
+              <div className="overflow-hidden rounded-xl border border-border">
+                <iframe
+                  src={editing.videoUrl}
+                  className="w-full aspect-video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Pré-visualização do vídeo"
+                />
+              </div>
+            )}
+
+            {videoMetaEdit ? (
+              <div className="space-y-2 rounded-xl border border-border bg-muted/30 p-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Título do vídeo *</Label>
+                  <Input
+                    value={editing.title}
+                    onChange={(e) => setEditing({ ...editing, title: e.target.value })}
+                    placeholder="Título obrigatório para salvar"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">URL do vídeo</Label>
+                  <Input
+                    value={editing.videoUrl}
+                    onChange={(e) => {
+                      const newUrl = e.target.value;
+                      setEditing((prev) => {
+                        const wasImported = importedVideoUrl.current && prev.videoUrl === importedVideoUrl.current;
+                        return {
+                          ...prev,
+                          videoUrl: newUrl,
+                          thumbnailUrl: wasImported && newUrl !== importedVideoUrl.current ? "" : prev.thumbnailUrl,
+                        };
+                      });
+                    }}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={() => setVideoMetaEdit(false)}>
+                  Concluído
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-foreground">
+                    {editing.title || "Vídeo do YouTube"}
+                  </p>
+                  <p className="truncate text-[11px] text-muted-foreground">{editing.videoUrl}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setVideoMetaEdit(true)}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  title="Editar título e URL"
+                  aria-label="Editar vídeo do YouTube"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={clearYouTube}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                  title="Excluir vídeo do YouTube"
+                  aria-label="Excluir vídeo do YouTube"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -572,35 +621,58 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                   className="rounded-xl border border-border p-4 space-y-3"
                 >
                   <AudioPlayer src={resolveImageUrl(audio.url) || ""} />
-                  <div className="flex items-end gap-2">
-                    <div className="flex-1 space-y-1">
-                      <Label>Título do áudio</Label>
-                      <Input
-                        value={audio.title}
-                        onChange={handleAudioTitleChange(index)}
-                        placeholder="Ex.: Explicação do vídeo"
-                      />
-                      {audio.createdAt && (
-                        <p className="text-xs text-muted-foreground">
-                          Criado em {new Date(audio.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                        </p>
-                      )}
+                  {audioEditId === audio.id ? (
+                    <div className="space-y-2 rounded-xl border border-border bg-muted/30 p-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Título do áudio</Label>
+                        <Input
+                          value={audio.title}
+                          onChange={handleAudioTitleChange(index)}
+                          placeholder="Ex.: Explicação do vídeo"
+                          autoFocus
+                        />
+                      </div>
+                      <Button type="button" size="sm" variant="outline" onClick={() => setAudioEditId(null)}>
+                        Concluído
+                      </Button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditing((prev) => ({
-                          ...prev,
-                          audios: prev.audios.filter((_, i) => i !== index),
-                        }))
-                      }
-                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 shrink-0"
-                      title="Remover áudio"
-                      aria-label="Remover áudio"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-semibold text-foreground">
+                          {audio.title || "Áudio sem título"}
+                        </p>
+                        {audio.createdAt && (
+                          <p className="text-[11px] text-muted-foreground">
+                            Criado em {new Date(audio.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAudioEditId(audio.id)}
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        title="Editar título do áudio"
+                        aria-label="Editar áudio"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditing((prev) => ({
+                            ...prev,
+                            audios: prev.audios.filter((_, i) => i !== index),
+                          }))
+                        }
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                        title="Remover áudio"
+                        aria-label="Remover áudio"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
