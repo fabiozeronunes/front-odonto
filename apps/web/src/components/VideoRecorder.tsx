@@ -1,30 +1,38 @@
 import { useRef, useState } from "react";
-import { Camera, Trash2, RotateCcw, Video, Loader2, ExternalLink } from "lucide-react";
+import { Camera, Trash2, RotateCcw, Video, Loader2, Upload } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+type Orientation = "16:9" | "9:16";
+
 interface VideoRecorderProps {
-  onRecorded: (url: string, title: string) => void;
+  onRecorded: (url: string, title: string, orientation?: string) => void;
   onRemoved: () => void;
 }
 
 export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const [phase, setPhase] = useState<"idle" | "preview" | "uploading" | "done">("idle");
+  const [orientation, setOrientation] = useState<Orientation>("16:9");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedMeta, setRecordedMeta] = useState<{ date: string; dayWeek: string; hour: string } | null>(null);
   const [title, setTitle] = useState("");
-  const [youtubeId, setYoutubeId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<string>("");
 
   function openCamera() {
     setError(null);
-    inputRef.current?.click();
+    cameraInputRef.current?.click();
+  }
+
+  function openUpload() {
+    setError(null);
+    uploadInputRef.current?.click();
   }
 
   function formatDate(d: Date) {
@@ -39,9 +47,24 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   }
 
-  function onFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+  function detectOrientation(file: File): Promise<Orientation> {
+    return new Promise((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => {
+        resolve(v.videoHeight > v.videoWidth ? "9:16" : "16:9");
+        URL.revokeObjectURL(v.src);
+      };
+      v.onerror = () => resolve("16:9");
+      v.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function onFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const detected = await detectOrientation(file);
+    setOrientation(detected);
     const url = URL.createObjectURL(file);
     const now = new Date();
     setRecordedBlob(file);
@@ -109,10 +132,8 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
 
       const uploadData = await uploadRes.json();
       const videoId = uploadData.id;
-      setYoutubeId(videoId);
-
       const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-      onRecorded(embedUrl, title);
+      onRecorded(embedUrl, title, orientation);
 
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setRecordedBlob(null);
@@ -133,12 +154,10 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
     setPreviewUrl(null);
     setRecordedMeta(null);
     setTitle("");
-    setYoutubeId(null);
     setPhase("idle");
   }
 
   function removeUploaded() {
-    setYoutubeId(null);
     setPhase("idle");
     onRemoved();
   }
@@ -152,18 +171,61 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
       )}
 
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="video/*"
         capture="environment"
         className="hidden"
         onChange={onFileSelected}
       />
+      <input
+        ref={uploadInputRef}
+        type="file"
+        accept="video/*"
+        className="hidden"
+        onChange={onFileSelected}
+      />
+
+      {phase === "idle" && (
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Orientação:</span>
+            <div className="inline-flex overflow-hidden rounded-lg border border-border">
+              {(["16:9", "9:16"] as const).map((o) => (
+                <button
+                  key={o}
+                  type="button"
+                  onClick={() => setOrientation(o)}
+                  className={`px-3 py-1 text-xs font-medium transition-colors ${
+                    orientation === o
+                      ? "bg-primary-700 text-primary-foreground"
+                      : "bg-surface text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {o === "16:9" ? "Horizontal 16:9" : "Vertical 9:16"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={openCamera}>
+              <Camera className="h-3.5 w-3.5" /> Gravar aula
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={openUpload}>
+              <Upload className="h-3.5 w-3.5" /> Enviar vídeo
+            </Button>
+          </div>
+        </div>
+      )}
 
       {phase === "preview" && previewUrl && (
         <div className="space-y-3">
-          <div className="rounded-xl border border-border overflow-hidden">
-            <video controls src={previewUrl} className="w-full" preload="metadata" playsInline />
+          <div
+            className={`mx-auto overflow-hidden rounded-xl border border-border ${
+              orientation === "9:16" ? "aspect-[9/16] max-w-[280px]" : "aspect-video w-full"
+            }`}
+          >
+            <video controls src={previewUrl} className="h-full w-full object-contain" preload="metadata" playsInline />
           </div>
           {recordedMeta && (
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -179,26 +241,6 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         </div>
       )}
 
-      {phase === "done" && youtubeId && (
-        <div className="space-y-2">
-          <div className="rounded-xl border border-border overflow-hidden">
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeId}`}
-              className="w-full aspect-video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title={title}
-            />
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="rounded-full bg-green-100 text-green-700 px-2 py-0.5 font-medium">No YouTube</span>
-            <a href={`https://www.youtube.com/watch?v=${youtubeId}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-foreground">
-              <ExternalLink className="h-3 w-3" /> Abrir
-            </a>
-          </div>
-        </div>
-      )}
-
       {phase === "uploading" && (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 p-6">
           <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -206,35 +248,30 @@ export function VideoRecorder({ onRecorded, onRemoved }: VideoRecorderProps) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        {phase === "idle" && (
-          <Button type="button" variant="outline" size="sm" onClick={openCamera}>
-            <Camera className="h-3.5 w-3.5" /> Gravar aula
+      {phase === "preview" && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" size="sm" onClick={uploadToYouTube} disabled={!title.trim()}>
+            <Video className="h-3.5 w-3.5" /> Enviar e usar
           </Button>
-        )}
+          <Button type="button" variant="ghost" size="sm" onClick={discard}>
+            <RotateCcw className="h-3.5 w-3.5" /> Descartar
+          </Button>
+        </div>
+      )}
 
-        {phase === "preview" && (
-          <>
-            <Button type="button" size="sm" onClick={uploadToYouTube} disabled={!title.trim()}>
-              <Video className="h-3.5 w-3.5" /> Enviar e usar
-            </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={discard}>
-              <RotateCcw className="h-3.5 w-3.5" /> Descartar
-            </Button>
-          </>
-        )}
-
-        {phase === "done" && (
-          <>
-            <Button type="button" variant="outline" size="sm" onClick={openCamera}>
-              <Camera className="h-3.5 w-3.5" /> Gravar outra
-            </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={removeUploaded} className="text-red-600 hover:text-red-700">
-              <Trash2 className="h-3.5 w-3.5" /> Excluir
-            </Button>
-          </>
-        )}
-      </div>
+      {phase === "done" && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={openCamera}>
+            <Camera className="h-3.5 w-3.5" /> Gravar outra
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={openUpload}>
+            <Upload className="h-3.5 w-3.5" /> Enviar outro
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={removeUploaded} className="text-red-600 hover:text-red-700">
+            <Trash2 className="h-3.5 w-3.5" /> Excluir
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

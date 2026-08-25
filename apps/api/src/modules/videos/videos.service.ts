@@ -113,6 +113,7 @@ const videoSelect = {
   recordedTitle: true,
   recordedDate: true,
   recordedTime: true,
+  recordedOrientation: true,
   audios: {
     select: {
       id: true,
@@ -459,6 +460,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "recordedTitle",
     "recordedDate",
     "recordedTime",
+    "recordedOrientation",
   ] as const;
 
   for (const field of simpleFields) {

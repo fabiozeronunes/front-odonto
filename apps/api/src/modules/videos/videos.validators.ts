@@ -43,6 +43,7 @@ export const createVideoSchema = z.object({
   recordedTitle: z.string().max(200).optional().nullable(),
   recordedDate: z.string().max(20).optional().nullable(),
   recordedTime: z.string().max(20).optional().nullable(),
+  recordedOrientation: z.enum(["16:9", "9:16"]).optional().nullable(),
 });
 
 export const updateVideoSchema = createVideoSchema.partial();

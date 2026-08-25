@@ -85,6 +85,7 @@ export function MyVideos() {
       recordedTitle: video.recordedTitle ?? "",
       recordedDate: video.recordedDate ?? "",
       recordedTime: video.recordedTime ?? "",
+      recordedOrientation: video.recordedOrientation ?? "16:9",
       thumbnailUrl: video.thumbnailUrl ?? "",
       specialtyId: video.specialty?.id ?? "",
       difficulty: video.difficulty,

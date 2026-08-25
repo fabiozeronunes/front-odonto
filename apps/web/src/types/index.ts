@@ -99,6 +99,7 @@ export interface Video {
   recordedTitle?: string | null;
   recordedDate?: string | null;
   recordedTime?: string | null;
+  recordedOrientation?: string | null;
   audioTags?: VideoTag[];
   audios?: { id: string; url: string; title?: string | null; createdAt?: string }[];
   status: ContentStatus;

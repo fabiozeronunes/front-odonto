@@ -38,6 +38,7 @@ export interface VideoFormState {
   recordedTitle: string;
   recordedDate: string;
   recordedTime: string;
+  recordedOrientation: string;
   thumbnailUrl: string;
   specialtyId: string;
   difficulty: string;
@@ -60,6 +61,7 @@ export const emptyVideoForm: VideoFormState = {
   recordedTitle: "",
   recordedDate: "",
   recordedTime: "",
+  recordedOrientation: "16:9",
   thumbnailUrl: "",
   specialtyId: "",
   difficulty: "BASICO",
@@ -92,7 +94,26 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
   const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null);
+  const [metaEdit, setMetaEdit] = useState(false);
   const lastSavedRef = useRef<string>("");
+
+  function formatRecDate(d?: string | null) {
+    if (!d) return "";
+    const dt = new Date(`${d}T12:00:00`);
+    return isNaN(dt.getTime()) ? d : dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function clearRecorded() {
+    setEditing((prev) => ({
+      ...prev,
+      recordedUrl: "",
+      recordedTitle: "",
+      recordedDate: "",
+      recordedTime: "",
+      recordedOrientation: "16:9",
+    }));
+    setMetaEdit(false);
+  }
 
   useEffect(() => {
     setEditing(initial ?? emptyVideoForm);
@@ -115,6 +136,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           recordedTitle: editing.recordedTitle || null,
           recordedDate: editing.recordedDate || null,
           recordedTime: editing.recordedTime || null,
+          recordedOrientation: editing.recordedOrientation || null,
           thumbnailUrl: editing.thumbnailUrl || undefined,
           specialtyId: editing.specialtyId || null,
           difficulty: editing.difficulty,
@@ -195,6 +217,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       recordedTitle: editing.recordedTitle || null,
       recordedDate: editing.recordedDate || null,
       recordedTime: editing.recordedTime || null,
+      recordedOrientation: editing.recordedOrientation || null,
       thumbnailUrl: editing.thumbnailUrl || undefined,
       specialtyId: editing.specialtyId || null,
       difficulty: editing.difficulty,
@@ -400,56 +423,102 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           salva aqui, sem substituir o vídeo importado do YouTube.
         </p>
         <VideoRecorder
-          onRecorded={(url, recTitle) =>
+          onRecorded={(url, recTitle, orient) =>
             setEditing((prev) => ({
               ...prev,
               recordedUrl: url,
               recordedTitle: prev.recordedTitle || recTitle || "",
               recordedDate: prev.recordedDate || new Date().toISOString().slice(0, 10),
               recordedTime: prev.recordedTime || new Date().toTimeString().slice(0, 5),
+              recordedOrientation: orient ?? prev.recordedOrientation ?? "16:9",
             }))
           }
-          onRemoved={() =>
-            setEditing((prev) => ({
-              ...prev,
-              recordedUrl: "",
-              recordedTitle: "",
-              recordedDate: "",
-              recordedTime: "",
-            }))
-          }
+          onRemoved={clearRecorded}
         />
         {editing.recordedUrl && (
           <div className="mt-4 space-y-3">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2 md:col-span-3">
-                <Label>Nome do vídeo gravado</Label>
-                <Input
-                  value={editing.recordedTitle}
-                  onChange={(e) => setEditing({ ...editing, recordedTitle: e.target.value })}
-                  placeholder="Ex.: Aula de Anatomia - 1º período"
+            <div
+              className={`overflow-hidden rounded-xl border border-border bg-black ${
+                editing.recordedOrientation === "9:16" ? "mx-auto aspect-[9/16] max-w-[300px]" : "aspect-video w-full"
+              }`}
+            >
+              {editing.recordedUrl.includes("youtube.com/embed") ? (
+                <iframe
+                  src={editing.recordedUrl}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={editing.recordedTitle || "Aula gravada"}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Data da gravação</Label>
-                <Input
-                  type="date"
-                  value={editing.recordedDate}
-                  onChange={(e) => setEditing({ ...editing, recordedDate: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Hora da gravação</Label>
-                <Input
-                  type="time"
-                  value={editing.recordedTime}
-                  onChange={(e) => setEditing({ ...editing, recordedTime: e.target.value })}
-                />
-              </div>
+              ) : (
+                <video controls src={editing.recordedUrl} className="h-full w-full object-contain" preload="metadata" playsInline />
+              )}
             </div>
-            <div className="rounded-xl border border-border overflow-hidden">
-              <video controls src={editing.recordedUrl} className="w-full" preload="metadata" />
-            </div>
+
+            {metaEdit ? (
+              <div className="space-y-2 rounded-xl border border-border bg-muted/30 p-3">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1 sm:col-span-3">
+                    <Label className="text-xs">Nome do vídeo</Label>
+                    <Input
+                      value={editing.recordedTitle}
+                      onChange={(e) => setEditing({ ...editing, recordedTitle: e.target.value })}
+                      placeholder="Ex.: Aula de Anatomia"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Data</Label>
+                    <Input
+                      type="date"
+                      value={editing.recordedDate}
+                      onChange={(e) => setEditing({ ...editing, recordedDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Hora</Label>
+                    <Input
+                      type="time"
+                      value={editing.recordedTime}
+                      onChange={(e) => setEditing({ ...editing, recordedTime: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={() => setMetaEdit(false)}>
+                  Concluído
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-foreground">
+                    {editing.recordedTitle || "Aula gravada"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {[formatRecDate(editing.recordedDate), editing.recordedTime && `às ${editing.recordedTime}`, editing.recordedOrientation === "9:16" ? "Vertical 9:16" : "Horizontal 16:9"]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMetaEdit(true)}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  title="Editar nome, data e hora"
+                  aria-label="Editar vídeo gravado"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={clearRecorded}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                  title="Excluir vídeo gravado"
+                  aria-label="Excluir vídeo gravado"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

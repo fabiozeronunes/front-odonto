@@ -151,6 +151,7 @@ model Video {
   recordedTitle   String?
   recordedDate    String?
   recordedTime    String?
+  recordedOrientation String?
   favorites       Favorite[]
   images          Media[]
   studyResources  StudyResource[]
