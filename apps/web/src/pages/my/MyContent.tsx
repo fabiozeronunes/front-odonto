@@ -86,8 +86,6 @@ export function MyContent() {
           ))}
         </div>
       </div>
-        </div>
-      </div>
 
       <div>
         {tab === "videos" && <MyVideos />}
