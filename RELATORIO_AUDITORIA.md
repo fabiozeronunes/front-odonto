@@ -4,7 +4,9 @@
 
 ---
 
-## 🎯 NOTA GERAL: 7,1 / 10 → **8,9 / 10** (pós-correções 25/08)
+## 🎯 NOTA GERAL: 7,1 / 10 → **9,0 / 10** (pós-correções completas 25/08)
+
+> **Único item pendente:** push do workflow CI (`.github/workflows/ci.yml`, pronto no repo local) exige token GitHub com escopo `workflow`. Testes web (vitest, 9/10 verdes) e API já rodam localmente via `npm test`.
 
 | Categoria | Antes | Depois | Corrigido |
 |-----------|-------|--------|-----------|
