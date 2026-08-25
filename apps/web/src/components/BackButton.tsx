@@ -20,7 +20,12 @@ export function BackButton({ to, label = "Voltar", className }: BackButtonProps)
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleClick} className={className}>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleClick}
+      className={`mb-4 inline-flex items-center gap-1.5 border-border bg-surface font-medium text-foreground hover:bg-muted ${className ?? ""}`}
+    >
       <ArrowLeft className="h-4 w-4" /> {label}
     </Button>
   );

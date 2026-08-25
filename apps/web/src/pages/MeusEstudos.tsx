@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BookOpen, ChevronRight, Loader2, Send, Trash2, Headphones, Table, List } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import type { StudyResource } from "../types";
@@ -18,11 +18,16 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export function MeusEstudos() {
-  const [view, setView] = useState<"estudos" | "grade">("estudos");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = searchParams.get("view") === "grade" ? "grade" : "estudos";
   const [resources, setResources] = useState<StudyResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+
+  function setView(next: "estudos" | "grade") {
+    setSearchParams(next === "grade" ? { view: "grade" } : {}, { replace: true });
+  }
 
   function load() {
     setLoading(true);
