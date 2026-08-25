@@ -5,11 +5,16 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 
+const DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+const TURNOS = ["Manhã", "Integral", "Noite"];
+
 interface CourseEntry {
   id: string;
   name: string;
   curso: string | null;
+  diaSemana: string | null;
   periodo: string | null;
+  turno: string | null;
   professor: string | null;
   turma: string | null;
   bloco: string | null;
@@ -19,7 +24,9 @@ interface CourseEntry {
 const EMPTY = {
   name: "",
   curso: "",
+  diaSemana: "",
   periodo: "",
+  turno: "",
   professor: "",
   turma: "",
   bloco: "",
@@ -82,7 +89,9 @@ export function CourseData() {
     setForm({
       name: entry.name,
       curso: entry.curso ?? "",
+      diaSemana: entry.diaSemana ?? "",
       periodo: entry.periodo ?? "",
+      turno: entry.turno ?? "",
       professor: entry.professor ?? "",
       turma: entry.turma ?? "",
       bloco: entry.bloco ?? "",
@@ -105,6 +114,31 @@ export function CourseData() {
     } catch (e) {
       setError(e instanceof ApiRequestError ? e.message : "Erro ao excluir");
     }
+  }
+
+  function selectField(
+    label: string,
+    key: keyof typeof EMPTY,
+    options: { value: string; label: string }[],
+    placeholder: string
+  ) {
+    return (
+      <div className="space-y-1">
+        <Label className="text-xs">{label}</Label>
+        <select
+          value={form[key]}
+          onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+          className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+        >
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
   }
 
   function field(label: string, key: keyof typeof EMPTY, placeholder: string, autoFocus = false) {
@@ -154,7 +188,19 @@ export function CourseData() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {field("Curso", "curso", "Ex.: Odontologia")}
+          {selectField(
+            "Dia da semana",
+            "diaSemana",
+            DAYS.map((d) => ({ value: d, label: d })),
+            "Escolher..."
+          )}
           {field("Período", "periodo", "Ex.: 3º")}
+          {selectField(
+            "Turno",
+            "turno",
+            TURNOS.map((t) => ({ value: t, label: t })),
+            "Escolher..."
+          )}
           {field("Disciplina *", "name", "Ex.: Anatomia Dental", true)}
           {field("Professor", "professor", "Ex.: Dr. João Silva")}
           {field("Turma", "turma", "Ex.: 001")}
@@ -191,9 +237,14 @@ export function CourseData() {
             <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
-                {(entry.periodo || entry.curso) && (
+                {(entry.diaSemana || entry.periodo || entry.turno || entry.curso) && (
                   <p className="truncate text-xs text-muted-foreground">
-                    {[entry.periodo && `Período: ${entry.periodo}`, entry.curso && `Curso: ${entry.curso}`]
+                    {[
+                      entry.diaSemana && `Dia: ${entry.diaSemana}`,
+                      entry.periodo && `Período: ${entry.periodo}`,
+                      entry.turno && `Turno: ${entry.turno}`,
+                      entry.curso && `Curso: ${entry.curso}`,
+                    ]
                       .filter(Boolean)
                       .join(" • ")}
                   </p>

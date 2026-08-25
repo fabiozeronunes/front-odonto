@@ -670,7 +670,9 @@ model CourseDiscipline {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   curso     String?
+  diaSemana String?
   periodo   String?
+  turno     String?
   professor String?
   turma     String?
   bloco     String?

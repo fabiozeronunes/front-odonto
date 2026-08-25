@@ -4,7 +4,9 @@ import { NotFoundError } from "../../utils/errors.js";
 interface DisciplineFields {
   name: string;
   curso?: string | null;
+  diaSemana?: string | null;
   periodo?: string | null;
+  turno?: string | null;
   professor?: string | null;
   turma?: string | null;
   bloco?: string | null;
@@ -15,7 +17,9 @@ function pickFields(body: Record<string, unknown>): DisciplineFields {
   return {
     name: String(body.name ?? "").trim(),
     curso: String(body.curso ?? "").trim() || null,
+    diaSemana: String(body.diaSemana ?? "").trim() || null,
     periodo: String(body.periodo ?? "").trim() || null,
+    turno: String(body.turno ?? "").trim() || null,
     professor: String(body.professor ?? "").trim() || null,
     turma: String(body.turma ?? "").trim() || null,
     bloco: String(body.bloco ?? "").trim() || null,

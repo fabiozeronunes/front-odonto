@@ -144,7 +144,7 @@ export async function applyMigrations() {
 
     // 11. Disciplinas/Curso (Meu espaço)
     if (await tableExists("CourseDiscipline")) {
-      for (const col of ["curso", "periodo", "professor", "turma", "bloco", "sala"]) {
+      for (const col of ["curso", "diaSemana", "periodo", "turno", "professor", "turma", "bloco", "sala"]) {
         const cdCol = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'CourseDiscipline' AND column_name = ${col}` as any[];
         if (cdCol.length === 0) {
           await prisma.$executeRawUnsafe(`ALTER TABLE "CourseDiscipline" ADD COLUMN "${col}" TEXT`);
