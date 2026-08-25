@@ -116,6 +116,10 @@ export async function applyMigrations() {
         await prisma.$executeRaw`ALTER TABLE "RefreshToken" ADD COLUMN "ipAddress" TEXT`;
         await prisma.$executeRaw`ALTER TABLE "RefreshToken" ADD COLUMN "userAgent" TEXT`;
       }
+      const rtRevoked = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'RefreshToken' AND column_name = 'revokedAt'` as any[];
+      if (rtRevoked.length === 0) {
+        await prisma.$executeRaw`ALTER TABLE "RefreshToken" ADD COLUMN "revokedAt" TIMESTAMP(3)`;
+      }
     }
 
     // 10. Video recorded* columns (aula gravada separada do embed YouTube)

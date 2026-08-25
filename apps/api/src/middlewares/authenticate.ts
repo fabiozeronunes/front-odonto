@@ -21,11 +21,18 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
 
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, role: true, planId: true, isActive: true },
+      select: { id: true, email: true, role: true, planId: true, isActive: true, tokenVersion: true },
     });
 
     if (!user || !user.isActive) {
       throw new UnauthorizedError("Usuário inativo ou inexistente");
+    }
+
+    if (
+      payload.tokenVersion !== undefined &&
+      payload.tokenVersion < user.tokenVersion
+    ) {
+      throw new UnauthorizedError("Sessão expirada. Faça login novamente.");
     }
 
     (req as AuthenticatedRequest).user = user;

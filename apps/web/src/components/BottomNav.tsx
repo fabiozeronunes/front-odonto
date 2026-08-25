@@ -43,7 +43,7 @@ export function BottomNav() {
               key={item.to}
               to={item.to}
               className={cn(
-                "flex min-w-[4.5rem] flex-1 basis-16 flex-col items-center justify-center gap-1 px-2 py-2 text-[10px] font-semibold transition-colors",
+                "flex min-w-[4.5rem] flex-1 basis-16 flex-col items-center justify-center gap-1 px-2 py-2 text-[11px] font-semibold transition-colors",
                 isActive ? "text-primary-700 dark:text-primary-400" : "text-muted-foreground hover:text-foreground"
               )}
             >

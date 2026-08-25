@@ -240,7 +240,7 @@ export async function handleWebhook(req: Request) {
     event = stripe.webhooks.constructEvent(
       (req as any).rawBody || JSON.stringify(req.body),
       sig,
-      env.paymentGatewaySecret
+      env.stripeWebhookSecret || env.paymentGatewaySecret
     );
   } catch (err) {
     console.error("[WEBHOOK] Signature verification failed:", err);

@@ -21,6 +21,6 @@ export const getSignedUrl = asyncHandler(async (req: Request, res: Response) => 
   const userId = (req as AuthenticatedRequest).user.id;
   const { filename, contentType } = req.body as { filename?: string; contentType?: string };
   if (!contentType) throw new ApiError(400, "contentType obrigatório");
-  const result = generateSignedUploadUrl(userId, filename ?? "upload", contentType);
+  const result = await generateSignedUploadUrl(userId, filename ?? "upload", contentType);
   res.json({ data: result });
 });

@@ -51,14 +51,14 @@ export function AdminTags() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             Tags
             <InfoPopover
               title="Como usar"
               text="Palavras-chave que tornam os conteúdos encontráveis. Ao cadastrar um vídeo ou caso, você pode marcar várias tags. Os alunos usam as tags na busca e na página de tags para filtrar por assunto."
             />
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Etiquetas de conteúdo pesquisáveis</p>
+          <p className="mt-1 text-sm text-muted-foreground">Etiquetas de conteúdo pesquisáveis</p>
         </div>
         <Button onClick={() => setEditing({ name: "" })}>
           <Plus className="h-4 w-4" /> Nova tag
@@ -70,7 +70,7 @@ export function AdminTags() {
           <CardHeader><CardTitle>{editing.id ? "Editar tag" : "Nova tag"}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Nome *</label>
+              <label className="text-sm font-medium text-foreground">Nome *</label>
               <Input
                 value={editing.name}
                 onChange={(e) => setEditing({ ...editing, name: e.target.value })}
@@ -89,13 +89,13 @@ export function AdminTags() {
         <CardContent className="p-0">
           <div className="divide-y divide-slate-100">
             {loading ? (
-              <p className="p-8 text-center text-slate-400">Carregando...</p>
+              <p className="p-8 text-center text-muted-foreground/80">Carregando...</p>
             ) : (
               items.map((t) => (
-                <div key={t.id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50">
+                <div key={t.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/50">
                   <div>
-                    <p className="font-medium text-slate-800">#{t.name}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="font-medium text-foreground">#{t.name}</p>
+                    <p className="text-xs text-muted-foreground/80">
                       {t._count?.videos ?? 0} vídeos · {t._count?.caseStudies ?? 0} casos
                     </p>
                   </div>

@@ -49,6 +49,7 @@ export const env = {
   whatsappApiToken: process.env.WHATSAPP_API_TOKEN ?? "",
   paymentGateway: process.env.PAYMENT_GATEWAY ?? "",
   paymentGatewaySecret: process.env.PAYMENT_GATEWAY_SECRET ?? "",
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
   paymentGatewayPublicKey: process.env.PAYMENT_GATEWAY_PUBLIC_KEY ?? "",
   encryptionKey: process.env.ENCRYPTION_KEY ?? "",
   resendApiKey: process.env.RESEND_API_KEY ?? "",

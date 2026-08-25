@@ -65,19 +65,19 @@ export function AdminFinanceiro() {
   }
 
   if (loading) {
-    return <div className="h-48 animate-pulse rounded-2xl bg-slate-200" />;
+    return <div className="h-48 animate-pulse rounded-2xl bg-muted" />;
   }
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         Dados financeiros
         <InfoPopover
           title="Dados para pagamento"
           text="Estes dados aparecem na tela de pagamento via Pix para os alunos. Preencha a chave Pix, o banco e o beneficiário. O aluno paga o Pix e você confirma o pagamento na lista de usuários."
         />
       </h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-muted-foreground">
         Configure a chave Pix e os dados bancários exibidos para o aluno pagar a assinatura.
       </p>
 
@@ -203,31 +203,31 @@ export function AdminFinanceiro() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-4 text-xs text-slate-500">
+          <p className="mb-4 text-xs text-muted-foreground">
             Como o aluno verá os dados de pagamento. A prévia atualiza conforme você digita.
           </p>
-          <div className="mx-auto max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mx-auto max-w-sm rounded-2xl border border-border bg-surface p-5 shadow-sm">
             <div className="text-center">
               <Badge className="bg-primary-100 text-primary-800">Pagamento via Pix</Badge>
-              <h3 className="mt-3 font-display text-lg font-bold text-slate-900">
+              <h3 className="mt-3 font-display text-lg font-bold text-foreground">
                 Pagamento em análise
               </h3>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Sua assinatura está <strong>aguardando pagamento</strong>.
               </p>
             </div>
 
-            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mt-4 rounded-xl border border-border bg-muted/50 p-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-bold text-slate-900">Plano Premium</p>
-                  <p className="text-xs text-slate-500">Pedido #XXXXXXXX</p>
+                  <p className="text-sm font-bold text-foreground">Plano Premium</p>
+                  <p className="text-xs text-muted-foreground">Pedido #XXXXXXXX</p>
                 </div>
-                <p className="text-lg font-extrabold text-slate-900">{formatPrice(718.8)}</p>
+                <p className="text-lg font-extrabold text-foreground">{formatPrice(718.8)}</p>
               </div>
             </div>
 
-            <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mt-3 rounded-xl border border-border bg-muted/50 p-3">
               {form.pixKey && (
                 <div className="mb-3 flex flex-col items-center gap-2">
                   <PixQrCode
@@ -236,24 +236,24 @@ export function AdminFinanceiro() {
                     amount={718.8}
                     size={170}
                   />
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-muted-foreground/80">
                     QR code gerado a partir dos dados acima
                   </p>
                 </div>
               )}
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 Chave Pix ({form.pixKeyType || "pix"})
               </p>
-              <p className="mt-1 break-all font-mono text-sm font-semibold text-slate-900">
+              <p className="mt-1 break-all font-mono text-sm font-semibold text-foreground">
                 {form.pixKey || "—"}
               </p>
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground">
                 {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Chave copiada!" : "Copiar chave Pix"}
               </div>
 
               {form.bankName && (
-                <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Landmark className="h-3.5 w-3.5" />
                   {form.bankName}
                   {form.agency && <span>· Agência {form.agency}</span>}
@@ -262,10 +262,10 @@ export function AdminFinanceiro() {
               )}
 
               {form.beneficiary && (
-                <p className="mt-1 text-xs text-slate-500">Beneficiário: {form.beneficiary}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Beneficiário: {form.beneficiary}</p>
               )}
 
-              {form.cpfCnpj && <p className="mt-1 text-xs text-slate-500">CPF/CNPJ: {form.cpfCnpj}</p>}
+              {form.cpfCnpj && <p className="mt-1 text-xs text-muted-foreground">CPF/CNPJ: {form.cpfCnpj}</p>}
 
               {form.instructions && (
                 <p className="mt-3 rounded-lg bg-primary-50 p-2.5 text-xs text-primary-800">

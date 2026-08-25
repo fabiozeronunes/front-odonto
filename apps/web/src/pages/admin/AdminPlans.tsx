@@ -96,14 +96,14 @@ export function AdminPlans() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             Planos
             <InfoPopover
               title="Como funciona"
               text="Estes são os planos de assinatura exibidos em /planos. O plano 'gratuito' é o padrão ao cadastrar. Ao assinar um plano pago, o aluno libera o acesso ao catálogo de vídeos e casos. A cobrança anual é 12x o valor mensal."
             />
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Planos de assinatura de membros</p>
+          <p className="mt-1 text-sm text-muted-foreground">Planos de assinatura de membros</p>
         </div>
         <Button onClick={() => setEditing({ name: "", description: "", price: "0", billing: "MONTHLY", benefitsText: "", status: "ACTIVE" })}>
           <Plus className="h-4 w-4" /> Novo plano
@@ -116,11 +116,11 @@ export function AdminPlans() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Nome *</label>
+                <label className="text-sm font-medium text-foreground">Nome *</label>
                 <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Preço mensal</label>
+                <label className="text-sm font-medium text-foreground">Preço mensal</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -128,14 +128,14 @@ export function AdminPlans() {
                   onChange={(e) => setEditing({ ...editing, price: e.target.value })}
                 />
                 {editing.billing === "YEARLY" && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Cobrança anual: <strong>{formatPrice((Number(editing.price) || 0) * 12)}/ano</strong>{" "}
                     (12x o valor mensal)
                   </p>
                 )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Periodicidade</label>
+                <label className="text-sm font-medium text-foreground">Periodicidade</label>
                 <Select
                   value={editing.billing}
                   onChange={(e) => setEditing({ ...editing, billing: e.target.value })}
@@ -145,7 +145,7 @@ export function AdminPlans() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Status</label>
+                <label className="text-sm font-medium text-foreground">Status</label>
                 <Select
                   value={editing.status}
                   onChange={(e) => setEditing({ ...editing, status: e.target.value })}
@@ -156,11 +156,11 @@ export function AdminPlans() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Descrição</label>
+              <label className="text-sm font-medium text-foreground">Descrição</label>
               <Textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Benefícios (um por linha)</label>
+              <label className="text-sm font-medium text-foreground">Benefícios (um por linha)</label>
               <Textarea rows={5} value={editing.benefitsText} onChange={(e) => setEditing({ ...editing, benefitsText: e.target.value })} />
             </div>
             <div className="flex justify-end gap-2">
@@ -173,7 +173,7 @@ export function AdminPlans() {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {loading ? (
-          <p className="text-slate-400">Carregando...</p>
+          <p className="text-muted-foreground/80">Carregando...</p>
         ) : (
           items.map((p) => (
             <Card key={p.id}>
@@ -184,11 +184,11 @@ export function AdminPlans() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-extrabold text-slate-900">
+                <p className="text-2xl font-extrabold text-foreground">
                   {formatPrice(p.price)}
-                  <span className="text-sm font-normal text-slate-400"> / {p.billing === "MONTHLY" ? "mês" : "ano"}</span>
+                  <span className="text-sm font-normal text-muted-foreground/80"> / {p.billing === "MONTHLY" ? "mês" : "ano"}</span>
                 </p>
-                <p className="mt-1 text-xs text-slate-400">{p._count?.users ?? 0} usuários</p>
+                <p className="mt-1 text-xs text-muted-foreground/80">{p._count?.users ?? 0} usuários</p>
                 <div className="mt-3 flex gap-1">
                   <Button variant="outline" size="sm" onClick={() => startEdit(p)}>
                     <Pencil className="h-3 w-3" /> Editar

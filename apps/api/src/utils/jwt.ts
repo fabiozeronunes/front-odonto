@@ -7,6 +7,7 @@ export interface AccessTokenPayload {
   email: string;
   role: Role;
   planId: string;
+  tokenVersion?: number;
 }
 
 export interface RefreshTokenPayload {

@@ -91,14 +91,14 @@ export function AdminVideos() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             Vídeos
             <InfoPopover
               title="Como usar"
               text="Cadastre e edite os vídeos do catálogo. Pode informar URL (YouTube/Vimeo) ou fazer upload de arquivo. Associe a uma especialidade e a tags para aparecer na busca. Vídeos marcados como 'pago' exigem plano de assinatura para assistir."
             />
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Gerenciar conteúdos da plataforma</p>
+          <p className="mt-1 text-sm text-muted-foreground">Gerenciar conteúdos da plataforma</p>
         </div>
         <Button onClick={startCreate}>
           <Plus className="h-4 w-4" /> Novo vídeo
@@ -131,7 +131,7 @@ export function AdminVideos() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Título</th>
                   <th className="px-5 py-3">Especialidade</th>
@@ -143,16 +143,16 @@ export function AdminVideos() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
+                    <td colSpan={5} className="px-5 py-8 text-center text-muted-foreground/80">Carregando...</td>
                   </tr>
                 ) : (
                   videos.map((v) => (
-                    <tr key={v.id} className="hover:bg-slate-50">
+                    <tr key={v.id} className="hover:bg-muted/50">
                       <td className="max-w-[280px] px-5 py-3">
-                        <p className="truncate font-medium text-slate-800">{v.title}</p>
-                        <p className="text-xs text-slate-400">{v.author ?? "—"}</p>
+                        <p className="truncate font-medium text-foreground">{v.title}</p>
+                        <p className="text-xs text-muted-foreground/80">{v.author ?? "—"}</p>
                       </td>
-                      <td className="px-5 py-3 text-slate-500">{v.specialty?.name ?? "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{v.specialty?.name ?? "—"}</td>
                       <td className="px-5 py-3">
                         <Badge variant={v.isFree ? "free" : "premium"}>
                           {v.isFree ? "FREE" : "PREMIUM"}
@@ -189,7 +189,7 @@ export function AdminVideos() {
         <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
           Anterior
         </Button>
-        <span className="text-sm text-slate-500">Página {page} de {Math.max(totalPages, 1)}</span>
+        <span className="text-sm text-muted-foreground">Página {page} de {Math.max(totalPages, 1)}</span>
         <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
           Próxima
         </Button>

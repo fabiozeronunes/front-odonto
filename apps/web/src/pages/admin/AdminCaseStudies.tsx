@@ -129,14 +129,14 @@ export function AdminCaseStudies() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             Estudos de caso
             <InfoPopover
               title="Como usar"
               text="Casos clínicos exibidos na seção 'Casos' do site. Cada caso traz uma especialidade, tags e pode conter imagens do passo a passo clínico. Ajudam o aluno a ver a teoria aplicada na prática."
             />
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Casos clínicos da plataforma</p>
+          <p className="mt-1 text-sm text-muted-foreground">Casos clínicos da plataforma</p>
         </div>
         <Button onClick={() => setEditing(emptyForm)}>
           <Plus className="h-4 w-4" /> Novo caso
@@ -225,7 +225,7 @@ export function AdminCaseStudies() {
                     <button
                       type="button"
                       onClick={() => setEditing({ ...editing, tagIds: editing.tagIds.includes(tag.id) ? editing.tagIds.filter((t) => t !== tag.id) : [...editing.tagIds, tag.id] })}
-                      className="ml-2 text-white/25 hover:bg-white/40 rounded-full h-4 w-4"
+                      className="ml-2 text-white/25 hover:bg-surface/40 rounded-full h-4 w-4"
                       title="Remover tag"
                     >
                       <X className="h-3 w-3" />
@@ -254,13 +254,13 @@ export function AdminCaseStudies() {
         <CardContent className="p-0">
           <div className="divide-y divide-slate-100">
             {loading ? (
-              <p className="p-8 text-center text-slate-400">Carregando...</p>
+              <p className="p-8 text-center text-muted-foreground/80">Carregando...</p>
             ) : (
               items.map((cs) => (
-                <div key={cs.id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50">
+                <div key={cs.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/50">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-slate-800">{cs.title}</p>
-                    <p className="text-xs text-slate-400">{cs.specialty?.name ?? "Geral"}</p>
+                    <p className="truncate font-medium text-foreground">{cs.title}</p>
+                    <p className="text-xs text-muted-foreground/80">{cs.specialty?.name ?? "Geral"}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={cs.isFree ? "free" : "premium"}>{cs.isFree ? "FREE" : "PREMIUM"}</Badge>
@@ -284,7 +284,7 @@ export function AdminCaseStudies() {
 
       <div className="mt-4 flex items-center justify-center gap-2">
         <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Anterior</Button>
-        <span className="text-sm text-slate-500">Página {page} de {Math.max(totalPages, 1)}</span>
+        <span className="text-sm text-muted-foreground">Página {page} de {Math.max(totalPages, 1)}</span>
         <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Próxima</Button>
       </div>
     </div>

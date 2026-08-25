@@ -234,14 +234,14 @@ export function AdminAffiliates() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         Afiliados
         <InfoPopover
           title="Como funciona"
           text="Cadastre um afiliado e ele recebe um link de indicação. Quando um aluno se cadastra pelo link e assina um plano ou compra produto no site, o sistema computa a comissão automaticamente. Aqui você define as taxas (aluno e produtos) e marca os valores como pagos quando repassar ao afiliado."
         />
       </h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-muted-foreground">
         Professores e parceiros que indicam alunos e recebem comissão.
       </p>
 
@@ -260,7 +260,7 @@ export function AdminAffiliates() {
               "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
               tab === key
                 ? "bg-primary-700 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             )}
           >
             {label}
@@ -274,7 +274,7 @@ export function AdminAffiliates() {
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/80" />
           <Input
             placeholder="Buscar afiliado por nome, e-mail ou código..."
             className="pl-9"
@@ -291,7 +291,7 @@ export function AdminAffiliates() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Afiliado</th>
                   <th className="px-5 py-3">Código / Link</th>
@@ -305,11 +305,11 @@ export function AdminAffiliates() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
+                    <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground/80">Carregando...</td>
                   </tr>
                 ) : affiliates.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                    <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground/80">
                       {tab === "suspended"
                         ? "Nenhum afiliado suspenso. Ao desativar um afiliado, ele fica suspenso e pode ser reativado aqui."
                         : "Nenhum afiliado ainda. Torne um usuário afiliado na aba Usuários."}
@@ -317,15 +317,15 @@ export function AdminAffiliates() {
                   </tr>
                 ) : (
                   affiliates.map((a) => (
-                    <tr key={a.id} className="hover:bg-slate-50">
+                    <tr key={a.id} className="hover:bg-muted/50">
                       <td className="px-5 py-3">
-                        <p className="font-medium text-slate-800">{a.name}</p>
-                        <p className="text-xs text-slate-400">{a.email}</p>
+                        <p className="font-medium text-foreground">{a.name}</p>
+                        <p className="text-xs text-muted-foreground/80">{a.email}</p>
                       </td>
                       <td className="px-5 py-3">
                         {a.affiliateCode ? (
                           <div className="flex flex-col gap-1">
-                            <span className="font-mono text-xs text-slate-600">{a.affiliateCode}</span>
+                            <span className="font-mono text-xs text-muted-foreground">{a.affiliateCode}</span>
                             <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => copyLink(a.affiliateCode!)}>
                               {copied === a.affiliateCode ? (
                                 <Check className="h-3.5 w-3.5 text-emerald-600" />
@@ -336,7 +336,7 @@ export function AdminAffiliates() {
                             </Button>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400">—</span>
+                          <span className="text-xs text-muted-foreground/80">—</span>
                         )}
                       </td>
                       <td className="px-5 py-3">
@@ -352,7 +352,7 @@ export function AdminAffiliates() {
                               title="Comissão de indicação de aluno (%)"
                               onChange={(e) => updateRateDraft(a, "referral", e.target.value)}
                             />
-                            <span className="text-[10px] leading-tight text-slate-400">% aluno</span>
+                            <span className="text-[10px] leading-tight text-muted-foreground/80">% aluno</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Input
@@ -365,7 +365,7 @@ export function AdminAffiliates() {
                               title="Comissão de produtos do site (%)"
                               onChange={(e) => updateRateDraft(a, "product", e.target.value)}
                             />
-                            <span className="text-[10px] leading-tight text-slate-400">% produtos</span>
+                            <span className="text-[10px] leading-tight text-muted-foreground/80">% produtos</span>
                           </div>
                           <Button
                             variant="outline"
@@ -379,7 +379,7 @@ export function AdminAffiliates() {
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <span className="font-medium text-slate-700">{a.referredCount}</span>
+                        <span className="font-medium text-foreground">{a.referredCount}</span>
                       </td>
                       <td className="px-5 py-3 font-semibold text-emerald-700">
                         {formatPrice(a.paidCommissions)}
@@ -445,12 +445,12 @@ export function AdminAffiliates() {
             </div>
 
             <div className="mt-6 border-t border-slate-100 pt-5">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-foreground">
                 <HandCoins className="h-4 w-4 text-emerald-600" /> Registrar pagamento de um aluno indicado
               </h3>
               <div className="flex flex-wrap items-end gap-2">
                 <div className="min-w-[220px] flex-1">
-                  <label className="mb-1 block text-xs text-slate-500">Aluno indicado</label>
+                  <label className="mb-1 block text-xs text-muted-foreground">Aluno indicado</label>
                   <Select value={referredUserId} onChange={(e) => setReferredUserId(e.target.value)}>
                     <option value="">Selecionar aluno</option>
                     {selected.referrals.map((r) => (
@@ -461,7 +461,7 @@ export function AdminAffiliates() {
                   </Select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs text-slate-500">Valor pago (R$)</label>
+                  <label className="mb-1 block text-xs text-muted-foreground">Valor pago (R$)</label>
                   <Input
                     className="w-32"
                     type="number"
@@ -475,19 +475,19 @@ export function AdminAffiliates() {
                   <UserPlus className="h-4 w-4" /> Registrar pagamento
                 </Button>
               </div>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-muted-foreground/80">
                 A comissão ({selected.commissionRate}%) é calculada automaticamente sobre o valor informado.
               </p>
             </div>
 
             <div className="mt-6 border-t border-slate-100 pt-5">
-              <h3 className="mb-3 text-sm font-bold text-slate-700">Comissões</h3>
+              <h3 className="mb-3 text-sm font-bold text-foreground">Comissões</h3>
               {selected.commissions.length === 0 ? (
-                <p className="text-sm text-slate-400">Nenhuma comissão registrada.</p>
+                <p className="text-sm text-muted-foreground/80">Nenhuma comissão registrada.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                    <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                       <tr>
                         <th className="px-4 py-2">Aluno</th>
                         <th className="px-4 py-2">Origem</th>
@@ -499,29 +499,29 @@ export function AdminAffiliates() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {selected.commissions.map((c) => (
-                        <tr key={c.id} className="hover:bg-slate-50">
+                        <tr key={c.id} className="hover:bg-muted/50">
                           <td className="px-4 py-2">
-                            <p className="font-medium text-slate-700">{c.referred.name}</p>
-                            <p className="text-xs text-slate-400">{c.referred.email}</p>
+                            <p className="font-medium text-foreground">{c.referred.name}</p>
+                            <p className="text-xs text-muted-foreground/80">{c.referred.email}</p>
                           </td>
                           <td className="px-4 py-2">
-                            <p className="text-xs font-medium text-slate-700">
+                            <p className="text-xs font-medium text-foreground">
                               {c.source === "PRODUCT"
                                 ? "Produtos"
                                 : c.source === "PLAN"
                                   ? "Plano"
                                   : "Manual"}
                             </p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-muted-foreground/80">
                               {c.productName ?? c.planName ?? "—"}
                             </p>
                           </td>
-                          <td className="px-4 py-2 font-semibold text-slate-800">
+                          <td className="px-4 py-2 font-semibold text-foreground">
                             {formatPrice(c.amount)}
-                            <span className="ml-1 text-xs font-normal text-slate-400">({c.percent}%)</span>
+                            <span className="ml-1 text-xs font-normal text-muted-foreground/80">({c.percent}%)</span>
                           </td>
                           <td className="px-4 py-2">{statusBadge(c.status)}</td>
-                          <td className="px-4 py-2 text-slate-500">{formatDate(c.createdAt)}</td>
+                          <td className="px-4 py-2 text-muted-foreground">{formatDate(c.createdAt)}</td>
                           <td className="px-4 py-2">
                             <div className="flex justify-end gap-1">
                               {c.status === "PENDING" && (

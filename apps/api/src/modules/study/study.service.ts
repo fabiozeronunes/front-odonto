@@ -22,7 +22,8 @@ function toWatchUrl(url: string | null | undefined): string | null {
 }
 
 function encryptionKey(): Buffer {
-  const key = env.encryptionKey || env.jwtSecret;
+  const key = env.encryptionKey;
+  if (!key) throw new Error("ENCRYPTION_KEY não configurada no ambiente");
   return crypto.createHash("sha256").update(key).digest();
 }
 

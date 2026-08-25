@@ -180,6 +180,7 @@ export async function registerUser(input: RegisterInput) {
         email: user.email,
         role: user.role as "ADMIN" | "USER",
         planId: user.planId,
+        tokenVersion: 0,
       }),
       refreshToken,
     },
@@ -223,6 +224,7 @@ export async function loginUser(input: LoginInput, ip?: string) {
         email: user.email,
         role: user.role,
         planId: user.planId,
+        tokenVersion: user.tokenVersion,
       }),
       refreshToken,
     },
@@ -239,6 +241,15 @@ export async function refreshAccess(refreshToken: string) {
     throw new UnauthorizedError("Refresh token não encontrado");
   }
 
+  if (dbToken.revokedAt) {
+    // Replay: token já rotacionado está sendo reutilizado -> revoga toda a conta
+    await prisma.refreshToken.updateMany({
+      where: { userId: dbToken.userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    throw new UnauthorizedError("Sessão encerrada por segurança. Faça login novamente.");
+  }
+
   if (dbToken.expiresAt < new Date()) {
     await prisma.refreshToken.delete({ where: { id: dbToken.id } });
     throw new UnauthorizedError("Refresh token expirado. Faça login novamente.");
@@ -251,9 +262,19 @@ export async function refreshAccess(refreshToken: string) {
     throw new UnauthorizedError("Usuário inexistente ou inativo");
   }
 
-  // Rotate: delete old, create new
-  await prisma.refreshToken.delete({ where: { id: dbToken.id } });
-  const newRefreshToken = await createRefreshToken(user.id);
+  // Rotate: marca o antigo como revogado e cria o novo
+  const newRaw = crypto.randomBytes(40).toString("hex");
+  const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await prisma.$transaction([
+    prisma.refreshToken.create({
+      data: { token: newRaw, userId: user.id, expiresAt: newExpiresAt },
+    }),
+    prisma.refreshToken.update({
+      where: { id: dbToken.id },
+      data: { revokedAt: new Date() },
+    }),
+  ]);
+  const newRefreshToken = newRaw;
 
   return {
     accessToken: signAccessToken({
@@ -261,6 +282,7 @@ export async function refreshAccess(refreshToken: string) {
       email: user.email,
       role: user.role,
       planId: user.planId,
+      tokenVersion: user.tokenVersion,
     }),
     refreshToken: newRefreshToken,
   };

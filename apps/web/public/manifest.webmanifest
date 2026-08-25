@@ -1,0 +1,12 @@
+{
+  "name": "FrontOdontus",
+  "short_name": "Odontus",
+  "description": "Plataforma de estudos odontológicos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

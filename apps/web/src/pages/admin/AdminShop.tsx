@@ -209,14 +209,14 @@ export function AdminShop() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             <Package className="h-6 w-6 text-primary-700" /> Shop Odontus
             <InfoPopover
               title="Como funciona"
               text="A loja exibida em /loja. Em 'Produtos' você cadastra os itens vendidos. Em 'Categorias' organiza os produtos. Em 'Pedidos' acompanha as compras dos alunos; você pode excluir pedidos e ver o total faturado. Compras geram comissão automática para o afiliado que indicou o aluno."
             />
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Cadastre produtos de odontologia, kits, uniformes e materiais.
           </p>
         </div>
@@ -243,7 +243,7 @@ export function AdminShop() {
               "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
               tab === key
                 ? "bg-primary-700 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             )}
           >
             {key === "pedidos" && <ShoppingCart className="mr-1.5 inline h-4 w-4" />}
@@ -313,7 +313,7 @@ export function AdminShop() {
                   value={editing.saleStartsAt}
                   onChange={(e) => setEditing({ ...editing, saleStartsAt: e.target.value })}
                 />
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground/80">
                   Quando a promoção começa. Deixe vazio para começar imediatamente.
                 </p>
               </div>
@@ -324,7 +324,7 @@ export function AdminShop() {
                   value={editing.saleEndsAt}
                   onChange={(e) => setEditing({ ...editing, saleEndsAt: e.target.value })}
                 />
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground/80">
                   Data/hora em que a contagem regressiva termina. Deixe vazio para não exibir.
                 </p>
               </div>
@@ -366,7 +366,7 @@ export function AdminShop() {
                 type="checkbox"
                 checked={editing.isFeatured}
                 onChange={(e) => setEditing({ ...editing, isFeatured: e.target.checked })}
-                className="h-4 w-4 rounded border-slate-300 text-primary-700 focus:ring-primary-500"
+                className="h-4 w-4 rounded border-border text-primary-700 focus:ring-primary-500"
               />
               <Label htmlFor="featured">Produto em destaque</Label>
             </div>
@@ -388,7 +388,7 @@ export function AdminShop() {
                     className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                       editing.tagIds.includes(tag.id)
                         ? "bg-primary-700 text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        : "bg-muted text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     #{tag.name}
@@ -414,7 +414,7 @@ export function AdminShop() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Produto</th>
                   <th className="px-5 py-3">Categoria</th>
@@ -427,45 +427,45 @@ export function AdminShop() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
+                    <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground/80">Carregando...</td>
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                    <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground/80">
                       Nenhum produto cadastrado ainda.
                     </td>
                   </tr>
                 ) : (
                   products.map((p) => (
-                    <tr key={p.id} className="hover:bg-slate-50">
+                    <tr key={p.id} className="hover:bg-muted/50">
                       <td className="max-w-[260px] px-5 py-3">
                         <div className="flex items-center gap-3">
                           {p.images && p.images.length > 0 ? (
                             <img
                               src={p.images[0].url}
                               alt=""
-                              className="h-10 w-10 shrink-0 rounded-lg border border-slate-200 object-cover"
+                              className="h-10 w-10 shrink-0 rounded-lg border border-border object-cover"
                             />
                           ) : (
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground/80">
                               <Package className="h-5 w-5" />
                             </span>
                           )}
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-slate-800">{p.name}</p>
-                            <p className="truncate text-xs text-slate-400">{p.brand ?? "—"}{p.isFeatured ? " • Destaque" : ""}</p>
+                            <p className="truncate font-medium text-foreground">{p.name}</p>
+                            <p className="truncate text-xs text-muted-foreground/80">{p.brand ?? "—"}{p.isFeatured ? " • Destaque" : ""}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-slate-500">{p.category?.name ?? "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{p.category?.name ?? "—"}</td>
                       <td className="px-5 py-3">
                         {p.promoPrice != null && Number(p.promoPrice) < Number(p.price) ? (
                           <div className="flex flex-col">
                             <span className="font-medium text-emerald-700">{formatPrice(p.promoPrice)}</span>
-                            <span className="text-xs text-slate-400 line-through">{formatPrice(p.price)}</span>
+                            <span className="text-xs text-muted-foreground/80 line-through">{formatPrice(p.price)}</span>
                           </div>
                         ) : (
-                          <span className="font-medium text-slate-800">{formatPrice(p.price)}</span>
+                          <span className="font-medium text-foreground">{formatPrice(p.price)}</span>
                         )}
                       </td>
                       <td className="px-5 py-3">
@@ -497,7 +497,7 @@ export function AdminShop() {
         <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
           Anterior
         </Button>
-        <span className="text-sm text-slate-500">Página {page} de {Math.max(totalPages, 1)}</span>
+        <span className="text-sm text-muted-foreground">Página {page} de {Math.max(totalPages, 1)}</span>
         <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
           Próxima
         </Button>
@@ -526,16 +526,16 @@ export function AdminShop() {
               {categories.map((c) => (
                 <span
                   key={c.id}
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700"
+                  className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground"
                 >
                   {c.name}
-                  <span className="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">
+                  <span className="rounded-full bg-surface px-2 py-0.5 text-xs text-muted-foreground">
                     {c._count?.products ?? 0} produtos
                   </span>
                   <button
                     type="button"
                     onClick={() => removeCategory(c.id)}
-                    className="text-slate-400 transition-colors hover:text-red-600"
+                    className="text-muted-foreground/80 transition-colors hover:text-red-600"
                     title="Excluir categoria"
                     aria-label={`Excluir categoria ${c.name}`}
                   >
@@ -544,7 +544,7 @@ export function AdminShop() {
                 </span>
               ))}
               {categories.length === 0 && (
-                <p className="text-sm text-slate-400">Nenhuma categoria criada ainda.</p>
+                <p className="text-sm text-muted-foreground/80">Nenhuma categoria criada ainda.</p>
               )}
             </div>
           </CardContent>
@@ -559,7 +559,7 @@ export function AdminShop() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-5 py-3">Pedido</th>
                     <th className="px-5 py-3">Cliente</th>
@@ -572,23 +572,23 @@ export function AdminShop() {
                 <tbody className="divide-y divide-slate-100">
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                      <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground/80">
                         Nenhum pedido realizado ainda.
                       </td>
                     </tr>
                   ) : (
                     orders.map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-50">
+                      <tr key={o.id} className="hover:bg-muted/50">
                         <td className="px-5 py-3">
-                          <p className="font-mono text-xs text-slate-700">#{o.id.slice(-8).toUpperCase()}</p>
-                          <p className="text-xs text-slate-400">{formatDate(o.createdAt)}</p>
+                          <p className="font-mono text-xs text-foreground">#{o.id.slice(-8).toUpperCase()}</p>
+                          <p className="text-xs text-muted-foreground/80">{formatDate(o.createdAt)}</p>
                         </td>
                         <td className="px-5 py-3">
-                          <p className="font-medium text-slate-800">{o.user?.name ?? "—"}</p>
-                          <p className="text-xs text-slate-400">{o.user?.email ?? ""}</p>
+                          <p className="font-medium text-foreground">{o.user?.name ?? "—"}</p>
+                          <p className="text-xs text-muted-foreground/80">{o.user?.email ?? ""}</p>
                         </td>
                         <td className="max-w-[280px] px-5 py-3">
-                          <ul className="space-y-0.5 text-xs text-slate-600">
+                          <ul className="space-y-0.5 text-xs text-muted-foreground">
                             {o.items.map((it) => (
                               <li key={it.id}>
                                 {it.quantity}× {it.product.name}
@@ -596,7 +596,7 @@ export function AdminShop() {
                             ))}
                           </ul>
                         </td>
-                        <td className="px-5 py-3 font-medium text-slate-800">
+                        <td className="px-5 py-3 font-medium text-foreground">
                           {formatPrice(o.total)}
                           {Number(o.discount) > 0 && (
                             <span className="block text-xs font-normal text-emerald-700">
@@ -613,7 +613,7 @@ export function AdminShop() {
                           <button
                             type="button"
                             onClick={() => handleDeleteOrder(o.id)}
-                            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            className="rounded-lg p-2 text-muted-foreground/80 transition-colors hover:bg-red-50 hover:text-red-600"
                             aria-label={`Excluir pedido ${o.id.slice(-8).toUpperCase()}`}
                             title="Excluir pedido"
                           >

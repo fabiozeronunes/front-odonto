@@ -48,13 +48,13 @@ export function AdminDashboard() {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+          <div key={i} className="h-28 animate-pulse rounded-2xl bg-muted" />
         ))}
       </div>
     );
   }
 
-  if (!metrics) return <p className="text-slate-500">Erro ao carregar métricas.</p>;
+  if (!metrics) return <p className="text-muted-foreground">Erro ao carregar métricas.</p>;
 
   const cards = [
     { label: "Usuários", value: metrics.users.total, sub: `${metrics.users.free} grátis · ${metrics.users.premium} premium`, icon: Users },
@@ -69,13 +69,13 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         Dashboard
         <InfoPopover
           text="Visão geral do negócio: total de alunos, planos ativos, receita estimada, vendas do Shop Odontus e os vídeos mais acessados."
         />
       </h1>
-      <p className="mt-1 text-sm text-slate-500">Visão geral da plataforma</p>
+      <p className="mt-1 text-sm text-muted-foreground">Visão geral da plataforma</p>
 
       <Card className="mt-6">
         <CardHeader className="pb-3">
@@ -96,18 +96,18 @@ export function AdminDashboard() {
             <div className="w-full">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {summary.map((p, i) => (
-                  <div key={p.id} className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                  <div key={p.id} className="rounded-lg border border-slate-100 bg-muted/50/50 p-3">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                      <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <span
                           className="h-3 w-3 rounded-full"
                           style={{ backgroundColor: PLAN_COLORS[i % PLAN_COLORS.length] }}
                         />
                         {p.name}
                       </span>
-                      <span className="text-sm font-semibold text-slate-900">{formatPrice(p.price)}</span>
+                      <span className="text-sm font-semibold text-foreground">{formatPrice(p.price)}</span>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span>{p.count} usuário(s)</span>
                       <span className="text-emerald-600">{p.paidCount} pago(s)</span>
                       {p.overdueCount > 0 && <span className="text-red-500">{p.overdueCount} em atraso</span>}
@@ -119,15 +119,15 @@ export function AdminDashboard() {
                 ))}
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3 text-sm">
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                   Total recebido:{" "}
                   <span className="font-semibold text-emerald-700">
                     {formatPrice(summary.reduce((acc, p) => acc + p.paidTotal, 0))}
                   </span>
                 </span>
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                   Pagos:{" "}
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-foreground">
                     {summary.reduce((acc, p) => acc + p.paidCount, 0)}
                   </span>
                 </span>
@@ -142,11 +142,11 @@ export function AdminDashboard() {
           <Card key={card.label}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-500">{card.label}</p>
+                <p className="text-sm text-muted-foreground">{card.label}</p>
                 <card.icon className="h-5 w-5 text-primary-600" />
               </div>
-              <p className="mt-2 text-3xl font-extrabold text-slate-900">{card.value}</p>
-              <p className="text-xs text-slate-400">{card.sub}</p>
+              <p className="mt-2 text-3xl font-extrabold text-foreground">{card.value}</p>
+              <p className="text-xs text-muted-foreground/80">{card.sub}</p>
             </CardContent>
           </Card>
         ))}
@@ -162,10 +162,10 @@ export function AdminDashboard() {
               {metrics.topVideos.map((v, i) => (
                 <li key={v.id} className="flex items-center justify-between py-2.5">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-slate-400">#{i + 1}</span>
+                    <span className="text-sm font-bold text-muted-foreground/80">#{i + 1}</span>
                     <Link
                       to={`/video/${v.slug}`}
-                      className="text-sm font-medium text-slate-700 hover:text-primary-800"
+                      className="text-sm font-medium text-foreground hover:text-primary-800"
                     >
                       {v.title}
                     </Link>
@@ -174,7 +174,7 @@ export function AdminDashboard() {
                     <Badge variant={v.isFree ? "free" : "premium"}>
                       {v.isFree ? "FREE" : "PREMIUM"}
                     </Badge>
-                    <span className="text-xs text-slate-400">{v.viewCount} views</span>
+                    <span className="text-xs text-muted-foreground/80">{v.viewCount} views</span>
                   </div>
                 </li>
               ))}
@@ -191,8 +191,8 @@ export function AdminDashboard() {
               {metrics.recentUsers.map((u) => (
                 <li key={u.id} className="flex items-center justify-between py-2.5">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">{u.name}</p>
-                    <p className="text-xs text-slate-400">{u.email}</p>
+                    <p className="text-sm font-medium text-foreground">{u.name}</p>
+                    <p className="text-xs text-muted-foreground/80">{u.email}</p>
                   </div>
                   <Badge variant={u.role === "ADMIN" ? "default" : "outline"}>
                     {u.role}
@@ -200,7 +200,7 @@ export function AdminDashboard() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-slate-400">
+            <p className="mt-3 text-xs text-muted-foreground/80">
               Registrados até {formatDate(new Date())}
             </p>
           </CardContent>

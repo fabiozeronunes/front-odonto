@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { MessageCircle, Search, Link2, Trash2, CheckCircle2 } from "lucide-react";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
@@ -34,9 +35,30 @@ export function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("");
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") ?? "";
+  const status = (searchParams.get("status") ?? "") as StatusFilter;
+  const page = Number(searchParams.get("page") ?? "1");
+
+  function updateParams(patch: { search?: string; status?: string; page?: number }) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (patch.search !== undefined) {
+        if (patch.search) next.set("search", patch.search);
+        else next.delete("search");
+      }
+      if (patch.status !== undefined) {
+        if (patch.status) next.set("status", patch.status);
+        else next.delete("status");
+      }
+      if (patch.page !== undefined) {
+        if (patch.page > 1) next.set("page", String(patch.page));
+        else next.delete("page");
+      }
+      return next;
+    }, { replace: true });
+  }
+  const setStatus = (v: StatusFilter) => updateParams({ status: v || undefined, page: 0 });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -226,14 +248,14 @@ export function AdminUsers() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         Usuários
         <InfoPopover
           title="Como usar"
           text="Lista todos os usuários cadastrados. Use a busca por nome/e-mail, filtre por plano ou status. Você pode tornar um usuário afiliado (gerando o link de indicação) e ativar/desativar o acesso de quem não deve entrar mais."
         />
       </h1>
-      <p className="mt-1 text-sm text-slate-500">{total} no extrato atual</p>
+      <p className="mt-1 text-sm text-muted-foreground">{total} no extrato atual</p>
 
       <Card className="mt-5">
         <CardHeader className="pb-3">
@@ -254,18 +276,18 @@ export function AdminUsers() {
             <div className="w-full">
               <div className="grid gap-3 sm:grid-cols-2">
                 {summary.map((p, i) => (
-                  <div key={p.id} className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                  <div key={p.id} className="rounded-lg border border-slate-100 bg-muted/50/50 p-3">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                      <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <span
                           className="h-3 w-3 rounded-full"
                           style={{ backgroundColor: PLAN_COLORS[i % PLAN_COLORS.length] }}
                         />
                         {p.name}
                       </span>
-                      <span className="text-sm font-semibold text-slate-900">{formatPrice(p.price)}</span>
+                      <span className="text-sm font-semibold text-foreground">{formatPrice(p.price)}</span>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span>{p.count} usuário(s)</span>
                       <span className="text-emerald-600">{p.paidCount} pago(s)</span>
                       {p.overdueCount > 0 && <span className="text-red-500">{p.overdueCount} em atraso</span>}
@@ -277,15 +299,15 @@ export function AdminUsers() {
                 ))}
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3 text-sm">
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                   Total recebido:{" "}
                   <span className="font-semibold text-emerald-700">
                     {formatPrice(summary.reduce((acc, p) => acc + p.paidTotal, 0))}
                   </span>
                 </span>
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                   Pagos:{" "}
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-foreground">
                     {summary.reduce((acc, p) => acc + p.paidCount, 0)}
                   </span>
                 </span>
@@ -301,28 +323,27 @@ export function AdminUsers() {
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/80" />
           <Input
             placeholder="Buscar por nome, e-mail ou telefone..."
             className="pl-9"
             value={search}
             onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
+              updateParams({ search: e.target.value || undefined, page: 0 });
             }}
           />
         </div>
-        <div className="flex gap-1 rounded-xl border border-slate-200 bg-white p-1">
+        <div className="flex gap-1 rounded-xl border border-border bg-surface p-1">
           {tabs.map((t) => (
             <button
               key={t.value}
               type="button"
               onClick={() => {
                 setStatus(t.value);
-                setPage(1);
+                // setStatus já reseta página via updateParams
               }}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                status === t.value ? "bg-primary-700 text-white" : "text-slate-600 hover:bg-slate-100"
+                status === t.value ? "bg-primary-700 text-white" : "text-muted-foreground hover:bg-muted"
               }`}
             >
               {t.label}
@@ -338,7 +359,7 @@ export function AdminUsers() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+              <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">Nome</th>
                   <th className="px-5 py-3">Matrícula</th>
@@ -354,14 +375,14 @@ export function AdminUsers() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="px-5 py-8 text-center text-slate-400">Carregando...</td>
+                    <td colSpan={9} className="px-5 py-8 text-center text-muted-foreground/80">Carregando...</td>
                   </tr>
                 ) : (
                   users.map((u) => (
-                    <tr key={u.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-medium text-slate-800">{u.name}</td>
-                      <td className="px-5 py-3 text-slate-500">{u.registrationNumber ?? "—"}</td>
-                      <td className="px-5 py-3 text-slate-500">{u.email}</td>
+                    <tr key={u.id} className="hover:bg-muted/50">
+                      <td className="px-5 py-3 font-medium text-foreground">{u.name}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{u.registrationNumber ?? "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{u.email}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-1">
                           <Input
@@ -392,7 +413,7 @@ export function AdminUsers() {
                         <div className="flex flex-col gap-1">
                           {paymentBadge(u)}
                           {u.lastPaymentAt && (
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-muted-foreground/80">
                               pago em {formatDate(u.lastPaymentAt)}
                             </span>
                           )}
@@ -414,7 +435,7 @@ export function AdminUsers() {
                           <option value="ADMIN">ADMIN</option>
                         </Select>
                       </td>
-                      <td className="px-5 py-3 text-slate-500">{formatDate(u.createdAt)}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{formatDate(u.createdAt)}</td>
                       <td className="px-5 py-3">
                         <div className="flex justify-end gap-1">
                           <Button
@@ -424,7 +445,7 @@ export function AdminUsers() {
                             onClick={() => toggleAffiliate(u)}
                             title={u.isAffiliate ? "Remover como afiliado" : "Tornar afiliado"}
                           >
-                            <Link2 className={`h-4 w-4 ${u.isAffiliate ? "text-primary-600" : "text-slate-400"}`} />
+                            <Link2 className={`h-4 w-4 ${u.isAffiliate ? "text-primary-600" : "text-muted-foreground/80"}`} />
                             {u.isAffiliate ? "Afiliado" : "Afiliar"}
                           </Button>
                           <Button

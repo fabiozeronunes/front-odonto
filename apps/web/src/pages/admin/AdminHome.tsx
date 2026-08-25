@@ -295,19 +295,19 @@ export function AdminHome() {
   }
 
   if (loading) {
-    return <div className="h-48 animate-pulse rounded-2xl bg-slate-200" />;
+    return <div className="h-48 animate-pulse rounded-2xl bg-muted" />;
   }
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
         Página inicial
         <InfoPopover
           title="Vídeo da hero"
           text="Cole o link de um vídeo do YouTube. Ao importar, o vídeo aparece abaixo para você conferir e depois salvar. O vídeo fica visível para todos os visitantes no topo da home."
         />
       </h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-muted-foreground">
         Configure o vídeo exibido no bloco principal do topo da home.
       </p>
 
@@ -331,7 +331,7 @@ export function AdminHome() {
           )}
 
           <div>
-            <label htmlFor="hero-title" className="text-sm font-medium text-slate-700">
+            <label htmlFor="hero-title" className="text-sm font-medium text-foreground">
               Título
             </label>
             <textarea
@@ -339,18 +339,18 @@ export function AdminHome() {
               rows={2}
               value={heroTitle}
               onChange={(e) => setHeroTitle(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
             />
-            <p className="mt-1.5 text-xs text-slate-500">
+            <p className="mt-1.5 text-xs text-muted-foreground">
               Envolva uma palavra ou expressão com{" "}
-              <span className="font-mono font-semibold text-slate-700">*asteriscos*</span> para
+              <span className="font-mono font-semibold text-foreground">*asteriscos*</span> para
               aplicá-la o degrade da logomarca. Ex.:{" "}
               <span className="font-mono">Domine a *Odontologia* estudando...</span>
             </p>
           </div>
 
           <div>
-            <label htmlFor="hero-subtitle" className="text-sm font-medium text-slate-700">
+            <label htmlFor="hero-subtitle" className="text-sm font-medium text-foreground">
               Subtítulo
             </label>
             <textarea
@@ -358,7 +358,7 @@ export function AdminHome() {
               rows={3}
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
             />
           </div>
 
@@ -385,7 +385,7 @@ export function AdminHome() {
                   value={heroBusinessArea}
                   onChange={(e) => setHeroBusinessArea(e.target.value)}
                   placeholder="ex.: odontologia / educação odontológica"
-                  className="mt-1 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm text-slate-900"
+                  className="mt-1 w-full rounded-lg border border-teal-200 bg-surface px-3 py-2 text-sm text-foreground"
                 />
               </div>
               <div>
@@ -397,7 +397,7 @@ export function AdminHome() {
                   value={heroTags}
                   onChange={(e) => setHeroTags(e.target.value)}
                   placeholder="ex.: concurso, residência, preparação"
-                  className="mt-1 w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm text-slate-900"
+                  className="mt-1 w-full rounded-lg border border-teal-200 bg-surface px-3 py-2 text-sm text-foreground"
                 />
               </div>
             </div>
@@ -417,7 +417,7 @@ export function AdminHome() {
             </Button>
 
             {genNotice && (
-              <div className="mt-3 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">{genNotice}</div>
+              <div className="mt-3 rounded-lg bg-surface px-3 py-2 text-sm text-foreground">{genNotice}</div>
             )}
 
             {suggestions.length > 0 && (
@@ -427,13 +427,13 @@ export function AdminHome() {
                     key={i}
                     type="button"
                     onClick={() => applySuggestion(s)}
-                    className="w-full rounded-xl border border-teal-200 bg-white p-3 text-left transition hover:border-teal-400 hover:shadow-sm"
+                    className="w-full rounded-xl border border-teal-200 bg-surface p-3 text-left transition hover:border-teal-400 hover:shadow-sm"
                   >
                     <span className="inline-block rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-800">
                       {s.trigger}
                     </span>
-                    <p className="mt-1.5 text-sm font-semibold text-slate-900">{s.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{s.subtitle}</p>
+                    <p className="mt-1.5 text-sm font-semibold text-foreground">{s.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{s.subtitle}</p>
                   </button>
                 ))}
                 <p className="text-xs text-teal-700">
@@ -482,7 +482,7 @@ export function AdminHome() {
             )}
           </div>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground/80">
             Ao importar, o vídeo aparece acima para conferência antes de salvar.
           </p>
         </CardContent>
@@ -507,7 +507,7 @@ export function AdminHome() {
           )}
 
           <div>
-            <label htmlFor="progress-boost" className="text-sm font-medium text-slate-700">
+            <label htmlFor="progress-boost" className="text-sm font-medium text-foreground">
               Velocidade da barra: {progressBoost.toLocaleString("pt-BR")}x
             </label>
             <input
@@ -520,14 +520,14 @@ export function AdminHome() {
               onChange={(e) => setProgressBoost(Number(e.target.value))}
               className="mt-2 w-full accent-teal-600"
             />
-            <div className="mt-1 flex justify-between text-xs text-slate-400">
+            <div className="mt-1 flex justify-between text-xs text-muted-foreground/80">
               <span>1.0x — normal</span>
               <span>1.5x — média</span>
               <span>2.0x — agressiva</span>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-muted-foreground">
               Com {progressBoost.toLocaleString("pt-BR")}x, a barra enche aos{" "}
-              <span className="font-semibold text-slate-700">
+              <span className="font-semibold text-foreground">
                 {Math.round(100 / progressBoost)}%
               </span>{" "}
               do vídeo e segura até o fim.
@@ -556,10 +556,10 @@ export function AdminHome() {
             <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{lockNotice}</div>
           )}
 
-          <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-slate-50 px-4 py-3">
+          <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3">
             <div>
-              <p className="text-sm font-semibold text-slate-800">Ativar bloqueio para anônimos</p>
-              <p className="text-xs text-slate-500">Requere um vídeo configurado na hero.</p>
+              <p className="text-sm font-semibold text-foreground">Ativar bloqueio para anônimos</p>
+              <p className="text-xs text-muted-foreground">Requere um vídeo configurado na hero.</p>
             </div>
             <input
               type="checkbox"
@@ -570,7 +570,7 @@ export function AdminHome() {
           </label>
 
           <div>
-            <label htmlFor="lock-minutes" className="text-sm font-medium text-slate-700">
+            <label htmlFor="lock-minutes" className="text-sm font-medium text-foreground">
               Liberar automaticamente após (minutos)
             </label>
             <input
@@ -579,9 +579,9 @@ export function AdminHome() {
               min={0}
               value={lockMinutes}
               onChange={(e) => setLockMinutes(Math.max(0, Number(e.target.value) || 0))}
-              className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900"
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
             />
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-muted-foreground/80">
               0 = só libera quando o vídeo terminar.
             </p>
           </div>
@@ -614,13 +614,13 @@ export function AdminHome() {
                 value={faq.dicaTitle}
                 onChange={(e) => setFaq((f) => ({ ...f, dicaTitle: e.target.value }))}
                 placeholder="Título"
-                className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-amber-200 bg-surface px-3 py-2 text-sm"
               />
               <input
                 value={faq.dicaCta}
                 onChange={(e) => setFaq((f) => ({ ...f, dicaCta: e.target.value }))}
                 placeholder="Texto do botão"
-                className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm"
+                className="rounded-lg border border-amber-200 bg-surface px-3 py-2 text-sm"
               />
             </div>
             <textarea
@@ -628,7 +628,7 @@ export function AdminHome() {
               onChange={(e) => setFaq((f) => ({ ...f, dicaText: e.target.value }))}
               placeholder="Texto da dica"
               rows={2}
-              className="mt-2 w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-lg border border-amber-200 bg-surface px-3 py-2 text-sm"
             />
           </div>
 
@@ -636,7 +636,7 @@ export function AdminHome() {
             {faq.groups.map((group) => {
               const groupItems = faq.items.filter((it) => it.groupId === group.id);
               return (
-                <div key={group.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                <div key={group.id} className="rounded-xl border border-border bg-muted/50/60 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase text-teal-700">
@@ -655,31 +655,31 @@ export function AdminHome() {
                       value={group.title}
                       onChange={(e) => updateFaqGroup(group.id, { title: e.target.value })}
                       placeholder="Título do grupo"
-                      className="rounded-lg border border-border bg-white px-3 py-2 text-sm"
+                      className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                     />
                     <input
                       value={group.tag}
                       onChange={(e) => updateFaqGroup(group.id, { tag: e.target.value })}
                       placeholder="Tag"
-                      className="rounded-lg border border-border bg-white px-3 py-2 text-sm"
+                      className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                     />
                   </div>
 
                   <div className="mt-3 space-y-3">
                     {groupItems.map((item) => (
-                      <div key={item.id} className="rounded-lg border border-border bg-white p-3">
+                      <div key={item.id} className="rounded-lg border border-border bg-surface p-3">
                         <input
                           value={item.question}
                           onChange={(e) => updateFaqItem(item.id, { question: e.target.value })}
                           placeholder="Pergunta"
-                          className="w-full rounded-lg border border-border bg-slate-50 px-3 py-2 text-sm font-medium"
+                          className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm font-medium"
                         />
                         <textarea
                           value={item.answer}
                           onChange={(e) => updateFaqItem(item.id, { answer: e.target.value })}
                           placeholder="Resposta"
                           rows={2}
-                          className="mt-2 w-full rounded-lg border border-border bg-slate-50 px-3 py-2 text-sm"
+                          className="mt-2 w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm"
                         />
                         <button
                           type="button"

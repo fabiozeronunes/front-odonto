@@ -98,7 +98,8 @@ export async function listMyUploads(userId: string): Promise<{ url: string; name
 }
 
 export async function generateSignedUploadUrl(userId: string, filename: string, contentType: string) {
-  const ext = ALLOWED_MIMES[contentType] ?? ".bin";
+  const ext = ALLOWED_MIMES[contentType];
+  if (!ext) throw new Error("Tipo de arquivo não permitido");
   const uniqueName = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
   const path = `${userId}/${uniqueName}`;
 
