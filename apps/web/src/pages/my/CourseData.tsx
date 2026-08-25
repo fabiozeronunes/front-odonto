@@ -237,14 +237,16 @@ export function CourseData() {
             <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
               <div className="min-w-0 flex-1 space-y-0.5">
                 <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
-                {(entry.diaSemana || entry.periodo || entry.turno || entry.curso) && (
+                {(entry.diaSemana || entry.turno) && (
                   <p className="truncate text-xs text-muted-foreground">
-                    {[
-                      entry.diaSemana && `Dia: ${entry.diaSemana}`,
-                      entry.periodo && `Período: ${entry.periodo}`,
-                      entry.turno && `Turno: ${entry.turno}`,
-                      entry.curso && `Curso: ${entry.curso}`,
-                    ]
+                    {[entry.diaSemana && `Dia: ${entry.diaSemana}`, entry.turno && `Turno: ${entry.turno}`]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </p>
+                )}
+                {(entry.periodo || entry.curso) && (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {[entry.periodo && `Período: ${entry.periodo}`, entry.curso && `Curso: ${entry.curso}`]
                       .filter(Boolean)
                       .join(" • ")}
                   </p>
