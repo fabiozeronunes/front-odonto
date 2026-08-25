@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, User, LogOut, LayoutGrid, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
+import { Heart, History, Sparkles, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Video } from "../types";
@@ -31,7 +31,7 @@ export function Dashboard() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            Olá, {user?.name.split(" ")[0]} 👋
+            Olá, {user?.name.split(" ")[0]}
           </h1>
           <div className="mt-2 flex items-center gap-2">
             {isPremium ? (
@@ -84,7 +84,7 @@ export function Dashboard() {
           <AffiliateShareCard />
           <Link to="/comissoes">
             <Button variant="outline" className={`w-full sm:w-auto ${dashBtn}`}>
-              Minhas comissões
+              <HandCoins className="h-4 w-4" /> Minhas comissões
             </Button>
           </Link>
         </div>
