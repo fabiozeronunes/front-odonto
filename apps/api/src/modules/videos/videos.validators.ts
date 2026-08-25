@@ -14,6 +14,8 @@ const imageItem = z.object({
 const audioItem = z.object({
   url: z.string().max(1000),
   title: z.string().max(200).optional(),
+  disciplina: z.string().max(120).optional(),
+  curso: z.string().max(120).optional(),
 });
 
 export const createVideoSchema = z.object({
@@ -44,6 +46,10 @@ export const createVideoSchema = z.object({
   recordedDate: z.string().max(20).optional().nullable(),
   recordedTime: z.string().max(20).optional().nullable(),
   recordedOrientation: z.enum(["16:9", "9:16"]).optional().nullable(),
+  disciplina: z.string().max(120).optional().nullable(),
+  curso: z.string().max(120).optional().nullable(),
+  recordedDisciplina: z.string().max(120).optional().nullable(),
+  recordedCurso: z.string().max(120).optional().nullable(),
 });
 
 export const updateVideoSchema = createVideoSchema.partial();

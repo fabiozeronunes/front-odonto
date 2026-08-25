@@ -27,6 +27,8 @@ interface AudioDraft {
   url: string;
   title: string;
   createdAt?: string;
+  disciplina?: string;
+  curso?: string;
 }
 
 export interface VideoFormState {
@@ -39,6 +41,10 @@ export interface VideoFormState {
   recordedDate: string;
   recordedTime: string;
   recordedOrientation: string;
+  recordedDisciplina: string;
+  recordedCurso: string;
+  disciplina: string;
+  curso: string;
   thumbnailUrl: string;
   specialtyId: string;
   difficulty: string;
@@ -62,6 +68,10 @@ export const emptyVideoForm: VideoFormState = {
   recordedDate: "",
   recordedTime: "",
   recordedOrientation: "16:9",
+  recordedDisciplina: "",
+  recordedCurso: "",
+  disciplina: "",
+  curso: "",
   thumbnailUrl: "",
   specialtyId: "",
   difficulty: "BASICO",
@@ -97,6 +107,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
   const [metaEdit, setMetaEdit] = useState(false);
   const [videoMetaEdit, setVideoMetaEdit] = useState(false);
   const [audioEditId, setAudioEditId] = useState<string | null>(null);
+  const [disciplinas, setDisciplinas] = useState<{ id: string; name: string }[]>([]);
   const lastSavedRef = useRef<string>("");
 
   function formatRecDate(d?: string | null) {
@@ -149,6 +160,10 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           recordedDate: editing.recordedDate || null,
           recordedTime: editing.recordedTime || null,
           recordedOrientation: editing.recordedOrientation || null,
+          recordedDisciplina: editing.recordedDisciplina || null,
+          recordedCurso: editing.recordedCurso || null,
+          disciplina: editing.disciplina || null,
+          curso: editing.curso || null,
           thumbnailUrl: editing.thumbnailUrl || undefined,
           specialtyId: editing.specialtyId || null,
           difficulty: editing.difficulty,
@@ -158,7 +173,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
           author: editing.author || undefined,
           institution: editing.institution || undefined,
           observations: editing.observations || undefined,
-          audios: editing.audios.map((a) => ({ url: a.url, title: a.title })),
+          audios: editing.audios.map((a) => ({ url: a.url, title: a.title, disciplina: a.disciplina || undefined, curso: a.curso || undefined })),
           tagIds: editing.tagIds,
           images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
         };
@@ -172,6 +187,12 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
     }, 30000);
     return () => clearInterval(interval);
   }, [editing.id, saving]);
+
+  useEffect(() => {
+    api<{ data: { disciplinas: { id: string; name: string }[] } }>("/api/my-disciplines")
+      .then((d) => setDisciplinas(d.data.disciplinas))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     api<Paginated<Tag>>("/api/tags?perPage=50")
@@ -230,6 +251,10 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       recordedDate: editing.recordedDate || null,
       recordedTime: editing.recordedTime || null,
       recordedOrientation: editing.recordedOrientation || null,
+      recordedDisciplina: editing.recordedDisciplina || null,
+      recordedCurso: editing.recordedCurso || null,
+      disciplina: editing.disciplina || null,
+      curso: editing.curso || null,
       thumbnailUrl: editing.thumbnailUrl || undefined,
       specialtyId: editing.specialtyId || null,
       difficulty: editing.difficulty,
@@ -239,7 +264,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
       author: editing.author || undefined,
       institution: editing.institution || undefined,
       observations: editing.observations || undefined,
-      audios: editing.audios.map((a) => ({ url: a.url, title: a.title })),
+      audios: editing.audios.map((a) => ({ url: a.url, title: a.title, disciplina: a.disciplina || undefined, curso: a.curso || undefined })),
       tagIds: editing.tagIds,
       images: editing.images.map((img) => ({ url: img.url, tagIds: img.tagIds })),
     };
@@ -466,6 +491,27 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                       onChange={(e) => setEditing({ ...editing, recordedTime: e.target.value })}
                     />
                   </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Disciplina</Label>
+                    <select
+                      value={ editing.recordedDisciplina }
+                      onChange={(e) => setEditing({ ...editing, recordedDisciplina: e.target.value })}
+                      className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                    >
+                      <option value="">Sem disciplina</option>
+                      {disciplinas.map((d) => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Curso / Graduação</Label>
+                    <Input
+                      value={ editing.recordedCurso }
+                      onChange={(e) => setEditing({ ...editing, recordedCurso: e.target.value })}
+                      placeholder="Ex.: Odontologia"
+                    />
+                  </div>
                 </div>
                 <Button type="button" size="sm" variant="outline" onClick={() => setMetaEdit(false)}>
                   Concluído
@@ -478,7 +524,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                     {editing.recordedTitle || "Aula gravada"}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    {[formatRecDate(editing.recordedDate), editing.recordedTime && `às ${editing.recordedTime}`, editing.recordedOrientation === "9:16" ? "Vertical 9:16" : "Horizontal 16:9"]
+                    {[formatRecDate(editing.recordedDate), editing.recordedTime && `às ${editing.recordedTime}`, editing.recordedOrientation === "9:16" ? "Vertical 9:16" : "Horizontal 16:9", editing.recordedDisciplina, editing.recordedCurso]
                       .filter(Boolean)
                       .join(" • ")}
                   </p>
@@ -554,6 +600,29 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                     placeholder="https://www.youtube.com/watch?v=..."
                   />
                 </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Disciplina</Label>
+                    <select
+                      value={ editing.disciplina }
+                      onChange={(e) => setEditing({ ...editing, disciplina: e.target.value })}
+                      className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                    >
+                      <option value="">Sem disciplina</option>
+                      {disciplinas.map((d) => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Curso / Graduação</Label>
+                    <Input
+                      value={ editing.curso }
+                      onChange={(e) => setEditing({ ...editing, curso: e.target.value })}
+                      placeholder="Ex.: Odontologia"
+                    />
+                  </div>
+                </div>
                 <Button type="button" size="sm" variant="outline" onClick={() => setVideoMetaEdit(false)}>
                   Concluído
                 </Button>
@@ -565,6 +634,11 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                     {editing.title || "Vídeo do YouTube"}
                   </p>
                   <p className="truncate text-[11px] text-muted-foreground">{editing.videoUrl}</p>
+                  {(editing.disciplina || editing.curso) && (
+                    <p className="truncate text-[11px] font-medium text-primary-700">
+                      {[editing.disciplina, editing.curso].filter(Boolean).join(" • ")}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -605,7 +679,7 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                 if (audioUrl) {
                   setEditing((prev) => ({
                     ...prev,
-                    audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "", createdAt: new Date().toISOString() }],
+                    audios: [...prev.audios, { id: crypto.randomUUID(), url: audioUrl, title: "", createdAt: new Date().toISOString(), disciplina: "", curso: "" }],
                   }));
                 }
               }}
@@ -632,6 +706,29 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                           autoFocus
                         />
                       </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Disciplina</Label>
+                          <select
+                            value={ audio.disciplina ?? "" }
+                            onChange={(e) => setEditing((prev) => ({ ...prev, audios: prev.audios.map((a, i) => i === index ? { ...a, disciplina: e.target.value } : a) }))}
+                            className="flex h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+                          >
+                            <option value="">Sem disciplina</option>
+                            {disciplinas.map((d) => (
+                              <option key={d.id} value={d.name}>{d.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Curso / Graduação</Label>
+                          <Input
+                            value={ audio.curso ?? "" }
+                            onChange={(e) => setEditing((prev) => ({ ...prev, audios: prev.audios.map((a, i) => i === index ? { ...a, curso: e.target.value } : a) }))}
+                            placeholder="Ex.: Odontologia"
+                          />
+                        </div>
+                      </div>
                       <Button type="button" size="sm" variant="outline" onClick={() => setAudioEditId(null)}>
                         Concluído
                       </Button>
@@ -645,6 +742,11 @@ export function VideoForm({ initial, specialties, onDone, onCancel }: VideoFormP
                         {audio.createdAt && (
                           <p className="text-[11px] text-muted-foreground">
                             Criado em {new Date(audio.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        )}
+                        {(audio.disciplina || audio.curso) && (
+                          <p className="truncate text-[11px] font-medium text-primary-700">
+                            {[audio.disciplina, audio.curso].filter(Boolean).join(" • ")}
                           </p>
                         )}
                       </div>

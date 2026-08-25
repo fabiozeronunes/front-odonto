@@ -28,6 +28,8 @@ model User {
   geminiApiKey          String?
   emailVerified         Boolean                  @default(false)
   tokenVersion          Int                      @default(0)
+  curso                 String?
+  courseDisciplines     CourseDiscipline[]
   affiliateCommissions  AffiliateCommission[]    @relation("AffiliateCommissions")
   referredCommissions   AffiliateCommission[]    @relation("ReferredCommissions")
   caseStudies           CaseStudy[]
@@ -152,6 +154,10 @@ model Video {
   recordedDate    String?
   recordedTime    String?
   recordedOrientation String?
+  disciplina      String?
+  curso           String?
+  recordedDisciplina String?
+  recordedCurso   String?
   favorites       Favorite[]
   images          Media[]
   studyResources  StudyResource[]
@@ -194,6 +200,8 @@ model VideoAudio {
   id        String   @id @default(cuid())
   url       String
   title     String?
+  disciplina String?
+  curso     String?
   videoId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -652,6 +660,16 @@ model GradeSchedule {
   color        String   @default("")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model CourseDiscipline {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }

@@ -142,6 +142,33 @@ export async function applyMigrations() {
       }
     }
 
+    // 11. Disciplinas/Curso (Meu espaço)
+    if (!(await tableExists("CourseDiscipline"))) {
+      console.log("[MIGRATION] Creating CourseDiscipline...");
+      await safeExec(`CREATE TABLE "CourseDiscipline" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"name" TEXT NOT NULL,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "CourseDiscipline_pkey" PRIMARY KEY ("id"))`, "CourseDiscipline table");
+      await safeExec(`CREATE INDEX "CourseDiscipline_userId_idx" ON "CourseDiscipline"("userId")`, "CourseDiscipline userId idx");
+      await safeFK("CourseDiscipline_userId_fkey", "CourseDiscipline", "User", "id", "CASCADE");
+    }
+    if (await tableExists("User")) {
+      const uCols = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'User' AND column_name = 'curso'` as any[];
+      if (uCols.length === 0) {
+        await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN "curso" TEXT`;
+      }
+    }
+    for (const [table, col] of [
+      ["Video", "disciplina"],
+      ["Video", "curso"],
+      ["Video", "recordedDisciplina"],
+      ["Video", "recordedCurso"],
+      ["VideoAudio", "disciplina"],
+      ["VideoAudio", "curso"],
+    ] as const) {
+      const colRes = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = ${table} AND column_name = ${col}` as any[];
+      if (colRes.length === 0) {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "${table}" ADD COLUMN "${col}" TEXT`);
+      }
+    }
+
     console.log("[MIGRATION] All migrations applied successfully.");
   } catch (err) {
     console.error("[MIGRATION] Error applying migrations:", err);

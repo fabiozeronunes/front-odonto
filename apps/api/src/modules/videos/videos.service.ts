@@ -114,6 +114,10 @@ const videoSelect = {
   recordedDate: true,
   recordedTime: true,
   recordedOrientation: true,
+  disciplina: true,
+  curso: true,
+  recordedDisciplina: true,
+  recordedCurso: true,
   audios: {
     select: {
       id: true,
@@ -397,6 +401,10 @@ export async function createVideo(input: CreateVideoInput, createdById: string, 
   data.recordedTitle = input.recordedTitle ?? null;
   data.recordedDate = input.recordedDate ?? null;
   data.recordedTime = input.recordedTime ?? null;
+  data.disciplina = input.disciplina ?? null;
+  data.curso = input.curso ?? null;
+  data.recordedDisciplina = input.recordedDisciplina ?? null;
+  data.recordedCurso = input.recordedCurso ?? null;
 
   if (data.status === ContentStatus.PUBLISHED) {
     data.publishedAt = new Date();
@@ -461,6 +469,10 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
     "recordedDate",
     "recordedTime",
     "recordedOrientation",
+    "disciplina",
+    "curso",
+    "recordedDisciplina",
+    "recordedCurso",
   ] as const;
 
   for (const field of simpleFields) {
@@ -514,7 +526,7 @@ export async function updateVideo(id: string, input: UpdateVideoInput, user: Aut
       await tx.videoAudio.deleteMany({ where: { videoId: video.id } });
       if (audioData.length > 0) {
         await tx.videoAudio.createMany({
-          data: audioData.map((a: { url: string; title?: string }) => ({ url: a.url, title: a.title ?? null, videoId: video.id })),
+          data: audioData.map((a: { url: string; title?: string; disciplina?: string; curso?: string }) => ({ url: a.url, title: a.title ?? null, disciplina: a.disciplina ?? null, curso: a.curso ?? null, videoId: video.id })),
         });
       }
     }

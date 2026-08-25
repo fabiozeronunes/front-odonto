@@ -100,8 +100,12 @@ export interface Video {
   recordedDate?: string | null;
   recordedTime?: string | null;
   recordedOrientation?: string | null;
+  disciplina?: string | null;
+  curso?: string | null;
+  recordedDisciplina?: string | null;
+  recordedCurso?: string | null;
   audioTags?: VideoTag[];
-  audios?: { id: string; url: string; title?: string | null; createdAt?: string }[];
+  audios?: { id: string; url: string; title?: string | null; createdAt?: string; disciplina?: string | null; curso?: string | null }[];
   status: ContentStatus;
   publishedAt?: string | null;
   viewCount: number;
