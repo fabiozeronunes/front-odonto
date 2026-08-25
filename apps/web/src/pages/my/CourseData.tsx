@@ -189,20 +189,29 @@ export function CourseData() {
         <ul className="divide-y divide-border rounded-xl border border-border bg-surface shadow-card">
           {entries.map((entry) => (
             <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-foreground">
-                  {entry.curso ? `${entry.curso} • ` : ""}{entry.periodo ? `${entry.periodo} período • ` : ""}{entry.name}
-                </p>
-                <p className="truncate text-[11px] text-muted-foreground">
-                  {[
-                    entry.professor && `Prof. ${entry.professor}`,
-                    entry.turma && `Turma ${entry.turma}`,
-                    entry.bloco && `Bloco ${entry.bloco}`,
-                    entry.sala && `Sala ${entry.sala}`,
-                  ]
-                    .filter(Boolean)
-                    .join(" • ") || "—"}
-                </p>
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
+                {(entry.periodo || entry.curso) && (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {[entry.periodo && `Período: ${entry.periodo}`, entry.curso && `Curso: ${entry.curso}`]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </p>
+                )}
+                {entry.professor && (
+                  <p className="truncate text-xs text-muted-foreground">Professor: {entry.professor}</p>
+                )}
+                {(entry.turma || entry.bloco || entry.sala) && (
+                  <p className="truncate text-[11px] text-muted-foreground/80">
+                    {[
+                      entry.turma && `Turma ${entry.turma}`,
+                      entry.bloco && `Bloco ${entry.bloco}`,
+                      entry.sala && `Sala ${entry.sala}`,
+                    ]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
