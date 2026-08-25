@@ -29,9 +29,18 @@ import { gradeRouter } from "./modules/grade/grade.routes.js";
 import { myDisciplinesRouter } from "./modules/myDisciplines/myDisciplines.routes.js";
 import { startCleanupSchedule } from "./modules/youtube/youtube.service.js";
 import { prisma } from "./lib/prisma.js";
+import { applyMigrations } from "./services/migrate.js";
+
+let bootMigrationsDone = false;
 
 export function createApp() {
   const app = express();
+
+  // Em serverless (Vercel) main() do index.ts não roda; garante schema atualizado no cold start.
+  if (!bootMigrationsDone) {
+    bootMigrationsDone = true;
+    applyMigrations().catch((err) => console.error("[MIGRATION] falha no boot:", err?.message ?? err));
+  }
 
   app.disable("x-powered-by");
   app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
