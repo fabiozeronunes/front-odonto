@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, History, Sparkles, User, LogOut, LayoutGrid, HandCoins, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
+import { Heart, History, Sparkles, User, LogOut, LayoutGrid, Wallet, BookOpen, Video as VideoIcon } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { Paginated, Video } from "../types";
@@ -84,7 +84,7 @@ export function Dashboard() {
           <AffiliateShareCard />
           <Link to="/comissoes">
             <Button variant="outline" className={`w-full sm:w-auto ${dashBtn}`}>
-              <HandCoins className="h-4 w-4" /> Minhas comissões
+              Minhas comissões
             </Button>
           </Link>
         </div>
