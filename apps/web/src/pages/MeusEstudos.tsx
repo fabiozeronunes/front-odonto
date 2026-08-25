@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { BookOpen, ChevronRight, Loader2, Send, Trash2, Headphones, Table, List } from "lucide-react";
+import { BookOpen, ChevronRight, Loader2, Send, Trash2, Headphones, Table, List, GraduationCap } from "lucide-react";
 import { api, ApiRequestError } from "../lib/api";
 import type { StudyResource } from "../types";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { StudyResourceRenderer } from "../components/StudyResourceRenderer";
 import { MySchedule } from "./my/MySchedule";
+import { CourseData } from "./my/CourseData";
 import { resolveImageUrl } from "../lib/utils";
 import { BackButton } from "../components/BackButton";
 
@@ -19,14 +20,16 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function MeusEstudos() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const view = searchParams.get("view") === "grade" ? "grade" : "estudos";
+  const viewParam = searchParams.get("view");
+  const view: "estudos" | "dados" | "grade" =
+    viewParam === "grade" ? "grade" : viewParam === "dados" ? "dados" : "estudos";
   const [resources, setResources] = useState<StudyResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  function setView(next: "estudos" | "grade") {
-    setSearchParams(next === "grade" ? { view: "grade" } : {}, { replace: true });
+  function setView(next: "estudos" | "dados" | "grade") {
+    setSearchParams(next === "estudos" ? {} : { view: next }, { replace: true });
   }
 
   function load() {
@@ -99,6 +102,17 @@ export function MeusEstudos() {
         </button>
         <button
           type="button"
+          onClick={() => setView("dados")}
+          className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-xs font-medium transition-colors ${
+            view === "dados"
+              ? "bg-primary-700 text-primary-foreground shadow-sm"
+              : "border border-border bg-surface text-foreground hover:bg-muted"
+          }`}
+        >
+          <GraduationCap className="h-3.5 w-3.5" /> Dados do Curso
+        </button>
+        <button
+          type="button"
           onClick={() => setView("grade")}
           className={`inline-flex h-9 items-center gap-2 rounded-full px-4 text-xs font-medium transition-colors ${
             view === "grade"
@@ -113,6 +127,10 @@ export function MeusEstudos() {
       {view === "grade" ? (
         <div className="mt-6">
           <MySchedule />
+        </div>
+      ) : view === "dados" ? (
+        <div className="mt-6">
+          <CourseData />
         </div>
       ) : (
         <>

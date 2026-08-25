@@ -143,9 +143,17 @@ export async function applyMigrations() {
     }
 
     // 11. Disciplinas/Curso (Meu espaço)
+    if (await tableExists("CourseDiscipline")) {
+      for (const col of ["curso", "periodo", "professor", "turma", "bloco", "sala"]) {
+        const cdCol = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'CourseDiscipline' AND column_name = ${col}` as any[];
+        if (cdCol.length === 0) {
+          await prisma.$executeRawUnsafe(`ALTER TABLE "CourseDiscipline" ADD COLUMN "${col}" TEXT`);
+        }
+      }
+    }
     if (!(await tableExists("CourseDiscipline"))) {
       console.log("[MIGRATION] Creating CourseDiscipline...");
-      await safeExec(`CREATE TABLE "CourseDiscipline" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"name" TEXT NOT NULL,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "CourseDiscipline_pkey" PRIMARY KEY ("id"))`, "CourseDiscipline table");
+      await safeExec(`CREATE TABLE "CourseDiscipline" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"name" TEXT NOT NULL,"curso" TEXT,"periodo" TEXT,"professor" TEXT,"turma" TEXT,"bloco" TEXT,"sala" TEXT,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "CourseDiscipline_pkey" PRIMARY KEY ("id"))`, "CourseDiscipline table");
       await safeExec(`CREATE INDEX "CourseDiscipline_userId_idx" ON "CourseDiscipline"("userId")`, "CourseDiscipline userId idx");
       await safeFK("CourseDiscipline_userId_fkey", "CourseDiscipline", "User", "id", "CASCADE");
     }

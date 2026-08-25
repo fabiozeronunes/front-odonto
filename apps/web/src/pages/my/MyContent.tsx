@@ -1,21 +1,19 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { BookOpen, Film, Layers, Lock, GraduationCap } from "lucide-react";
+import { BookOpen, Film, Layers, Lock } from "lucide-react";
 import { MyVideos } from "./MyVideos";
 import { MyCases } from "./MyCases";
 import { MyTaxonomy } from "./MyTaxonomy";
-import { MyDisciplines } from "./MyDisciplines";
 import { useAuth } from "../../lib/auth";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { BackButton } from "../../components/BackButton";
 
-type Tab = "videos" | "cases" | "taxonomy" | "disciplinas";
+type Tab = "videos" | "cases" | "taxonomy";
 
 const tabs: { id: Tab; label: string; icon: typeof Film }[] = [
   { id: "videos", label: "Vídeos", icon: Film },
   { id: "cases", label: "Estudos de caso", icon: BookOpen },
   { id: "taxonomy", label: "Especialidades & Tags", icon: Layers },
-  { id: "disciplinas", label: "Disciplinas", icon: GraduationCap },
 ];
 
 export function MyContent() {
@@ -95,7 +93,6 @@ export function MyContent() {
         {tab === "videos" && <MyVideos />}
         {tab === "cases" && <MyCases />}
         {tab === "taxonomy" && <MyTaxonomy />}
-        {tab === "disciplinas" && <MyDisciplines />}
       </div>
     </div>
   );

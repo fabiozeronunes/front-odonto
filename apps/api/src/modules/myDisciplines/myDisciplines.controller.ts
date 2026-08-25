@@ -8,18 +8,13 @@ export const setup = asyncHandler(async (req: Request, res: Response) => {
   res.json({ data });
 });
 
-export const saveCurso = asyncHandler(async (req: Request, res: Response) => {
-  const result = await service.saveCurso((req as AuthenticatedRequest).user.id, String(req.body?.curso ?? ""));
-  res.json(result);
-});
-
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const item = await service.createDiscipline((req as AuthenticatedRequest).user.id, String(req.body?.name ?? ""));
+  const item = await service.createDiscipline((req as AuthenticatedRequest).user.id, req.body ?? {});
   res.status(201).json({ data: item });
 });
 
 export const rename = asyncHandler(async (req: Request, res: Response) => {
-  const item = await service.renameDiscipline((req as AuthenticatedRequest).user.id, req.params.id, String(req.body?.name ?? ""));
+  const item = await service.updateDiscipline((req as AuthenticatedRequest).user.id, req.params.id, req.body ?? {});
   res.json({ data: item });
 });
 

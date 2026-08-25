@@ -669,6 +669,12 @@ model CourseDiscipline {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
+  curso     String?
+  periodo   String?
+  professor String?
+  turma     String?
+  bloco     String?
+  sala      String?
   createdAt DateTime @default(now())
 
   @@index([userId])
