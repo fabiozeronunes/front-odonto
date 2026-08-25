@@ -23,6 +23,8 @@ export function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
+  const dashBtn = "h-9 px-4 text-[9px] font-medium uppercase tracking-wide";
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <BackButton to="/" />
@@ -44,34 +46,34 @@ export function Dashboard() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link to="/favoritos">
-            <Button variant="outline">
+            <Button variant="outline" className={dashBtn}>
               <Heart className="h-4 w-4" /> Favoritos
             </Button>
           </Link>
           <Link to="/catalogo">
-            <Button>Explorar vídeos</Button>
+            <Button className={dashBtn}>Explorar vídeos</Button>
           </Link>
           <Link to="/meus-conteudos">
-            <Button variant="outline">
+            <Button variant="outline" className={dashBtn}>
               <LayoutGrid className="h-4 w-4" /> Meu espaço
             </Button>
           </Link>
           <Link to="/perfil">
-            <Button variant="outline">
+            <Button variant="outline" className={dashBtn}>
               <User className="h-4 w-4" /> Perfil
             </Button>
           </Link>
           <Link to="/financeiro">
-            <Button variant="outline">
+            <Button variant="outline" className={dashBtn}>
               <Wallet className="h-4 w-4" /> Dados financeiros
             </Button>
           </Link>
           <Link to="/meus-estudos">
-            <Button variant="outline">
+            <Button variant="outline" className={dashBtn}>
               <BookOpen className="h-4 w-4" /> Meus estudos
             </Button>
           </Link>
-          <Button variant="outline" onClick={logout} className="text-red-600 hover:text-red-700">
+          <Button variant="outline" onClick={logout} className={`${dashBtn} text-red-600 hover:text-red-700`}>
             <LogOut className="h-4 w-4" /> Sair
           </Button>
         </div>
@@ -81,7 +83,7 @@ export function Dashboard() {
         <div className="mt-8 space-y-3">
           <AffiliateShareCard />
           <Link to="/comissoes">
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button variant="outline" className={`w-full sm:w-auto ${dashBtn}`}>
               <HandCoins className="h-4 w-4" /> Minhas comissões
             </Button>
           </Link>
