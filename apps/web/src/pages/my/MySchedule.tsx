@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Pencil, Clock, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Pencil, Clock, BookOpen, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { api } from "../../lib/api";
 
 interface Discipline {
   id: string;
@@ -38,21 +39,6 @@ const COLORS = [
   "bg-cyan-100 border-cyan-300 text-cyan-800",
 ];
 
-const STORAGE_KEY = "odonto-grade-disciplinas";
-
-function loadSchedule(): Discipline[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveSchedule(items: Discipline[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
 function nextColor(used: string[]): string {
   for (const c of COLORS) {
     if (!used.includes(c)) return c;
@@ -61,18 +47,27 @@ function nextColor(used: string[]): string {
 }
 
 export function MySchedule() {
-  const [items, setItems] = useState<Discipline[]>(loadSchedule);
+  const [items, setItems] = useState<Discipline[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Discipline | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [expandedPeriods, setExpandedPeriods] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
-    saveSchedule(items);
-  }, [items]);
-
-  useEffect(() => {
-    setItems(loadSchedule());
+    loadItems();
   }, []);
+
+  async function loadItems() {
+    try {
+      setLoading(true);
+      const res = await api<{ data: Discipline[] }>("/api/grade");
+      setItems(res.data);
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const periods = [...new Set(items.map((i) => i.period))].sort((a, b) => a - b);
 
@@ -111,22 +106,38 @@ export function MySchedule() {
     setShowForm(false);
   }
 
-  function saveDiscipline() {
+  async function saveDiscipline() {
     if (!editing || !editing.name.trim()) return;
     const usedColors = items.filter((i) => i.id !== editing.id).map((i) => i.color);
     const color = editing.color || nextColor(usedColors);
 
-    if (editing.id) {
-      setItems((prev) => prev.map((i) => (i.id === editing.id ? { ...editing, color } : i)));
-    } else {
-      const newDisc: Discipline = { ...editing, id: crypto.randomUUID(), color };
-      setItems((prev) => [...prev, newDisc]);
+    try {
+      if (editing.id) {
+        const res = await api<{ data: Discipline }>(`/api/grade/${editing.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...editing, color }),
+        });
+        setItems((prev) => prev.map((i) => (i.id === editing.id ? res.data : i)));
+      } else {
+        const res = await api<{ data: Discipline }>("/api/grade", {
+          method: "POST",
+          body: JSON.stringify({ ...editing, color }),
+        });
+        setItems((prev) => [...prev, res.data]);
+      }
+      closeForm();
+    } catch {
+      // erro silencioso
     }
-    closeForm();
   }
 
-  function deleteDiscipline(id: string) {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+  async function deleteDiscipline(id: string) {
+    try {
+      await api(`/api/grade/${id}`, { method: "DELETE" });
+      setItems((prev) => prev.filter((i) => i.id !== id));
+    } catch {
+      // erro silencioso
+    }
   }
 
   function addPeriod() {
@@ -142,6 +153,14 @@ export function MySchedule() {
 
   function getDisciplinesForDay(periodItems: Discipline[], day: string) {
     return periodItems.filter((i) => i.day === day);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+        <Loader2 className="animate-spin" /> Carregando grade...
+      </div>
+    );
   }
 
   return (

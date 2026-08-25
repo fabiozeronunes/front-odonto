@@ -48,6 +48,7 @@ model User {
   auditLogs             AuditLog[]
   refreshTokens         RefreshToken[]
   twoFactorSecret       TwoFactorSecret?
+  gradeSchedules        GradeSchedule[]
 
   @@index([email])
   @@index([referredById])
@@ -593,6 +594,8 @@ model RefreshToken {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
+  ipAddress String?
+  userAgent String?
   createdAt DateTime @default(now())
 
   @@index([token])
@@ -622,4 +625,28 @@ model LoginAttempt {
   @@index([email])
   @@index([ip])
   @@index([createdAt])
+}
+
+model GradeSchedule {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  period       Int
+  day          String
+  turma        String   @default("")
+  bloco        String   @default("")
+  sala         String   @default("")
+  curso        String   @default("")
+  turno        String   @default("Noturno")
+  professor    String   @default("")
+  period1Start String   @default("")
+  period1End   String   @default("")
+  period2Start String   @default("")
+  period2End   String   @default("")
+  color        String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
 }

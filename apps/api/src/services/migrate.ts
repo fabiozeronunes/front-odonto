@@ -102,6 +102,24 @@ export async function applyMigrations() {
       await safeExec(`CREATE INDEX "IPBlacklist_expiresAt_idx" ON "IPBlacklist"("expiresAt")`, "IPBlacklist expiresAt idx");
     }
 
+    // 8. GradeSchedule
+    if (!(await tableExists("GradeSchedule"))) {
+      console.log("[MIGRATION] Creating GradeSchedule...");
+      await safeExec(`CREATE TABLE "GradeSchedule" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"name" TEXT NOT NULL,"period" INTEGER NOT NULL,"day" TEXT NOT NULL,"turma" TEXT NOT NULL DEFAULT '',"bloco" TEXT NOT NULL DEFAULT '',"sala" TEXT NOT NULL DEFAULT '',"curso" TEXT NOT NULL DEFAULT '',"turno" TEXT NOT NULL DEFAULT 'Noturno',"professor" TEXT NOT NULL DEFAULT '',"period1Start" TEXT NOT NULL DEFAULT '',"period1End" TEXT NOT NULL DEFAULT '',"period2Start" TEXT NOT NULL DEFAULT '',"period2End" TEXT NOT NULL DEFAULT '',"color" TEXT NOT NULL DEFAULT '',"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"updatedAt" TIMESTAMP(3) NOT NULL,CONSTRAINT "GradeSchedule_pkey" PRIMARY KEY ("id"))`, "GradeSchedule table");
+      await safeExec(`CREATE INDEX "GradeSchedule_userId_idx" ON "GradeSchedule"("userId")`, "GradeSchedule userId idx");
+      await safeFK("GradeSchedule_userId_fkey", "GradeSchedule", "User", "id", "CASCADE");
+    }
+
+    // 9. RefreshToken ipAddress/userAgent columns
+    if (await tableExists("RefreshToken")) {
+      const rtCols = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'RefreshToken' AND column_name = 'ipAddress'` as any[];
+      if (rtCols.length === 0) {
+        console.log("[MIGRATION] Adding ipAddress/userAgent to RefreshToken...");
+        await prisma.$executeRaw`ALTER TABLE "RefreshToken" ADD COLUMN "ipAddress" TEXT`;
+        await prisma.$executeRaw`ALTER TABLE "RefreshToken" ADD COLUMN "userAgent" TEXT`;
+      }
+    }
+
     console.log("[MIGRATION] All migrations applied successfully.");
   } catch (err) {
     console.error("[MIGRATION] Error applying migrations:", err);

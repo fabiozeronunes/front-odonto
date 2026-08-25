@@ -22,6 +22,7 @@ import { youtubeRouter } from "./modules/youtube/youtube.routes.js";
 import { settingsRouter } from "./modules/settings/settings.routes.js";
 import { productsRouter } from "./modules/products/products.routes.js";
 import { studyRouter } from "./modules/study/study.routes.js";
+import { gradeRouter } from "./modules/grade/grade.routes.js";
 import { startCleanupSchedule } from "./modules/youtube/youtube.service.js";
 import { prisma } from "./lib/prisma.js";
 
@@ -133,6 +134,7 @@ export function createApp() {
   app.use("/api/settings", settingsRouter);
   app.use("/api/products", productsRouter);
   app.use("/api/study", studyRouter);
+  app.use("/api/grade", gradeRouter);
 
   app.use(notFound);
   app.use(errorHandler);
