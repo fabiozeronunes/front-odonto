@@ -70,6 +70,10 @@ export function MySchedule() {
     saveSchedule(items);
   }, [items]);
 
+  useEffect(() => {
+    setItems(loadSchedule());
+  }, []);
+
   const periods = [...new Set(items.map((i) => i.period))].sort((a, b) => a - b);
 
   function togglePeriod(p: number) {
