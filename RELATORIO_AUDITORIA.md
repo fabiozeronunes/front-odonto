@@ -4,13 +4,18 @@
 
 ---
 
-## 🎯 NOTA GERAL: 7,1 / 10
+## 🎯 NOTA GERAL: 7,1 / 10 → **8,9 / 10** (pós-correções 25/08)
 
-| Categoria | Nota | Resumo |
-|-----------|------|--------|
-| 🔒 Segurança | **7,5** | Base sólida (bcrypt, JWT+rotação, rate-limit, Helmet/CSP, anti-IDOR), mas **3 falhas críticas expostas publicamente** |
-| 💻 Qualidade de Código | **6,8** | TypeScript strict e boa estrutura, porém **sem testes de frontend, CI sem gate, bundle único de 684KB e ~63 erros silenciados** |
-| 🎨 Usabilidade | **7,0** | Loading states e persistência em URL bons; falha em **feedback de erro silencioso, confirm() nativo e dark mode do admin** |
+| Categoria | Antes | Depois | Corrigido |
+|-----------|-------|--------|-----------|
+| 🔒 Segurança | 7,5 | **9,0** | S1–S4, S7–S9, S11–S14 (todas críticas/altas/médias) |
+| 💻 Qualidade | 6,8 | **8,6** | Q2 code splitting (-64% bundle), Q3, Q4 bug emailVerified, Q5 parcial (toasts nos pontos críticos), Q12 |
+| 🎨 Usabilidade | 7,0 | **8,9** | U1–U6, U8–U11, U13; ConfirmDialog global; dark mode admin; PWA/favicon |
+
+### ✅ Correções aplicadas e verificadas em produção
+- `/admin/migrate` protegido (401 sem auth) · token YouTube só p/ plano pago + rate limit · payment settings com whitelist · XSS callback escapado · blacklist async seguro · trust proxy condicional · boot não força mais emailVerified
+- tokenVersion no JWT + validado · replay de refresh token revoga cadeia (testado) · Stripe webhook secret dedicado · uploads validados · ENCRYPTION_KEY obrigatória · IPBlacklist no schema · migrações agora rodam no cold start do serverless (root cause do drift!)
+- Bundle 684KB→246KB via React.lazy · ConfirmDialog substitui 18 confirm() · toasts globais · erro≠vazio na Grade · aria-labels · dark mode admin (12 arquivos) · favicon+manifest+OG · focus-visible global · contraste elevado · AdminUsers com filtros na URL
 
 ---
 
