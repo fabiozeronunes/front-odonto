@@ -70,7 +70,8 @@ describe("Conteúdo por membro", () => {
       .send({ name: `Tag do membro ${Date.now()}` });
     expect(res.status).toBe(201);
 
-    const pub = await request(app).get("/api/tags");
+    const tagName = res.body.data.name;
+    const pub = await request(app).get(`/api/tags?search=${encodeURIComponent(tagName)}`);
     expect(pub.status).toBe(200);
     expect(pub.body.data.some((t: { id: string }) => t.id === res.body.data.id)).toBe(true);
   });
@@ -117,9 +118,14 @@ describe("Checkout de planos", () => {
     expect(checkout.body.data.status).toBe("PENDING");
     expect(checkout.body.data.orderId).toBeDefined();
 
+    // confirmacao de pagamento é admin-only (cliente não confirma o próprio pagamento)
+    const adminLogin = await request(app).post("/api/auth/login").send({
+      email: "test-admin@odonto.study",
+      password: "Admin@123",
+    });
     const confirm = await request(app)
       .post(`/api/checkout/${checkout.body.data.orderId}/confirm`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${adminLogin.body.tokens.accessToken}`);
     expect(confirm.status).toBe(200);
     expect(confirm.body.data.ok).toBe(true);
     expect(confirm.body.data.planId).toBe(premium.id);
@@ -147,26 +153,14 @@ describe("Checkout de planos", () => {
     expect(res.status).toBe(401);
   });
 
-  it("cadastro aceita plano gratuito por padrão e planSlug pago", async () => {
+  it("cadastro sempre inicia no plano gratuito (upgrade apenas via checkout)", async () => {
     const email = `checkout-free-${Date.now()}@odonto.study`;
     const free = await request(app).post("/api/auth/register").send({
       name: "Checkout Free",
       email,
-      password: "Senha@123",
+      password: "Tr0v#2026-xQ!zR",
     });
     expect(free.status).toBe(201);
     expect(free.body.user.planId).toBeDefined();
-
-    const paidEmail = `checkout-paid-${Date.now()}@odonto.study`;
-    const plans = await request(app).get("/api/plans");
-    const premium = plans.body.data.find((p: { slug: string }) => p.slug === "premium");
-    const paid = await request(app).post("/api/auth/register").send({
-      name: "Checkout Paid",
-      email: paidEmail,
-      password: "Senha@123",
-      planSlug: "premium",
-    });
-    expect(paid.status).toBe(201);
-    expect(paid.body.user.planId).toBe(premium.id);
   });
 });

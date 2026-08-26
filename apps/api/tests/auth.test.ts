@@ -10,7 +10,8 @@ describe("Auth", () => {
     const res = await request(app).post("/api/auth/register").send({
       name: "Aluno Teste",
       email,
-      password: "Senha@123",
+      // senha forte e inedita: nao pode constar no banco de vazamentos (HIBP)
+      password: "Tr0v#2026-xQ!zR",
     });
 
     expect(res.status).toBe(201);

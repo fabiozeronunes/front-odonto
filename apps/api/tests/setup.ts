@@ -14,6 +14,25 @@ execSync("npx prisma db push --skip-generate --accept-data-loss", {
 const prisma = new PrismaClient();
 
 async function seedTestData() {
+  const TEST_EMAILS = [
+    "test-admin@odonto.study",
+    "test-free@odonto.study",
+    "test-paid@odonto.study",
+  ];
+
+  // Estado limpo em toda rodada: sem lockout acumulado nem assinaturas/pedidos órfãos
+  await prisma.loginAttempt.deleteMany({ where: { email: { in: TEST_EMAILS } } });
+  const existing = await prisma.user.findMany({
+    where: { email: { in: TEST_EMAILS } },
+    select: { id: true },
+  });
+  const ids = existing.map((u) => u.id);
+  if (ids.length > 0) {
+    await prisma.subscription.deleteMany({ where: { userId: { in: ids } } });
+    await prisma.order.deleteMany({ where: { userId: { in: ids } } });
+    await prisma.refreshToken.deleteMany({ where: { userId: { in: ids } } });
+  }
+
   const freePlan = await prisma.membershipPlan.upsert({
     where: { slug: "gratuito" },
     update: {},
@@ -36,6 +55,7 @@ async function seedTestData() {
     create: {
       name: "Admin Teste",
       email: "test-admin@odonto.study",
+      emailVerified: true,
       passwordHash:
         "$2a$10$8ZkY9rY9rY9rY9rY9rY9rO0K9WJtZ8X5V3m0kQ9oE9hYQ5xq5M9S6", // senha inválida, preenchida abaixo
       role: "ADMIN",
@@ -49,6 +69,7 @@ async function seedTestData() {
     create: {
       name: "Free Teste",
       email: "test-free@odonto.study",
+      emailVerified: true,
       passwordHash: await hash("Senha@123"),
       role: "USER",
       planId: freePlan.id,
@@ -61,6 +82,7 @@ async function seedTestData() {
     create: {
       name: "Paid Teste",
       email: "test-paid@odonto.study",
+      emailVerified: true,
       passwordHash: await hash("Senha@123"),
       role: "USER",
       planId: premiumPlan.id,
@@ -96,6 +118,18 @@ async function seedTestData() {
     },
   });
 
+  await prisma.user.updateMany({
+    where: { email: { in: TEST_EMAILS } },
+    data: { emailVerified: true },
+  });
+  await prisma.user.updateMany({
+    where: { email: "test-free@odonto.study" },
+    data: { passwordHash: await hash("Senha@123") },
+  });
+  await prisma.user.updateMany({
+    where: { email: "test-paid@odonto.study" },
+    data: { passwordHash: await hash("Senha@123") },
+  });
   await prisma.user.updateMany({
     where: { email: "test-admin@odonto.study" },
     data: { passwordHash: await hash("Admin@123") },

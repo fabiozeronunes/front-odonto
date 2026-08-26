@@ -13,10 +13,8 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const confirm = asyncHandler(async (req: Request, res: Response) => {
-  const result = await confirmCheckout(
-    (req as AuthenticatedRequest).user.id,
-    req.params.orderId
-  );
+  const user = (req as AuthenticatedRequest).user;
+  const result = await confirmCheckout(user.id, req.params.orderId, user.role === "ADMIN");
   res.json({ data: result });
 });
 

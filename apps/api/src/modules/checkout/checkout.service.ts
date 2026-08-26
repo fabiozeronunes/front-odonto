@@ -111,13 +111,18 @@ export async function createCheckout(userId: string, input: CreateCheckoutInput)
   };
 }
 
-export async function confirmCheckout(userId: string, orderId: string) {
-  const order = await prisma.order.findFirst({ where: { id: orderId, userId } });
+export async function confirmCheckout(userId: string, orderId: string, isAdmin = false) {
+  // Admin confirma pedidos de qualquer usuário; usuário comum apenas os próprios
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, ...(isAdmin ? {} : { userId }) },
+  });
   if (!order) throw new NotFoundError("Pedido não encontrado");
   if (order.status !== "PENDING") throw new ConflictError("Pedido já processado");
 
+  const targetUserId = order.userId;
+
   const subscription = await prisma.subscription.findFirst({
-    where: { userId, status: "PENDING" },
+    where: { userId: targetUserId, status: "PENDING" },
     orderBy: { createdAt: "desc" },
     include: { plan: true },
   });
@@ -134,11 +139,11 @@ export async function confirmCheckout(userId: string, orderId: string) {
       where: { id: subscription.id },
       data: { status: "ACTIVE", startsAt, endsAt },
     }),
-    prisma.user.update({ where: { id: userId }, data: { planId: subscription.planId } }),
+    prisma.user.update({ where: { id: targetUserId }, data: { planId: subscription.planId } }),
   ]);
 
   const referred = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: targetUserId },
     select: { referredById: true },
   });
 
@@ -151,7 +156,7 @@ export async function confirmCheckout(userId: string, orderId: string) {
       const existing = await prisma.affiliateCommission.findFirst({
         where: {
           affiliateId: affiliate.id,
-          referredUserId: userId,
+          referredUserId: targetUserId,
           status: "PENDING",
         },
       });
