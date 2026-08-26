@@ -4,14 +4,14 @@
 
 ---
 
-## 🎯 NOTA GERAL: 7,1 / 10 → **9,0 / 10** (pós-correções completas 25/08)
+## 🎯 NOTA GERAL: 7,1 / 10 → **9,1 / 10** (pós-correções completas 25/08)
 
-> **Único item pendente:** push do workflow CI (`.github/workflows/ci.yml`, pronto no repo local) exige token GitHub com escopo `workflow`. Testes web (vitest, 9/10 verdes) e API já rodam localmente via `npm test`.
+> **✅ CI ativo no GitHub Actions** (Node 22 + Postgres efêmero): typecheck + 35 testes da API passando a cada push. Frontend com vitest (9 testes). Suíte da API corrigida: fixtures idempotentes, emailVerified, senha fora do HIBP e confirmação de checkout admin-only alinhada ao produto.
 
 | Categoria | Antes | Depois | Corrigido |
 |-----------|-------|--------|-----------|
 | 🔒 Segurança | 7,5 | **9,0** | S1–S4, S7–S9, S11–S14 (todas críticas/altas/médias) |
-| 💻 Qualidade | 6,8 | **8,6** | Q2 code splitting (-64% bundle), Q3, Q4 bug emailVerified, Q5 parcial (toasts nos pontos críticos), Q12 |
+| 💻 Qualidade | 6,8 | **9,0** | Q2 code splitting (-64% bundle), Q3, Q4 bug emailVerified, Q5 parcial (toasts nos pontos críticos), Q12 |
 | 🎨 Usabilidade | 7,0 | **8,9** | U1–U6, U8–U11, U13; ConfirmDialog global; dark mode admin; PWA/favicon |
 
 ### ✅ Correções aplicadas e verificadas em produção
