@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GraduationCap, Loader2, Pencil, Trash2, BookOpen, X } from "lucide-react";
+import { GraduationCap, Loader2, Pencil, Trash2, BookOpen, X, ChevronDown, ChevronUp } from "lucide-react";
 import { api, ApiRequestError } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -50,6 +50,7 @@ export function CourseData() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ ...EMPTY });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -166,6 +167,26 @@ export function CourseData() {
     );
   }
 
+  const periodGroups = (() => {
+    const map = new Map<string, CourseEntry[]>();
+    for (const e of entries) {
+      const key = (e.periodo ?? "").trim() || "";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    }
+    const rank = (k: string) => {
+      const m = k.match(/\d+/);
+      return m ? parseInt(m[0], 10) : 9999;
+    };
+    return [...map.entries()]
+      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
+      .map(([periodo, items]) => ({ periodo, items: sortByDay(items) }));
+  })();
+
+  function togglePeriod(k: string) {
+    setCollapsed((prev) => ({ ...prev, [k]: !prev[k] }));
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -244,64 +265,99 @@ export function CourseData() {
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-border rounded-xl border border-border bg-surface shadow-card">
-          {entries.map((entry) => (
-            <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
-                {entry.codigo && (
-                  <p className="truncate text-xs font-medium text-muted-foreground">COD: {entry.codigo}</p>
-                )}
-                {(entry.diaSemana || entry.turno) && (
-                  <p className="truncate text-xs text-muted-foreground">
-                    {[entry.diaSemana && `Dia: ${entry.diaSemana}`, entry.turno && `Turno: ${entry.turno}`]
-                      .filter(Boolean)
-                      .join(" • ")}
-                  </p>
-                )}
-                {(entry.periodo || entry.curso) && (
-                  <p className="truncate text-xs text-muted-foreground">
-                    {[entry.periodo && `Período: ${entry.periodo}`, entry.curso && `Curso: ${entry.curso}`]
-                      .filter(Boolean)
-                      .join(" • ")}
-                  </p>
-                )}
-                {entry.professor && (
-                  <p className="truncate text-xs text-muted-foreground">Professor: {entry.professor}</p>
-                )}
-                {(entry.turma || entry.bloco || entry.sala) && (
-                  <p className="truncate text-[11px] text-muted-foreground/80">
-                    {[
-                      entry.turma && `Turma ${entry.turma}`,
-                      entry.bloco && `Bloco ${entry.bloco}`,
-                      entry.sala && `Sala ${entry.sala}`,
-                    ]
-                      .filter(Boolean)
-                      .join(" • ")}
-                  </p>
+        <div className="space-y-4">
+          {periodGroups.map(({ periodo, items }) => {
+            const key = periodo || "_sem";
+            const isCollapsed = collapsed[key] ?? false;
+            const title = periodo ? `${periodo}º Período` : "Sem período";
+            return (
+              <div
+                key={key}
+                className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card"
+              >
+                <button
+                  type="button"
+                  onClick={() => togglePeriod(key)}
+                  aria-expanded={!isCollapsed}
+                  className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors hover:bg-muted/50"
+                >
+                  <span className="flex items-center gap-2 font-bold text-foreground">
+                    <BookOpen className="h-4 w-4 text-primary-600" /> {title}
+                  </span>
+                  <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {items.length} disciplina{items.length > 1 ? "s" : ""}
+                    {isCollapsed ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4" />
+                    )}
+                  </span>
+                </button>
+
+                {!isCollapsed && (
+                  <ul className="divide-y divide-border border-t border-border">
+                    {items.map((entry) => (
+                      <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <p className="truncate text-sm font-semibold text-foreground">{entry.name}</p>
+                          {entry.codigo && (
+                            <p className="truncate text-xs font-medium text-muted-foreground">COD: {entry.codigo}</p>
+                          )}
+                          {(entry.diaSemana || entry.turno) && (
+                            <p className="truncate text-xs text-muted-foreground">
+                              {[entry.diaSemana && `Dia: ${entry.diaSemana}`, entry.turno && `Turno: ${entry.turno}`]
+                                .filter(Boolean)
+                                .join(" • ")}
+                            </p>
+                          )}
+                          {(entry.periodo || entry.curso) && (
+                            <p className="truncate text-xs text-muted-foreground">
+                              {[entry.periodo && `Período: ${entry.periodo}`, entry.curso && `Curso: ${entry.curso}`]
+                                .filter(Boolean)
+                                .join(" • ")}
+                            </p>
+                          )}
+                          {entry.professor && (
+                            <p className="truncate text-xs text-muted-foreground">Professor: {entry.professor}</p>
+                          )}
+                          {(entry.turma || entry.bloco || entry.sala) && (
+                            <p className="truncate text-[11px] text-muted-foreground/80">
+                              {[
+                                entry.turma && `Turma ${entry.turma}`,
+                                entry.bloco && `Bloco ${entry.bloco}`,
+                                entry.sala && `Sala ${entry.sala}`,
+                              ]
+                                .filter(Boolean)
+                                .join(" • ")}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => startEdit(entry)}
+                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          title="Editar"
+                          aria-label={`Editar ${entry.name}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => remove(entry.id)}
+                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                          title="Excluir"
+                          aria-label={`Excluir ${entry.name}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => startEdit(entry)}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                title="Editar"
-                aria-label={`Editar ${entry.name}`}
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(entry.id)}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
-                title="Excluir"
-                aria-label={`Excluir ${entry.name}`}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       )}
     </div>
   );
