@@ -167,20 +167,31 @@ export function CourseData() {
     );
   }
 
+  function normalizePeriod(raw?: string | null): { key: string; title: string } {
+    const t = (raw ?? "").trim();
+    if (!t) return { key: "_sem", title: "Sem período" };
+    const m = t.match(/\d+/);
+    if (m) {
+      const n = String(parseInt(m[0], 10));
+      return { key: n, title: `${n}º Período` };
+    }
+    return { key: t.toLowerCase(), title: t };
+  }
+
   const periodGroups = (() => {
-    const map = new Map<string, CourseEntry[]>();
+    const map = new Map<string, { title: string; items: CourseEntry[] }>();
     for (const e of entries) {
-      const key = (e.periodo ?? "").trim() || "";
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(e);
+      const { key, title } = normalizePeriod(e.periodo);
+      if (!map.has(key)) map.set(key, { title, items: [] });
+      map.get(key)!.items.push(e);
     }
     const rank = (k: string) => {
-      const m = k.match(/\d+/);
-      return m ? parseInt(m[0], 10) : 9999;
+      const m = k.match(/^\d+$/);
+      return m ? parseInt(k, 10) : 9999;
     };
     return [...map.entries()]
-      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
-      .map(([periodo, items]) => ({ periodo, items: sortByDay(items) }));
+      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[1].title.localeCompare(b[1].title))
+      .map(([key, g]) => ({ key, title: g.title, items: sortByDay(g.items) }));
   })();
 
   function togglePeriod(k: string) {
@@ -266,10 +277,8 @@ export function CourseData() {
         </div>
       ) : (
         <div className="space-y-4">
-          {periodGroups.map(({ periodo, items }) => {
-            const key = periodo || "_sem";
+          {periodGroups.map(({ key, title, items }) => {
             const isCollapsed = collapsed[key] ?? false;
-            const title = periodo ? `${periodo}º Período` : "Sem período";
             return (
               <div
                 key={key}
