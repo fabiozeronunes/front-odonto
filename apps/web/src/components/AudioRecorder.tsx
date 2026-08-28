@@ -65,8 +65,17 @@ export function AudioRecorder({
         setRecording(false);
         setPaused(false);
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        // Salva LOCAL no dispositivo imediatamente: o áudio não se perde
-        setPending({ blob, blobUrl: URL.createObjectURL(blob) });
+        const blobUrl = URL.createObjectURL(blob);
+        // Salva LOCAL no dispositivo imediatamente: dispara download nativo
+        // (no celular abre a opcao de escolha de pasta; no PC vai para Downloads)
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        const ext = blob.type.includes("webm") ? "webm" : "mp3";
+        a.download = `audio-gravado-${new Date().toISOString().replace(/[:.]/g, "-")}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setPending({ blob, blobUrl });
       };
       recorderRef.current = recorder;
       recorder.start();
@@ -136,7 +145,15 @@ export function AudioRecorder({
   function handleFile(file: File | undefined) {
     if (!file) return;
     setError(null);
-    setPending({ blob: file, blobUrl: URL.createObjectURL(file) });
+    const blobUrl = URL.createObjectURL(file);
+    // Garante tambem que o usuario tenha uma copia local do arquivo importado
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = `audio-importado-${new Date().toISOString().replace(/[:.]/g, "-")}-${file.name}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setPending({ blob: file, blobUrl });
     if (fileRef.current) fileRef.current.value = "";
   }
 
