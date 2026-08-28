@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { AudioLines, Mic, Pause, Play, Square, Trash2, Upload } from "lucide-react";
+import { AudioLines, Mic, Pause, Play, Square, Trash2, Upload, CheckCircle2 } from "lucide-react";
 import { api } from "../lib/api";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { cn, resolveImageUrl } from "../lib/utils";
+import { cn } from "../lib/utils";
 
 interface AudioRecorderProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+}
+
+interface PendingAudio {
+  blob: Blob;
+  blobUrl: string;
 }
 
 export function AudioRecorder({
@@ -21,6 +26,7 @@ export function AudioRecorder({
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [pending, setPending] = useState<PendingAudio | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -30,7 +36,9 @@ export function AudioRecorder({
   useEffect(() => {
     return () => {
       stopStream();
+      if (pending?.blobUrl) URL.revokeObjectURL(pending.blobUrl);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function stopStream() {
@@ -52,12 +60,13 @@ export function AudioRecorder({
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
-      recorder.onstop = async () => {
+      recorder.onstop = () => {
         stopStream();
         setRecording(false);
         setPaused(false);
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        await uploadBlob(blob, "gravacao.webm");
+        // Salva LOCAL no dispositivo imediatamente: o áudio não se perde
+        setPending({ blob, blobUrl: URL.createObjectURL(blob) });
       };
       recorderRef.current = recorder;
       recorder.start();
@@ -94,48 +103,41 @@ export function AudioRecorder({
     r.stop();
   }
 
-  async function uploadBlob(blob: Blob, name: string) {
+  /** Sobe o áudio pendente para o servidor e só então persiste a URL no formulário */
+  async function uploadPending() {
+    if (!pending) return;
     setUploading(true);
     setError(null);
     try {
       const form = new FormData();
-      form.append("image", blob, name);
+      form.append("image", pending.blob, "gravacao.webm");
       const res = await api<{ data: { url: string } }>("/api/uploads", {
         method: "POST",
         body: form,
       });
-      console.log("Audio upload successful:", res.data.url);
       onChange(res.data.url);
+      if (pending.blobUrl) URL.revokeObjectURL(pending.blobUrl);
+      setPending(null);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Falha no upload do áudio";
-      console.error("Audio upload failed:", e);
-      setError(`Erro no upload: ${msg}. Verifique se você está logado e tente novamente.`);
+      setError(`Erro no upload: ${msg}. O áudio continua salvo no dispositivo — tente novamente.`);
     } finally {
       setUploading(false);
     }
   }
 
-  async function handleFile(file: File | undefined) {
-    if (!file) return;
-    setUploading(true);
+  function discardPending() {
+    if (pending?.blobUrl) URL.revokeObjectURL(pending.blobUrl);
+    setPending(null);
     setError(null);
-    try {
-      const form = new FormData();
-      form.append("image", file, file.name);
-      const res = await api<{ data: { url: string } }>("/api/uploads", {
-        method: "POST",
-        body: form,
-      });
-      console.log("Audio file upload successful:", res.data.url);
-      onChange(res.data.url);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Falha no upload do áudio";
-      console.error("Audio file upload failed:", e);
-      setError(`Erro no upload: ${msg}. Verifique se você está logado e tente novamente.`);
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
+  }
+
+  /** Importar arquivo: também fica pendente (local) até o usuário confirmar o upload */
+  function handleFile(file: File | undefined) {
+    if (!file) return;
+    setError(null);
+    setPending({ blob: file, blobUrl: URL.createObjectURL(file) });
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   function format(sec: number) {
@@ -148,12 +150,13 @@ export function AudioRecorder({
     <div className="space-y-3">
       <Label>{label}</Label>
 
-      {value && (
+      {/* Áudio já persistido no formulário */}
+      {value && !pending && (
         <div className="flex items-center gap-3 rounded-xl border border-border bg-muted p-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-700 text-white">
             <AudioLines className="h-5 w-5" />
           </span>
-          <audio controls src={resolveImageUrl(value)} className="h-10 min-w-0 flex-1" preload="metadata" />
+          <audio controls src={value} className="h-10 min-w-0 flex-1" preload="metadata" />
           <Button
             type="button"
             variant="ghost"
@@ -168,9 +171,36 @@ export function AudioRecorder({
         </div>
       )}
 
+      {/* Gravação pendente: salva local, aguarda confirmação de upload */}
+      {pending && (
+        <div className="rounded-xl border border-primary/30 bg-primary-50/40 p-3 dark:bg-primary-950/30 space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-700 text-white">
+              <AudioLines className="h-5 w-5" />
+            </span>
+            <audio controls src={pending.blobUrl} className="h-10 min-w-0 flex-1" preload="metadata" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Áudio gravado e salvo no dispositivo. Clique em <strong>Enviar e usar</strong> para disponibilizá-lo na caixa de áudios.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" size="sm" onClick={uploadPending} disabled={uploading}>
+              {uploading ? (
+                <span className="flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" /> Enviando...</span>
+              ) : (
+                <><Upload className="h-3.5 w-3.5" /> Enviar e usar</>
+              )}
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={discardPending} disabled={uploading}>
+              <Trash2 className="h-3.5 w-3.5" /> Descartar
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         {!recording && !paused ? (
-          <Button type="button" variant="outline" size="sm" onClick={startRecording} disabled={uploading}>
+          <Button type="button" variant="outline" size="sm" onClick={startRecording} disabled={uploading || !!pending}>
             <Mic className="h-3.5 w-3.5" /> Gravar
           </Button>
         ) : (
@@ -189,7 +219,7 @@ export function AudioRecorder({
           variant="outline"
           size="sm"
           onClick={() => fileRef.current?.click()}
-          disabled={uploading}
+          disabled={uploading || !!pending}
         >
           <Upload className="h-3.5 w-3.5" /> Importar arquivo
         </Button>
@@ -207,9 +237,9 @@ export function AudioRecorder({
           )}
         >
           {recording && <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />}
-          {recording && !paused ? `Gravando ${format(elapsed)}` : paused ? `Pausado ${format(elapsed)}` : "Sem áudio"}
+          {recording && !paused ? `Gravando ${format(elapsed)}` : paused ? `Pausado ${format(elapsed)}` : pending ? "No dispositivo" : "Sem áudio"}
         </span>
-        {uploading && <span className="text-xs text-muted-foreground">Enviando...</span>}
+        {value && <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden />}
       </div>
 
       {error && (
